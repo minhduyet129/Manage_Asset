@@ -29,7 +29,7 @@ namespace RookieOnlineAssetManagement
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<User>(options =>
+            services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
             })
@@ -50,7 +50,9 @@ namespace RookieOnlineAssetManagement
                 };
             });
 
-            services.AddControllersWithViews();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
             services.AddRazorPages();
 
             // In production, the React files will be served from this directory

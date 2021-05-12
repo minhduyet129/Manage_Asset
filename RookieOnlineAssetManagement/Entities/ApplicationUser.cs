@@ -1,14 +1,13 @@
-﻿using RookieOnlineAssetManagement.Enums;
+﻿using Microsoft.AspNetCore.Identity;
+using RookieOnlineAssetManagement.Enums;
 using System;
+using System.Collections.Generic;
 
-namespace RookieOnlineAssetManagement.Models
+namespace RookieOnlineAssetManagement.Entities
 {
-    public class UserModel
+    public class ApplicationUser : IdentityUser<int>
     {
-        //commit moi hehe
-        public string Id { get; set; }
         public string StaffCode { get; set; }
-        public string UserName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DoB { get; set; }
@@ -16,5 +15,8 @@ namespace RookieOnlineAssetManagement.Models
         public Gender Gender { get; set; }
         public Role Role { get; set; }
         public string Location { get; set; }
+
+        public ICollection<ReturnRequest> ReturnRequests { get; set; }
+        public ICollection<UsersOfAssignment> UsersOfAssignments { get; set; }
     }
 }
