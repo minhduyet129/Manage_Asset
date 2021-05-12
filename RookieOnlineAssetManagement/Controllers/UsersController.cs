@@ -25,16 +25,15 @@ namespace RookieOnlineAssetManagement.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserModel>>> Get()
-        {
-            _logger.LogInformation("Getting all products");
-            return Ok(await _dbContext.Users.Select(x => new UserModel
-            {
-                Id = x.Id,
-                UserName = x.UserName,
-                Email = x.Email
-            }).ToListAsync());
-        }
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<UserModel>>> Get()
+        //{
+        //    _logger.LogInformation("Getting all products");
+        //    return Ok(await _dbContext.Users.Select(x => new UserModel
+        //    {
+        //        Id = int.Parse(x.Id),
+        //        UserName = x.UserName
+        //    }).ToListAsync());
+        //}
     }
 }
