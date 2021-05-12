@@ -8,6 +8,7 @@ namespace RookieOnlineAssetManagement.Enums
     public enum AssignmentState
     {
         Waiting,
-        Accepted
+        Accepted,
+        Declined
     }
 }
