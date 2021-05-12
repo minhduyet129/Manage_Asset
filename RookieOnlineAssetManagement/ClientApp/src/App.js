@@ -1,40 +1,30 @@
-import axios from 'axios';
-
-import logo from './logo.svg';
-import './App.css';
-
-axios.interceptors.request.use(config => {
-    return config;
-});
-axios.interceptors.response.use(response => {
-    return response;
-}, error => {
-    if (401 === error.response.status) {
-        window.location.href = "/Identity/Account/Login?returnUrl=" + window.location.pathname;
-    } else {
-        return Promise.reject(error);
-    }
-});
-
-axios.get("/api/users").then(response => console.table(response.data));
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Asset from './admin/pages/asset/Asset';
+import Report from './admin/pages/report/Report';
+import RequestForReturning from './admin/pages/request/RequestForReturning';
+import Home from './admin/pages/Home';
+import User from './admin/pages/user/User';
+import AssetManagement from './admin/pages/asset/AssetManagement';
+import Login from './login/Login';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Router>
+        <Switch>
+          <Route path='/admin' exact component={AssetManagement} />
+          <Route path='/admin/home' component={Home} />
+          <Route path='/admin/users' component={User} />
+          <Route path='/admin/assets' component={Asset} />
+          <Route path='/admin/assignments' component={AssetManagement} />
+          <Route
+            path='/admin/requests-for-returning'
+            component={RequestForReturning}
+          />
+          <Route path='/admin/reports' component={Report} />
+          <Route path='/admin/login' component={Login} />
+        </Switch>
+      </Router>
     </div>
   );
 }
