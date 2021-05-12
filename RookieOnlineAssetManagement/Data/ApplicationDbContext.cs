@@ -22,6 +22,7 @@ namespace RookieOnlineAssetManagement.Data
         {
             base.OnModelCreating(builder);
 
+           
         }
     }
 }

@@ -15,8 +15,8 @@ namespace RookieOnlineAssetManagement.Entities
         public Gender Gender { get; set; }
         public Role Role { get; set; }
         public string Location { get; set; }
-        public ICollection<Assignment> Assignments { get; set; }
-        public ICollection<Assignment> AssignmentAdmins { get; set; }
+
         public ICollection<ReturnRequest> ReturnRequests { get; set; }
+        public ICollection<UsersOfAssignment> UsersOfAssignments { get; set; }
     }
 }
