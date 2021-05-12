@@ -9,7 +9,7 @@ function LayoutAdmin({ children }) {
   const showSidebar = () => setSidebar(!sidebar);
 
   return (
-    <div className='container'>
+      <div className='container'>
       {/* Start Layout */}
       <nav className={sidebar ? 'nav active' : 'nav'}>
         {/* Render each item of the side bar */}
@@ -27,9 +27,10 @@ function LayoutAdmin({ children }) {
             );
           })}
         </ul>
+        
       </nav>
       {/* End Layout */}
-
+      
       <main className={sidebar ? 'main active' : 'main'}>
         <div className='topbar'>
           <div class='toggle' onClick={showSidebar}>
@@ -50,7 +51,12 @@ function LayoutAdmin({ children }) {
         {/* The rest of the page */}
         {children}
       </main>
+
     </div>
+
+
+    
+    
   );
 }
 
