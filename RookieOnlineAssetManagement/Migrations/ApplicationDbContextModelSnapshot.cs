@@ -289,6 +289,12 @@ namespace RookieOnlineAssetManagement.Migrations
                     b.Property<int>("AssetId")
                         .HasColumnType("int");
 
+                    b.Property<int>("AssignById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AssignToId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("AssignedDate")
                         .HasColumnType("datetime2");
 
@@ -301,6 +307,10 @@ namespace RookieOnlineAssetManagement.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssetId");
+
+                    b.HasIndex("AssignById");
+
+                    b.HasIndex("AssignToId");
 
                     b.ToTable("Assignments");
                 });
@@ -350,28 +360,6 @@ namespace RookieOnlineAssetManagement.Migrations
                         .IsUnique();
 
                     b.ToTable("ReturnRequests");
-                });
-
-            modelBuilder.Entity("RookieOnlineAssetManagement.Entities.UsersOfAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ApplicationUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AssignmentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("AssignmentId");
-
-                    b.ToTable("UsersOfAssignment");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -444,7 +432,23 @@ namespace RookieOnlineAssetManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationUser", "AssignBy")
+                        .WithMany("AssignmentsBy")
+                        .HasForeignKey("AssignById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationUser", "AssignTo")
+                        .WithMany("AssignmentsTo")
+                        .HasForeignKey("AssignToId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Asset");
+
+                    b.Navigation("AssignBy");
+
+                    b.Navigation("AssignTo");
                 });
 
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.ReturnRequest", b =>
@@ -466,30 +470,13 @@ namespace RookieOnlineAssetManagement.Migrations
                     b.Navigation("Assignment");
                 });
 
-            modelBuilder.Entity("RookieOnlineAssetManagement.Entities.UsersOfAssignment", b =>
-                {
-                    b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany("UsersOfAssignments")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RookieOnlineAssetManagement.Entities.Assignment", "Assignment")
-                        .WithMany("UsersOfAssignments")
-                        .HasForeignKey("AssignmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Assignment");
-                });
-
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.ApplicationUser", b =>
                 {
-                    b.Navigation("ReturnRequests");
+                    b.Navigation("AssignmentsBy");
 
-                    b.Navigation("UsersOfAssignments");
+                    b.Navigation("AssignmentsTo");
+
+                    b.Navigation("ReturnRequests");
                 });
 
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.Asset", b =>
@@ -500,8 +487,6 @@ namespace RookieOnlineAssetManagement.Migrations
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.Assignment", b =>
                 {
                     b.Navigation("ReturnRequest");
-
-                    b.Navigation("UsersOfAssignments");
                 });
 
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.Category", b =>
