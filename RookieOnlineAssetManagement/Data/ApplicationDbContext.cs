@@ -35,6 +35,7 @@ namespace RookieOnlineAssetManagement.Data
                  .HasForeignKey(a => a.AssignToId)
                  .OnDelete(DeleteBehavior.Restrict)
                  .IsRequired();
+
         }
     }
 }

@@ -14,6 +14,7 @@ namespace RookieOnlineAssetManagement.Entities
         public DateTime JoinedDate { get; set; }
         public Gender Gender { get; set; }
         public string Location { get; set; }
+        public string Password { get; set; }
 
         public ICollection<ReturnRequest> ReturnRequests { get; set; }
         public ICollection<Assignment> AssignmentsTo { get; set; }
