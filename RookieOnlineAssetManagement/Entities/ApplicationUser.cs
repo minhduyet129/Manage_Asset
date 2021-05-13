@@ -13,10 +13,10 @@ namespace RookieOnlineAssetManagement.Entities
         public DateTime DoB { get; set; }
         public DateTime JoinedDate { get; set; }
         public Gender Gender { get; set; }
-        public Role Role { get; set; }
         public string Location { get; set; }
 
         public ICollection<ReturnRequest> ReturnRequests { get; set; }
-        public ICollection<UsersOfAssignment> UsersOfAssignments { get; set; }
+        public ICollection<Assignment> AssignmentsTo { get; set; }
+        public ICollection<Assignment> AssignmentsBy { get; set; }
     }
 }

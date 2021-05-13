@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace RookieOnlineAssetManagement.Migrations
 {
-    public partial class createDatabase : Migration
+    public partial class initialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -183,11 +183,11 @@ namespace RookieOnlineAssetManagement.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AssetCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AssetName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     Specification = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InstalledDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,14 +206,28 @@ namespace RookieOnlineAssetManagement.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AssetId = table.Column<int>(type: "int", nullable: false),
                     AssignedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AssetId = table.Column<int>(type: "int", nullable: false),
+                    AssignById = table.Column<int>(type: "int", nullable: false),
+                    AssignToId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Assignments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Assignments_AspNetUsers_AssignById",
+                        column: x => x.AssignById,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Assignments_AspNetUsers_AssignToId",
+                        column: x => x.AssignToId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Assignments_Assets_AssetId",
                         column: x => x.AssetId,
@@ -229,9 +243,9 @@ namespace RookieOnlineAssetManagement.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AssignedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
                     ReturnedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
                     AssignmentId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -245,32 +259,6 @@ namespace RookieOnlineAssetManagement.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ReturnRequests_Assignments_AssignmentId",
-                        column: x => x.AssignmentId,
-                        principalTable: "Assignments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UsersOfAssignment",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    AssignmentId = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UsersOfAssignment", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UsersOfAssignment_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UsersOfAssignment_Assignments_AssignmentId",
                         column: x => x.AssignmentId,
                         principalTable: "Assignments",
                         principalColumn: "Id",
@@ -327,6 +315,16 @@ namespace RookieOnlineAssetManagement.Migrations
                 column: "AssetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Assignments_AssignById",
+                table: "Assignments",
+                column: "AssignById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Assignments_AssignToId",
+                table: "Assignments",
+                column: "AssignToId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ReturnRequests_ApplicationUserId",
                 table: "ReturnRequests",
                 column: "ApplicationUserId");
@@ -336,16 +334,6 @@ namespace RookieOnlineAssetManagement.Migrations
                 table: "ReturnRequests",
                 column: "AssignmentId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UsersOfAssignment_ApplicationUserId",
-                table: "UsersOfAssignment",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UsersOfAssignment_AssignmentId",
-                table: "UsersOfAssignment",
-                column: "AssignmentId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -369,16 +357,13 @@ namespace RookieOnlineAssetManagement.Migrations
                 name: "ReturnRequests");
 
             migrationBuilder.DropTable(
-                name: "UsersOfAssignment");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Assignments");
 
             migrationBuilder.DropTable(
-                name: "Assignments");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Assets");

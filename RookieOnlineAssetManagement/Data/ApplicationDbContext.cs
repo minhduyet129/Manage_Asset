@@ -22,7 +22,19 @@ namespace RookieOnlineAssetManagement.Data
         {
             base.OnModelCreating(builder);
 
-           
+            builder.Entity<Assignment>()
+                 .HasOne(a => a.AssignBy)
+                 .WithMany(u => u.AssignmentsBy)
+                 .HasForeignKey(a => a.AssignById)
+                 .OnDelete(DeleteBehavior.Restrict)
+                 .IsRequired();
+
+            builder.Entity<Assignment>()
+                 .HasOne(a => a.AssignTo)
+                 .WithMany(u => u.AssignmentsTo)
+                 .HasForeignKey(a => a.AssignToId)
+                 .OnDelete(DeleteBehavior.Restrict)
+                 .IsRequired();
         }
     }
 }
