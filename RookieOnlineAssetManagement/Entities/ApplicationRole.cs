@@ -8,6 +8,5 @@ namespace RookieOnlineAssetManagement.Entities
 {
     public class ApplicationRole : IdentityRole<int>
     {
-
     }
 }
