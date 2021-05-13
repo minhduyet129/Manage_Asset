@@ -1,10 +1,10 @@
 export const COLUMNS = [
     {
-        Headers:'Id',
+        Header:'Id',
         accessor: 'id'
     },
     {
-        Headers:'Name',
+        Header:'Name',
         accessor: 'name'
     },
 ]
