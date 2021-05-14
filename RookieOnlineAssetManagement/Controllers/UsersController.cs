@@ -118,18 +118,30 @@ namespace RookieOnlineAssetManagement.Controllers
             return BadRequest();
         }
 
-        //[HttpGet]
-        //public IActionResult GetListUser()
-        //{
-        //    var user = _dbContext.Users.Include()
+        [HttpGet()]
+        public async Task<ActionResult> GetListUser(string location)
+        {
+            var users = await _dbContext.Users.Where(u => u.Location == location).ToListAsync();
 
-        //    if (user != null)
-        //    {
-        //        return Ok(user);
-        //    }
+            var result = new List<UserModel>();
 
-        //    return BadRequest();
-        //}
+            foreach(var user in users)
+            {
+                result.Add(new UserModel
+                {
+                    Id = user.Id,
+                    StaffCode = user.StaffCode,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Gender = user.Gender,
+                    DoB = user.DoB,
+                    JoinedDate = user.JoinedDate,
+                    Location = user.Location
+                });
+            } 
+
+            return Ok(result);
+        }
 
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserModel model)
