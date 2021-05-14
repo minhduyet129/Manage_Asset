@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
@@ -19,14 +21,20 @@ namespace RookieOnlineAssetManagement.Controllers
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public UsersController(ApplicationDbContext dbContext)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        private readonly RoleManager<ApplicationRole> _roleManager;
+
+        public UsersController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public string AutoGenerateUserName(string firstName, string lastName)
         {
-            string userName = firstName.ToLower();
+            string userName = firstName;
             var parts = lastName.Split(" ").ToList();
 
             foreach (var part in parts)
@@ -110,6 +118,19 @@ namespace RookieOnlineAssetManagement.Controllers
             return BadRequest();
         }
 
+        //[HttpGet]
+        //public IActionResult GetListUser()
+        //{
+        //    var user = _dbContext.Users.Include()
+
+        //    if (user != null)
+        //    {
+        //        return Ok(user);
+        //    }
+
+        //    return BadRequest();
+        //}
+
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserModel model)
         {
@@ -132,19 +153,25 @@ namespace RookieOnlineAssetManagement.Controllers
                 Gender = model.Gender,
                 Location = model.Location,
                 UserName = userName,
-                Password = password,
+                Password = password
             };
 
-            var result = await _dbContext.Users.AddAsync(user);
-            _dbContext.SaveChanges();
+            var result = await _userManager.CreateAsync(user, password);
 
-            var staffCode = AutoGenerateStaffCode(result.Entity.Id);
+            if (!await _roleManager.RoleExistsAsync(RoleName.User))
+            {
+                await _roleManager.CreateAsync(new ApplicationRole(RoleName.User));
+            }
+            await _userManager.AddToRoleAsync(user, RoleName.User);
 
-            var currentUser = _dbContext.Users.SingleOrDefault(x => x.Id == result.Entity.Id);
+            var staffCode = AutoGenerateStaffCode(user.Id);
+
+            var currentUser = _dbContext.Users.Find(user.Id);
 
             currentUser.StaffCode = staffCode;
             _dbContext.Users.Update(currentUser);
             _dbContext.SaveChanges();
+
             return StatusCode(userValidation.StatusCode, userValidation);
         }
 

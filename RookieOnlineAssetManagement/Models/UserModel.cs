@@ -1,4 +1,5 @@
-﻿using RookieOnlineAssetManagement.Enums;
+﻿using RookieOnlineAssetManagement.Entities;
+using RookieOnlineAssetManagement.Enums;
 using System;
 
 namespace RookieOnlineAssetManagement.Models

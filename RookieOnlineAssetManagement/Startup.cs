@@ -30,10 +30,7 @@ namespace RookieOnlineAssetManagement
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = false;
-            })
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
