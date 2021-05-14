@@ -4,7 +4,19 @@ export const COLUMNS = [
         accessor: 'id'
     },
     {
-        Header:'Name',
-        accessor: 'name'
+        Header:'FullName',
+        accessor: 'fullname'
+    },
+    {
+        Header:'Username',
+        accessor: 'username'
+    },
+    {
+        Header:'Joined Date',
+        accessor: 'joined_date'
+    },
+    {
+        Header:'Type',
+        accessor: 'type'
     },
 ]
