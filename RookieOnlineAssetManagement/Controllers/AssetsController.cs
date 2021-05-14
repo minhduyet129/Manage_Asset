@@ -49,9 +49,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 {
                     return assetcode;
                    
-                }
-                        
-                
+                } 
             }
             assetcode = "";
             return assetcode;
