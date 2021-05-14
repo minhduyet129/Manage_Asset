@@ -6,6 +6,8 @@ import Home from './admin/pages/Home';
 import User from './admin/pages/user/User';
 import AssetManagement from './admin/pages/asset/AssetManagement';
 import Login from './login/Login';
+import AddUsersTable from './admin/pages/user/AddUsersTable';
+import "react-datepicker/dist/react-datepicker.css";
 
 function App() {
   return (
@@ -15,12 +17,14 @@ function App() {
           <Route path='/admin' exact component={AssetManagement} />
           <Route path='/admin/home' component={Home} />
           <Route path='/admin/users' component={User} />
+          <Route path='/addusers' component={AddUsersTable} />
           <Route path='/admin/assets' component={Asset} />
           <Route path='/admin/assignments' component={AssetManagement} />
           <Route
             path='/admin/requests-for-returning'
             component={RequestForReturning}
           />
+          
           <Route path='/admin/reports' component={Report} />
           <Route path='/admin/login' component={Login} />
         </Switch>
