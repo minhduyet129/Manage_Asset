@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
+using RookieOnlineAssetManagement.Enums;
+using RookieOnlineAssetManagement.Filter;
+using RookieOnlineAssetManagement.Helper;
 using RookieOnlineAssetManagement.Models;
 using RookieOnlineAssetManagement.Responses;
 using System;
@@ -65,7 +68,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return password;
         }
 
-        private UserResponse UserValidation(UserModel model)
+        private Response<UserResponseModel> UserValidation(UserModel model)
         {
             var error = new List<object> { };
             int statusCode = 0;
@@ -89,61 +92,90 @@ namespace RookieOnlineAssetManagement.Controllers
                 error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
             }
 
-            if (error.Count() == 0)
-            {
-                statusCode = 201;
-                message = "Created user successfully";
-            }
             else message = "Created fail";
 
-            var response = new UserResponse
+            var response = new Response<UserResponseModel>
             {
-                StatusCode = statusCode,
-                Error = error,
-                Message = message
+                Data = null,
+                Errors = error,
+                Message = message,
+                StatusCode = statusCode
             };
             return response;
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetUser(int id)
+        private string GetGender(Gender gender)
         {
-            var user = _dbContext.Users.SingleOrDefault(x => x.Id == id);
-
-            if (user != null)
+            if (gender == Gender.Female)
             {
-                return Ok(user);
+                return "Female";
             }
-
-            return BadRequest();
+            return "Male";
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> GetListUser(string location)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var user = await _dbContext.Users.Where(a => a.Id == id).FirstOrDefaultAsync();
+
+            if (user == null) return BadRequest();
+
+            var result = new UserResponseModel
+            {
+                Id = user.Id,
+                StaffCode = user.StaffCode,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Gender = GetGender(user.Gender),
+                DoB = user.DoB,
+                JoinedDate = user.JoinedDate,
+                Location = user.Location
+            };
+
+            return Ok(new Response<UserResponseModel>
+            {
+                Data = result,
+                StatusCode = 200,
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter)
         {
             var users = await _dbContext.Users.Where(u => u.Location == location).ToListAsync();
 
-            var result = new List<UserModel>();
+            if (users == null) return BadRequest();
+
+            var result = new List<UserResponseModel>();
 
             foreach (var user in users)
             {
-                result.Add(new UserModel
+                result.Add(new UserResponseModel
                 {
                     Id = user.Id,
                     StaffCode = user.StaffCode,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Gender = user.Gender,
+                    Gender = GetGender(user.Gender),
                     DoB = user.DoB,
                     JoinedDate = user.JoinedDate,
                     Location = user.Location
                 });
             }
 
-            return Ok(result);
+            var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+
+            var pagedData = result
+                .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
+                .Take(validFilter.PageSize).ToList();
+
+            var totalRecords = await _dbContext.Users.CountAsync();
+            var pagedReponse = PaginationHelper.CreatePagedReponse<UserResponseModel>(pagedData, validFilter, totalRecords, 200);
+
+            return Ok(pagedReponse);
         }
 
-        [HttpPost("")]
+        [HttpPost]
         public async Task<IActionResult> CreateUser(UserModel model)
         {
             string userName = AutoGenerateUserName(model.FirstName, model.LastName);
@@ -169,6 +201,8 @@ namespace RookieOnlineAssetManagement.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, password);
+
+            if (result == null) return BadRequest("Something was wrong");
 
             if (!await _roleManager.RoleExistsAsync(RoleName.User))
             {
