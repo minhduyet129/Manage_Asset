@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo,useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { COLUMNS } from './columns';
-import {UsersTable} from './UsersTable'
+import { UsersTable } from './UsersTable';
 
 function User() {
   //option 1(Usequery to call api)
@@ -18,7 +18,6 @@ function User() {
   // option 2(Useeffect to call api)
   const [users, setUser] = useState([]);
 
-
   useEffect(() => {
     (async () => {
       axios
@@ -26,20 +25,14 @@ function User() {
         .then((res) => res.data)
         .then((data) => {
           setUser(data);
-        })
+        });
     })();
   }, []);
 
-  
-
-  const data = React.useMemo(
-    () => users,
-    [users]
-  )
+  const data = React.useMemo(() => users, [users]);
 
   const columns = React.useMemo(() => COLUMNS, []);
 
-  
   // const getUsers = useQuery('users', () =>
   //   axios.get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
   // );
@@ -74,7 +67,7 @@ function User() {
 
   return (
     <LayoutAdmin>
-      <UsersTable columns={columns} data={data}/>
+      <UsersTable columns={columns} data={data} />
     </LayoutAdmin>
   );
 }

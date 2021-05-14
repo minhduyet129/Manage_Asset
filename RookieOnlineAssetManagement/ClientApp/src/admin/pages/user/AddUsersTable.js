@@ -29,9 +29,8 @@ let history = useHistory();
     formState: { errors },
   } = useForm();
   const onSubmit = async (data) => {
-    console.log(data);
-    await handleUsers(data);
     alert('Add successfully!')
+    await handleUsers(data);
     history.push("/admin/users")
      
   };
