@@ -32,7 +32,7 @@ namespace RookieOnlineAssetManagement.Controllers
             _roleManager = roleManager;
         }
 
-        public string AutoGenerateUserName(string firstName, string lastName)
+        private string AutoGenerateUserName(string firstName, string lastName)
         {
             string userName = firstName;
             var parts = lastName.Split(" ").ToList();
@@ -52,20 +52,20 @@ namespace RookieOnlineAssetManagement.Controllers
             return userName;
         }
 
-        public string AutoGenerateStaffCode(int id)
+        private string AutoGenerateStaffCode(int id)
         {
             var code = "SD" + id.ToString("d4");
             return code;
         }
 
-        public string AutoGeneratePassword(string userName, DateTime dob)
+        private string AutoGeneratePassword(string userName, DateTime dob)
         {
             string dateTime = dob.ToString("ddMMyyyy");
             string password = userName + "@" + dateTime;
             return password;
         }
 
-        public UserResponse UserValidation(UserModel model)
+        private UserResponse UserValidation(UserModel model)
         {
             var error = new List<object> { };
             int statusCode = 0;
@@ -118,14 +118,14 @@ namespace RookieOnlineAssetManagement.Controllers
             return BadRequest();
         }
 
-        [HttpGet()]
-        public async Task<ActionResult> GetListUser(string location)
+        [HttpGet("")]
+        public async Task<IActionResult> GetListUser(string location)
         {
             var users = await _dbContext.Users.Where(u => u.Location == location).ToListAsync();
 
             var result = new List<UserModel>();
 
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 result.Add(new UserModel
                 {
@@ -138,12 +138,12 @@ namespace RookieOnlineAssetManagement.Controllers
                     JoinedDate = user.JoinedDate,
                     Location = user.Location
                 });
-            } 
+            }
 
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpPost("")]
         public async Task<IActionResult> CreateUser(UserModel model)
         {
             string userName = AutoGenerateUserName(model.FirstName, model.LastName);
@@ -154,7 +154,7 @@ namespace RookieOnlineAssetManagement.Controllers
             if (userValidation.StatusCode == 422)
             {
                 return StatusCode(422, userValidation);
-            }    
+            }
 
             var user = new ApplicationUser
             {
@@ -185,12 +185,6 @@ namespace RookieOnlineAssetManagement.Controllers
             _dbContext.SaveChanges();
 
             return StatusCode(userValidation.StatusCode, userValidation);
-        }
-
-        [HttpPost("test")]
-        public IActionResult Test(UserModel model)
-        {
-            return Ok(UserValidation(model));
         }
     }
 }
