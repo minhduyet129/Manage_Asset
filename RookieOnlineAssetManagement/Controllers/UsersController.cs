@@ -50,7 +50,7 @@ namespace RookieOnlineAssetManagement.Controllers
             if (count > 0)
             {
                 userName += count.ToString();
-            }    
+            }
 
             return userName;
         }
@@ -74,25 +74,34 @@ namespace RookieOnlineAssetManagement.Controllers
             int statusCode = 0;
             string message = null;
 
-            if (DateTime.Now.Year - model.DoB.Year < 18)
+            if (DateTime.Now.ToString() == "")
+            {
+                statusCode = 422;
+                error.Add(new { joinedDate = "The field is required" });
+            }    
+            else if (DateTime.Now.Year - model.DoB.Year < 18)
             {
                 statusCode = 422;
                 error.Add(new { doB = "User is under 18. Please select a different date" });
             }
 
-            if (model.DoB.Year - model.JoinedDate.Year > 0)
+            if (model.JoinedDate.ToString() == "")
+            {
+                statusCode = 422;
+                error.Add(new { joinedDate = "The field is required" });
+            }    
+            else if (model.DoB.Year - model.JoinedDate.Year > 0)
             {
                 statusCode = 422;
                 error.Add(new { joinedDate = "Joined date is not later than Date of Birth. Please select a different date" });
-            }
-
-            if (model.JoinedDate.DayOfWeek == DayOfWeek.Saturday || model.JoinedDate.DayOfWeek == DayOfWeek.Sunday)
+            } 
+            else if (model.JoinedDate.DayOfWeek == DayOfWeek.Saturday || model.JoinedDate.DayOfWeek == DayOfWeek.Sunday)
             {
                 statusCode = 422;
                 error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
             }
 
-            else message = "Created fail";
+            else message = "Invalid information";
 
             var response = new Response<UserResponseModel>
             {
@@ -159,7 +168,8 @@ namespace RookieOnlineAssetManagement.Controllers
                     Gender = GetGender(user.Gender),
                     DoB = user.DoB,
                     JoinedDate = user.JoinedDate,
-                    Location = user.Location
+                    Location = user.Location,
+                    UserName = user.UserName
                 });
             }
 
@@ -220,5 +230,31 @@ namespace RookieOnlineAssetManagement.Controllers
 
             return StatusCode(userValidation.StatusCode, userValidation);
         }
+
+        [HttpPut("{id}")]
+        public IActionResult EditUser(int id, UpdateUserModel model)
+        {
+            var user = _dbContext.Users.SingleOrDefault(u => u.Id == id);
+
+            if (user == null) return BadRequest("Cannot find this user!");
+
+            //var userValidation = UserValidation(model);
+
+            //if (userValidation.StatusCode == 422)
+            //{
+            //    return StatusCode(422, userValidation);
+            //}
+
+            user.DoB = model.DoB;
+            user.JoinedDate = model.JoinedDate;
+            user.Gender = model.Gender;
+
+            _dbContext.Users.Update(user);
+            _dbContext.SaveChanges();
+
+            return StatusCode(200);
+        }
+
+
     }
 }
