@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
 using System.Threading.Tasks;
@@ -29,12 +31,14 @@ namespace RookieOnlineAssetManagement
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<User>(options =>
-            {
-                options.SignIn.RequireConfirmedAccount = false;
-            })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
             services.ConfigureApplicationCookie(options =>
             {
                 options.Events.OnRedirectToLogin = (context) =>
@@ -50,7 +54,7 @@ namespace RookieOnlineAssetManagement
                 };
             });
 
-            services.AddControllersWithViews();
+            services.AddControllers();
             services.AddRazorPages();
 
             // In production, the React files will be served from this directory
@@ -79,6 +83,11 @@ namespace RookieOnlineAssetManagement
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
