@@ -10,8 +10,8 @@ using RookieOnlineAssetManagement.Data;
 namespace RookieOnlineAssetManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210513025638_initialMigration")]
-    partial class initialMigration
+    [Migration("20210513032637_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -216,9 +216,6 @@ namespace RookieOnlineAssetManagement.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");

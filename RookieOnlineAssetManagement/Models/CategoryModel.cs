@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RookieOnlineAssetManagement.Entities
+namespace RookieOnlineAssetManagement.Models
 {
-    public class Category
+    public class CategoryModel
     {
-        public int Id { get; set; }
         public string CategoryCode { get; set; }
         public string Name { get; set; }
-
-        public ICollection<Asset> Assets { get; set; }
     }
 }
