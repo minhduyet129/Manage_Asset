@@ -157,38 +157,30 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter)
         {
-            var users = await _dbContext.Users.Where(u => u.Location == location).ToListAsync();
+            var queryable = !string.IsNullOrEmpty(location)
+                ? _dbContext.Users.Where(u => u.Location == location)
+                : _dbContext.Users;
+            var count = await queryable.CountAsync();
+            var data = await queryable
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
 
-            if (users == null) return BadRequest();
-
-            var result = new List<UserResponseModel>();
-
-            foreach (var user in users)
+            var result = data.Select(user => new UserResponseModel
             {
-                result.Add(new UserResponseModel
-                {
-                    Id = user.Id,
-                    StaffCode = user.StaffCode,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Gender = GetGender(user.Gender),
-                    DoB = user.DoB,
-                    JoinedDate = user.JoinedDate,
-                    Location = user.Location,
-                    UserName = user.UserName
-                });
-            }
+                Id = user.Id,
+                StaffCode = user.StaffCode,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Gender = GetGender(user.Gender),
+                DoB = user.DoB,
+                JoinedDate = user.JoinedDate,
+                Location = user.Location,
+                UserName = user.UserName
+            }).ToList();
 
-            var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
-
-            var pagedData = result
-                .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
-                .Take(validFilter.PageSize).ToList();
-
-            var totalRecords = await _dbContext.Users.CountAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<UserResponseModel>(pagedData, validFilter, totalRecords, 200);
-
-            return Ok(pagedReponse);
+            var response = PaginationHelper.CreatePagedResponse(result, filter.PageNumber, filter.PageSize, count, (int)HttpStatusCode.OK);
+            return Ok(response);
         }
 
         [HttpPost]
