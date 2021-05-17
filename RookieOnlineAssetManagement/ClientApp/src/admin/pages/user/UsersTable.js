@@ -40,7 +40,7 @@ export const UsersTable = ({columns, data}) => {
             ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {page &&
+          {
             page.map((row) => {
               prepareRow(row);
               return (

@@ -6,32 +6,38 @@ import { COLUMNS } from './columns';
 import { UsersTable } from './UsersTable';
 
 function User() {
-  //option 1(Usequery to call api)
-  // const getUsers = useQuery('users', () =>
-  //   axios.get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
-  // );
-  // const data = React.useMemo(
-  //   () => getUsers?.data?.data || [],
-  //   [getUsers?.data?.data]
-  // );
+  // option 1(Usequery to call api)
+  const getUsers = useQuery('users', () =>
+    axios.get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
+  );
+  const data = React.useMemo(
+    () => getUsers?.data?.data || [],
+    [getUsers?.data?.data]
+  );
 
   // option 2(Useeffect to call api)
-  const [users, setUser] = useState([]);
+  // const [users, setUser] = useState([]);
 
-  useEffect(() => {
-    (async () => {
-      axios
-        .get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
-        .then((res) => res.data)
-        .then((data) => {
-          setUser(data);
-        });
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     axios
+  //       .get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
+  //       .then((res) => res.data)
+  //       .then((data) => {
+  //         setUser(data);
+  //       });
+  //   })();
+  // }, []);
 
-  const data = React.useMemo(() => users, [users]);
+  // console.log(users)
 
-  const columns = React.useMemo(() => COLUMNS, []);
+  
+
+  //  const data = React.useMemo(() => users, [users]);
+
+   const columns = React.useMemo(() => COLUMNS, []);
+
+  
 
   // const getUsers = useQuery('users', () =>
   //   axios.get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
