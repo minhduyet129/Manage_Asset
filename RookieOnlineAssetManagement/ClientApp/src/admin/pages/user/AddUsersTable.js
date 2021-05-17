@@ -10,22 +10,23 @@ function AddUsersTable() {
   const [error, setError] = useState(null);
 
   async function handleUsers(users) {
-    console.log(users);
 
-    try {
-      await axios.post(
+
+    
+      users.gender = users.gender === 0 ? 0 : 1;
+       await axios.post(
         'http://hungbqit-001-site5.itempurl.com/api/Users',
         users
-      );
-      const res = await axios.get(
-        'http://hungbqit-001-site5.itempurl.com/api/Users'
-      );
-      const data = res.data;
-      setUsers(data);
-    } catch (err) {
-      setError(err);
+      ).then(function (response) {
+        console.log(response)
+      })
+      .catch(function (error) {
+        console.log(error.response.data.errors);
+      });
     }
-  }
+      
+
+  
 
   // type FormValues = {
   //   gender: enum;
@@ -38,7 +39,7 @@ function AddUsersTable() {
     formState: { errors },
   } = useForm();
   const onSubmit = async (data) => {
-    alert('Add successfully!');
+    console.log(data);
     await handleUsers(data);
     // history.push('/admin/users');
   };
@@ -48,11 +49,11 @@ function AddUsersTable() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className='container-1'>
             {/* register your input into the hook by invoking the "register" function */}
-            FirstName <input {...register('firstname')} />
+            FirstName <input {...register('firstName')} />
           </div>
           <div className='container-1'>
             {/* include validation with required or other standard HTML validation rules */}
-            LastName <input {...register('username', { required: true })} />
+            LastName <input {...register('lastName', { required: true })} />
           </div>
           <div>
             Date of birth
@@ -85,8 +86,8 @@ function AddUsersTable() {
           <div className='container-1'>
             Gender
             <select {...register('gender')}>
-              <option value={users.gender === 0}>female</option>
-              <option value={users.gender === 1}>male</option>
+              <option value={0}>female</option>
+              <option value={1}>male</option>
             </select>
           </div>
           <div className='container-1'>
