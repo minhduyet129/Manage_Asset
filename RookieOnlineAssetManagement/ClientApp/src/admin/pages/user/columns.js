@@ -1,22 +1,38 @@
 export const COLUMNS = [
     {
+        Header:'Id',
+        accessor: 'id'
+    },
+    {
         Header:'StaffCode',
-        accessor: 'staffcode'
+        accessor: 'staffCode'
     },
     {
         Header:'FirstName',
-        accessor: 'fullname'
+        accessor: 'firstName'
     },
     {
-        Header:'Username',
-        accessor: 'username'
+        Header:'LastName',
+        accessor: 'lastName'
+    },
+    {
+        Header:'Date of Birth',
+        accessor: 'doB'
     },
     {
         Header:'JoinedDate',
-        accessor: 'joined_date'
+        accessor: 'joinedDate'
     },
     {
-        Header:'Type',
-        accessor: 'type'
+        Header:'Gender',
+        accessor: 'gender'
+    },
+    {
+        Header:'Location',
+        accessor: 'location'
+    },
+    {
+        Header:'Username',
+        accessor: 'userName'
     },
 ]

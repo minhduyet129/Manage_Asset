@@ -5,7 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import ReactDatePicker from 'react-datepicker';
 import { useHistory } from 'react-router-dom';
 function AddUsersTable() {
-let history = useHistory();
+  let history = useHistory();
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 
@@ -13,14 +13,23 @@ let history = useHistory();
     console.log(users);
 
     try {
-      await axios.post('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users', users);
-      const res = await axios.get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users');
+      await axios.post(
+        'http://hungbqit-001-site5.itempurl.com/api/Users',
+        users
+      );
+      const res = await axios.get(
+        'http://hungbqit-001-site5.itempurl.com/api/Users'
+      );
       const data = res.data;
       setUsers(data);
     } catch (err) {
       setError(err);
     }
   }
+
+  type FormValues = {
+    gender: enum;
+  };
 
   const {
     register,
@@ -29,10 +38,9 @@ let history = useHistory();
     formState: { errors },
   } = useForm();
   const onSubmit = async (data) => {
-    alert('Add successfully!')
+    alert('Add successfully!');
     await handleUsers(data);
-    history.push("/admin/users")
-     
+    // history.push('/admin/users');
   };
   return (
     <div>
@@ -40,16 +48,17 @@ let history = useHistory();
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className='container-1'>
             {/* register your input into the hook by invoking the "register" function */}
-            FullName <input {...register('fullname')} />
+            FirstName <input {...register('firstname')} />
           </div>
           <div className='container-1'>
             {/* include validation with required or other standard HTML validation rules */}
-            UserName <input {...register('username', { required: true })} />
+            LastName <input {...register('username', { required: true })} />
           </div>
-            JoinDate
+          <div>
+            Date of birth
             <Controller
               control={control}
-              name='ReactDatepicker'
+              name='doB'
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <ReactDatePicker
                   onChange={onChange}
@@ -58,15 +67,40 @@ let history = useHistory();
                 />
               )}
             />
-            <div className='container-1'>
+          </div>
+          <div>
+            JoinedDate
+            <Controller
+              control={control}
+              name='joinedDate'
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <ReactDatePicker
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  selected={value}
+                />
+              )}
+            />
+          </div>
+          <div className='container-1'>
+            Gender
+            <select {...register('gender')}>
+              <option value={users.gender === 0}>female</option>
+              <option value={users.gender === 1}>male</option>
+            </select>
+          </div>
+          <div className='container-1'>
+            {/* register your input into the hook by invoking the "register" function */}
+            Location <input {...register('location')} />
+          </div>
+          <div className='container-1'>
             {/* include validation with required or other standard HTML validation rules */}
-            Type <input {...register('type', { required: true })} />
+            Type <input {...register('userName', { required: true })} />
           </div>
           {/* errors will return when field validation fails  */}
           {errors.exampleRequired && <span>This field is required</span>}
           <div className='container-1'>
-              <input type='submit' />
-            
+            <input type='submit' />
           </div>
         </form>
       </LayoutAdmin>
