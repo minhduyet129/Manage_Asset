@@ -35,10 +35,6 @@ namespace RookieOnlineAssetManagement
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-            });
             services.ConfigureApplicationCookie(options =>
             {
                 options.Events.OnRedirectToLogin = (context) =>
@@ -54,10 +50,25 @@ namespace RookieOnlineAssetManagement
                 };
             });
 
+            // Add CORS policy
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigin", builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowedToAllowWildcardSubdomains();
+                });
+            });
+
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
+
             services.AddRazorPages();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -85,6 +96,9 @@ namespace RookieOnlineAssetManagement
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseCors("AllowAllOrigin");
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
