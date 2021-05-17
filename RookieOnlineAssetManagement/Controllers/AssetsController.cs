@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
 using RookieOnlineAssetManagement.Models;
@@ -18,40 +19,99 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             _context = context;
         }
+        [HttpGet]
+        public IEnumerable<Asset> GetAllCategory()
+        {
+            return _context.Assets.ToList();
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAssetDetail(int id)
+        {
+            var asset = await _context.Assets.SingleOrDefaultAsync(x => x.Id == id);
+            if (asset == null)
+            {
+                return BadRequest();
+            }
+            return Ok(asset);
+        }
         [HttpPost]
         public async Task<IActionResult> CreateAsset(AssetModel asset)
         {
-            var code = AutoRenderAssetCode(asset.CategoryId);
-            if (code == null) return BadRequest("Error!");
+           
             var newasset = new Asset
             {
-                AssetCode=code,
+                AssetCode="",
                 AssetName=asset.AssetName,
                 Specification=asset.Specification,
                 State=asset.State,
                 Location=asset.Location,
-                InstalledDate=asset.InstalledDate
+                InstalledDate=asset.InstalledDate,
+                CategoryId=asset.CategoryId
 
             };
              _context.Assets.Add(newasset);
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
+            var assetcode = AutoRenderAssetCode(newasset.Id, newasset.CategoryId);
+            if (assetcode != null)
+            {
+                var assetupdate = await _context.Assets.FindAsync(newasset.Id);
+                assetupdate.AssetCode = assetcode;
+                await _context.SaveChangesAsync();
+                return Ok(assetupdate);
+
+            }
+            
+
             return Ok(newasset);
         }
-        private string AutoRenderAssetCode(int categoryid)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsset(int id,AssetModel asset)
+        {
+            var assetupdate = _context.Assets.SingleOrDefault(x => x.Id == id);
+            if (assetupdate == null)
+            {
+                return NotFound();
+            }
+            assetupdate.AssetName = asset.AssetName;
+            assetupdate.Specification = asset.Specification;
+            assetupdate.InstalledDate = asset.InstalledDate;
+            assetupdate.State = asset.State;
+            await _context.SaveChangesAsync();
+            return Ok(assetupdate);
+
+        }
+         
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsset(int id)
+        {
+            var asset = _context.Assets.SingleOrDefault(x => x.Id == id);
+            if(asset == null)
+            {
+                return NotFound();
+            }
+            var assignAsset = _context.Assignments.FirstOrDefault(x => x.AssetId == id);
+            if (assignAsset == null)
+            {
+                _context.Assets.Remove(asset);
+                await _context.SaveChangesAsync();
+                return Ok("Successful delete");
+            }
+            return BadRequest("Cannot delete the asset because it belongs to one or more historical assignments");
+        }
+        private string AutoRenderAssetCode(int assetId,int categoryid)
         {
             string assetcode = "";
             var cate = _context.Categories.SingleOrDefault(x => x.Id == categoryid);
-            for(int i = 1; i < 1000000; i++)
-            {
-                 assetcode = cate.CategoryCode + i.ToString("d6");
+            
+                 assetcode = cate.CategoryCode + assetId.ToString("d6");
                 var category = _context.Assets.SingleOrDefault(x => x.AssetCode == assetcode);
                 if (category == null)
                 {
                     return assetcode;
                    
                 } 
-            }
-            assetcode = "";
+            
+            
             return assetcode;
         }
 
