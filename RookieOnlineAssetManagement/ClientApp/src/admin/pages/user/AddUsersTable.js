@@ -27,9 +27,9 @@ function AddUsersTable() {
     }
   }
 
-  type FormValues = {
-    gender: enum;
-  };
+  // type FormValues = {
+  //   gender: enum;
+  // };
 
   const {
     register,
