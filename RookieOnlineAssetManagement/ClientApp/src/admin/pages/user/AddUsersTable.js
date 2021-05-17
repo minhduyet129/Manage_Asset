@@ -25,13 +25,6 @@ function AddUsersTable() {
       });
     }
       
-
-  
-
-  // type FormValues = {
-  //   gender: enum;
-  // };
-
   const {
     register,
     handleSubmit,
