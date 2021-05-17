@@ -21,37 +21,47 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsset(AssetModel asset)
         {
-            var code = AutoRenderAssetCode(asset.CategoryId);
-            if (code == null) return BadRequest("Error!");
+           
             var newasset = new Asset
             {
-                AssetCode=code,
+                AssetCode="",
                 AssetName=asset.AssetName,
                 Specification=asset.Specification,
                 State=asset.State,
                 Location=asset.Location,
-                InstalledDate=asset.InstalledDate
+                InstalledDate=asset.InstalledDate,
+                CategoryId=asset.CategoryId
 
             };
              _context.Assets.Add(newasset);
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
+            var assetcode = AutoRenderAssetCode(newasset.Id, newasset.CategoryId);
+            if (assetcode != null)
+            {
+                var assetupdate = await _context.Assets.FindAsync(newasset.Id);
+                assetupdate.AssetCode = assetcode;
+                await _context.SaveChangesAsync();
+                return Ok(assetupdate);
+
+            }
+            
+
             return Ok(newasset);
         }
-        private string AutoRenderAssetCode(int categoryid)
+        private string AutoRenderAssetCode(int assetId,int categoryid)
         {
             string assetcode = "";
             var cate = _context.Categories.SingleOrDefault(x => x.Id == categoryid);
-            for(int i = 1; i < 1000000; i++)
-            {
-                 assetcode = cate.CategoryCode + i.ToString("d6");
+            
+                 assetcode = cate.CategoryCode + assetId.ToString("d6");
                 var category = _context.Assets.SingleOrDefault(x => x.AssetCode == assetcode);
                 if (category == null)
                 {
                     return assetcode;
                    
                 } 
-            }
-            assetcode = "";
+            
+            
             return assetcode;
         }
 
