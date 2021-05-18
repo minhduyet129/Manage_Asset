@@ -15,11 +15,9 @@ namespace RookieOnlineAssetManagement.Responses
             Message = string.Empty;
             Errors = null;
             Data = data;
-            StatusCode = 0;
         }
         public T Data { get; set; }
         public List<object> Errors { get; set; }
         public string Message { get; set; }
-        public int StatusCode { get; set; }
     }
 }

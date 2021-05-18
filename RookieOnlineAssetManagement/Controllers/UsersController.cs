@@ -113,8 +113,7 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 Data = null,
                 Errors = error,
-                Message = message,
-                StatusCode = statusCode
+                Message = message
             };
             return response;
         }
@@ -128,12 +127,24 @@ namespace RookieOnlineAssetManagement.Controllers
             return "Male";
         }
 
+        private string GetRoleType(int role)
+        {
+            if (role == 0)
+            {
+                return RoleName.Admin;
+            } 
+            else
+            {
+                return RoleName.User;
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _dbContext.Users.Where(a => a.Id == id).FirstOrDefaultAsync();
+            var user = await _dbContext.Users.Where(a => a.Id == id).SingleOrDefaultAsync();
 
-            if (user == null) return BadRequest();
+            if (user == null) return NotFound("Cannot find this user!");
 
             var result = new UserResponseModel
             {
@@ -144,14 +155,11 @@ namespace RookieOnlineAssetManagement.Controllers
                 Gender = GetGender(user.Gender),
                 DoB = user.DoB,
                 JoinedDate = user.JoinedDate,
-                Location = user.Location
+                Location = user.Location,
+                UserName = user.UserName
             };
 
-            return Ok(new Response<UserResponseModel>
-            {
-                Data = result,
-                StatusCode = 200,
-            });
+            return Ok(new Response<UserResponseModel>(result));
         }
 
         [HttpGet]
@@ -179,7 +187,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 UserName = user.UserName
             }).ToList();
 
-            var response = PaginationHelper.CreatePagedResponse(result, filter.PageNumber, filter.PageSize, count, (int)HttpStatusCode.OK);
+            var response = PaginationHelper.CreatePagedResponse(result, filter.PageNumber, filter.PageSize, count);
             return Ok(response);
         }
 
@@ -192,7 +200,6 @@ namespace RookieOnlineAssetManagement.Controllers
                 var password = AutoGeneratePassword(userName, model.DoB);
 
                 var userValidation = UserValidation(model);
-                if (userValidation.StatusCode == 422) return StatusCode(422, userValidation);
 
                 var user = new ApplicationUser
                 {
@@ -210,26 +217,29 @@ namespace RookieOnlineAssetManagement.Controllers
                 if (result == null) return BadRequest("Something was wrong");
                 if (result.Errors.Any()) return BadRequest(result.Errors);
 
-                if (!await _roleManager.RoleExistsAsync(RoleName.User))
+                var roleType = GetRoleType(model.RoleType);
+
+                if (!await _roleManager.RoleExistsAsync(roleType))
                 {
-                    await _roleManager.CreateAsync(new ApplicationRole(RoleName.User));
+                    await _roleManager.CreateAsync(new ApplicationRole(roleType));
                 }
-                await _userManager.AddToRoleAsync(user, RoleName.User);
+                await _userManager.AddToRoleAsync(user, roleType);
 
                 user.StaffCode = AutoGenerateStaffCode(user.Id);
-                _dbContext.Users.Update(user);
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(new UserModel
+                return Ok(new UserResponseModel
                 {
                     Id = user.Id,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     DoB = user.DoB,
-                    Gender = user.Gender,
+                    Gender = GetGender(user.Gender),
                     Location = user.Location,
                     StaffCode = user.StaffCode,
-                    JoinedDate = user.JoinedDate
+                    JoinedDate = user.JoinedDate,
+                    UserName = user.UserName,
+                    RoleType = GetRoleType(model.RoleType)
                 });
             }
             catch (Exception ex)
@@ -239,29 +249,39 @@ namespace RookieOnlineAssetManagement.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult EditUser(int id, UpdateUserModel model)
+        public async Task<IActionResult> EditUser(int id, UpdateUserModel model)
         {
-            var user = _dbContext.Users.SingleOrDefault(u => u.Id == id);
+            try
+            {
+                var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == id);
 
-            if (user == null) return BadRequest("Cannot find this user!");
+                if (user == null) return NotFound("Cannot find this user!");
 
-            //var userValidation = UserValidation(model);
+                user.DoB = model.DoB;
+                user.JoinedDate = model.JoinedDate;
+                user.Gender = model.Gender;
 
-            //if (userValidation.StatusCode == 422)
-            //{
-            //    return StatusCode(422, userValidation);
-            //}
+                await _dbContext.SaveChangesAsync();
 
-            user.DoB = model.DoB;
-            user.JoinedDate = model.JoinedDate;
-            user.Gender = model.Gender;
+                return Ok(new UserResponseModel
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    DoB = user.DoB,
+                    Gender = GetGender(user.Gender),
+                    Location = user.Location,
+                    StaffCode = user.StaffCode,
+                    JoinedDate = user.JoinedDate,
+                    UserName = user.UserName
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
 
-            _dbContext.Users.Update(user);
-            _dbContext.SaveChanges();
-
-            return StatusCode(200);
         }
-
 
     }
 }
