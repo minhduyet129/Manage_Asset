@@ -18,13 +18,13 @@ const CreateUser = () => {
     users.gender = users.gender === 0 ? 0 : 1;
     return useCreateUser
       .create(users)
-      .then(function (response) {
+      .then( response => {
         if(response.status === 200) {
           alert('Add user sucessfully')
         }
       })
-      .catch(function (error) {
-        console.log(error.response.data.errors[0]);
+      .catch( error => {
+        alert('Something went wrong!');
       });
   }
 
@@ -129,8 +129,8 @@ const CreateUser = () => {
 
           <div className='form__div'>
             <select className='form__input' {...register('gender')} id='gender'>
-              <option value={0}>female</option>
-              <option value={1}>male</option>
+              <option value={0}>Female</option>
+              <option value={1}>Male</option>
             </select>
             <label className='form__label' htmlFor='gender'>
               Gender
