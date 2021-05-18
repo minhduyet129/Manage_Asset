@@ -15,24 +15,22 @@ export const useUsers = () => {
   return useQuery('users', () =>
     axios
       .get('http://hungbqit-001-site5.itempurl.com/api/Users')
-      .then((res) => res.data)
   );
 };
 
 // Create a new user
-export const useCreateUser = () => {
-  const queryClient = useQueryClient();
-  return useMutation(
-    (values) =>
-      axios.post('http://hungbqit-001-site5.itempurl.com/api/Users', values),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries('users');
-      },
-    }
-  );
+function create(users)  {
+  return axios.post(
+    'http://hungbqit-001-site5.itempurl.com/api/Users',
+    users
+  )
 };
+
+export const useCreateUser = {
+  create,
+};
+
+
 
 // Disable an existing user
 export const useDisableUser = () => {};
