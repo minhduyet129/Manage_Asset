@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Asset from './admin/pages/asset/Asset';
-import Report from './admin/pages/report/Report';
-import RequestForReturning from './admin/pages/request/RequestForReturning';
 import Home from './admin/pages/Home';
 import User from './admin/pages/user/User';
-import AssetManagement from './admin/pages/asset/AssetManagement';
+import CreateUser from './admin/pages/user/CreateUser';
+import Asset from './admin/pages/asset/Asset';
+import Assignment from './admin/pages/assignment/Assignment';
+import RequestForReturning from './admin/pages/request/RequestForReturning';
+import Report from './admin/pages/report/Report';
 import Login from './login/Login';
 
 function App() {
@@ -12,17 +13,18 @@ function App() {
     <div>
       <Router>
         <Switch>
-          <Route path='/admin' exact component={AssetManagement} />
-          <Route path='/admin/home' component={Home} />
-          <Route path='/admin/users' component={User} />
-          <Route path='/admin/assets' component={Asset} />
-          <Route path='/admin/assignments' component={AssetManagement} />
+          <Route path='/admin' exact component={Home} />
+          <Route path='/admin/users' exact component={User} />
+          <Route path='/admin/users/create' component={CreateUser} />
+          <Route path='/admin/assets' exact component={Asset} />
+          <Route path='/admin/assignments' exact component={Assignment} />
           <Route
             path='/admin/requests-for-returning'
+            exact
             component={RequestForReturning}
           />
-          <Route path='/admin/reports' component={Report} />
-          <Route path='/admin/login' component={Login} />
+          <Route path='/admin/reports' exact component={Report} />
+          <Route path='/admin/login' exact component={Login} />
         </Switch>
       </Router>
     </div>

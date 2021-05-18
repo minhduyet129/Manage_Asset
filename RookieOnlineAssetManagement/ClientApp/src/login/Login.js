@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import './Login.css';
 
 function Login() {
   const {
@@ -28,6 +27,7 @@ function Login() {
           <input
             className='form__input'
             {...register('password', { required: true })}
+            type='password'
           />
           <label className='form__label' htmlFor='password'>
             Password
@@ -37,7 +37,7 @@ function Login() {
           <span className='form__validation'>This field is required</span>
         )}
         <Link to='/admin'>
-          <input className='form__button' type='submit' value='Login' />
+          <input className='btn' type='submit' value='Login' />
         </Link>
       </form>
     </div>

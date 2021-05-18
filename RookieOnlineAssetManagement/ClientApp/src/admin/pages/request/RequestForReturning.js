@@ -4,7 +4,9 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 function RequestForReturning() {
   return (
     <LayoutAdmin>
-      <div>Request For Returning</div>
+      <div className='table__view'>
+        <div>Request For Returning</div>
+      </div>
     </LayoutAdmin>
   );
 }
