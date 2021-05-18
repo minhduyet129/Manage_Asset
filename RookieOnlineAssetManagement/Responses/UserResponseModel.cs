@@ -16,5 +16,6 @@ namespace RookieOnlineAssetManagement.Responses
         public string Gender { get; set; }
         public string Location { get; set; }
         public string UserName { get; set; }
+        public string RoleType { get; set; }
     }
 }

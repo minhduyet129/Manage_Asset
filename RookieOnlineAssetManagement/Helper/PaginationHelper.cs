@@ -6,7 +6,7 @@ namespace RookieOnlineAssetManagement.Helper
 {
     public class PaginationHelper
     {
-        public static PagedResponse<List<T>> CreatePagedResponse<T>(List<T> data, int pageIndex, int pageSize, int totalRecords, int statusCode)
+        public static PagedResponse<List<T>> CreatePagedResponse<T>(List<T> data, int pageIndex, int pageSize, int totalRecords)
         {
             var response = new PagedResponse<List<T>>(data, pageIndex, pageSize);
 
@@ -15,7 +15,6 @@ namespace RookieOnlineAssetManagement.Helper
 
             response.TotalPages = roundedTotalPages;
             response.TotalRecords = totalRecords;
-            response.StatusCode = statusCode;
 
             return response;
         }
