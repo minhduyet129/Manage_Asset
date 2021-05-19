@@ -189,7 +189,7 @@ namespace RookieOnlineAssetManagement.Controllers
         public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter)
         {
             var queryable = !string.IsNullOrEmpty(location)
-                ? _userManager.Users.Where(u => u.Location == location)
+                ? _userManager.Users.Where(u => u.Location == location && u.State == UserState.Enable)
                 : _userManager.Users;
             var count = await queryable.CountAsync();
             var data = await queryable
@@ -248,7 +248,8 @@ namespace RookieOnlineAssetManagement.Controllers
                     Gender = model.Gender,
                     Location = model.Location,
                     UserName = userName,
-                    Password = password
+                    Password = password,
+                    State = UserState.Enable
                 };
 
                 var result = await _userManager.CreateAsync(user, password);
@@ -331,11 +332,11 @@ namespace RookieOnlineAssetManagement.Controllers
 
         }
 
-        [HttpDelete("{id}")]
+        [HttpPut("disable/{id}")]
         public async Task<IActionResult> DisableUser(int id)
         {
-            var errors = new List<object>();
             var user = await _dbContext.Users.Include(u => u.AssignmentsTo).SingleOrDefaultAsync(u => u.Id == id);
+            var errors = new List<object>();
 
             if (user == null)
             {
@@ -358,7 +359,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 return BadRequest(new Response<UserResponseModel> { Errors = errors });
             }
 
-            _dbContext.Users.Remove(user);
+            user.State = UserState.Disable;
             await _dbContext.SaveChangesAsync();
             return Ok();
         }
