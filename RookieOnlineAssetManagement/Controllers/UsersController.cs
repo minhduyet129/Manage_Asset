@@ -77,44 +77,78 @@ namespace RookieOnlineAssetManagement.Controllers
         private Response<UserResponseModel> UserValidation(UserModel model)
         {
             var error = new List<object> { };
-            int statusCode = 0;
-            string message = null;
 
-            if (DateTime.Now.ToString() == "")
+            if (model.FirstName == string.Empty)
             {
-                statusCode = 422;
-                error.Add(new { joinedDate = "The field is required" });
+                error.Add(new { firstName = "The first name is required" });
             }
-            else if (DateTime.Now.Year - model.DoB.Year < 18)
+
+            if (model.LastName == string.Empty)
             {
-                statusCode = 422;
+                error.Add(new { firstName = "The last name is required" });
+            }
+
+            if (DateTime.Now.Year - model.DoB.Year < 18)
+            {
                 error.Add(new { doB = "User is under 18. Please select a different date" });
             }
 
-            if (model.JoinedDate.ToString() == "")
+            if (model.DoB.Year - model.JoinedDate.Year > 0)
             {
-                statusCode = 422;
-                error.Add(new { joinedDate = "The field is required" });
-            }
-            else if (model.DoB.Year - model.JoinedDate.Year > 0)
-            {
-                statusCode = 422;
                 error.Add(new { joinedDate = "Joined date is not later than Date of Birth. Please select a different date" });
             }
             else if (model.JoinedDate.DayOfWeek == DayOfWeek.Saturday || model.JoinedDate.DayOfWeek == DayOfWeek.Sunday)
             {
-                statusCode = 422;
                 error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
             }
 
-            else message = "Invalid information";
+            if (model.RoleType == string.Empty)
+            {
+                error.Add(new { RoleType = "The role field is required" });
+            }    
+            else if (model.RoleType != RoleName.Admin && model.RoleType != RoleName.User)
+            {
+                error.Add(new { RoleType = "The role is not found" });
+            }    
 
             var response = new Response<UserResponseModel>
             {
                 Data = null,
-                Errors = error,
-                Message = message
+                Errors = error
             };
+
+            return response;
+        }
+
+        private Response<UserResponseModel> UpdateUserValidation(UpdateUserModel model)
+        {
+            var error = new List<object> { };
+
+            if (DateTime.Now.Year - model.DoB.Year < 18)
+            {
+                error.Add(new { doB = "User is under 18. Please select a different date" });
+            }
+
+            if (model.DoB.Year - model.JoinedDate.Year > 0)
+            {
+                error.Add(new { joinedDate = "Joined date is not later than Date of Birth. Please select a different date" });
+            }
+            else if (model.JoinedDate.DayOfWeek == DayOfWeek.Saturday || model.JoinedDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
+            }
+
+            if (model.RoleType != RoleName.Admin && model.RoleType != RoleName.User)
+            {
+                error.Add(new { RoleType = "The role is not found" });
+            }
+
+            var response = new Response<UserResponseModel>
+            {
+                Data = null,
+                Errors = error
+            };
+
             return response;
         }
 
@@ -127,22 +161,10 @@ namespace RookieOnlineAssetManagement.Controllers
             return "Male";
         }
 
-        private string GetRoleType(int role)
-        {
-            if (role == 0)
-            {
-                return RoleName.Admin;
-            } 
-            else
-            {
-                return RoleName.User;
-            }
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _dbContext.Users.Where(a => a.Id == id).SingleOrDefaultAsync();
+            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == id);
 
             if (user == null) return NotFound("Cannot find this user!");
 
@@ -156,7 +178,8 @@ namespace RookieOnlineAssetManagement.Controllers
                 DoB = user.DoB,
                 JoinedDate = user.JoinedDate,
                 Location = user.Location,
-                UserName = user.UserName
+                UserName = user.UserName,
+                RoleType = await _userManager.GetRolesAsync(user)
             };
 
             return Ok(new Response<UserResponseModel>(result));
@@ -166,29 +189,43 @@ namespace RookieOnlineAssetManagement.Controllers
         public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter)
         {
             var queryable = !string.IsNullOrEmpty(location)
-                ? _dbContext.Users.Where(u => u.Location == location)
-                : _dbContext.Users;
+                ? _userManager.Users.Where(u => u.Location == location && u.State == UserState.Enable)
+                : _userManager.Users;
             var count = await queryable.CountAsync();
             var data = await queryable
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();
 
-            var result = data.Select(user => new UserResponseModel
+            var result = new List<UserResponseModel>();
+
+            foreach (var user in data)
             {
-                Id = user.Id,
-                StaffCode = user.StaffCode,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Gender = GetGender(user.Gender),
-                DoB = user.DoB,
-                JoinedDate = user.JoinedDate,
-                Location = user.Location,
-                UserName = user.UserName
-            }).ToList();
+                var roleType = await _userManager.GetRolesAsync(user);
+
+                result.Add(new UserResponseModel
+                {
+                    Id = user.Id,
+                    StaffCode = user.StaffCode,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Gender = GetGender(user.Gender),
+                    DoB = user.DoB,
+                    JoinedDate = user.JoinedDate,
+                    Location = user.Location,
+                    UserName = user.UserName,
+                    RoleType = roleType
+                });
+            }
 
             var response = PaginationHelper.CreatePagedResponse(result, filter.PageNumber, filter.PageSize, count);
             return Ok(response);
+        }
+
+        [HttpGet("roles")]
+        public IActionResult GetRoleList()
+        {
+            return Ok(_roleManager.Roles);
         }
 
         [HttpPost]
@@ -196,10 +233,11 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             try
             {
+                var userValidation = UserValidation(model);
+                if (userValidation.Errors.Count > 0) return BadRequest(userValidation);
+
                 var userName = AutoGenerateUserName(model.FirstName, model.LastName);
                 var password = AutoGeneratePassword(userName, model.DoB);
-
-                var userValidation = UserValidation(model);
 
                 var user = new ApplicationUser
                 {
@@ -210,20 +248,19 @@ namespace RookieOnlineAssetManagement.Controllers
                     Gender = model.Gender,
                     Location = model.Location,
                     UserName = userName,
-                    Password = password
+                    Password = password,
+                    State = UserState.Enable
                 };
 
                 var result = await _userManager.CreateAsync(user, password);
                 if (result == null) return BadRequest("Something was wrong");
                 if (result.Errors.Any()) return BadRequest(result.Errors);
 
-                var roleType = GetRoleType(model.RoleType);
-
-                if (!await _roleManager.RoleExistsAsync(roleType))
+                if (!await _roleManager.RoleExistsAsync(model.RoleType))
                 {
-                    await _roleManager.CreateAsync(new ApplicationRole(roleType));
+                    await _roleManager.CreateAsync(new ApplicationRole(model.RoleType));
                 }
-                await _userManager.AddToRoleAsync(user, roleType);
+                await _userManager.AddToRoleAsync(user, model.RoleType);
 
                 user.StaffCode = AutoGenerateStaffCode(user.Id);
                 await _dbContext.SaveChangesAsync();
@@ -239,7 +276,7 @@ namespace RookieOnlineAssetManagement.Controllers
                     StaffCode = user.StaffCode,
                     JoinedDate = user.JoinedDate,
                     UserName = user.UserName,
-                    RoleType = GetRoleType(model.RoleType)
+                    RoleType = await _userManager.GetRolesAsync(user)
                 });
             }
             catch (Exception ex)
@@ -253,15 +290,26 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             try
             {
-                var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Id == id);
+                var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == id);
 
                 if (user == null) return NotFound("Cannot find this user!");
+
+                var userValidation = UpdateUserValidation(model);
+                if (userValidation.Errors.Count > 0) return BadRequest(userValidation);
+
+                var oldUserRole = await _userManager.GetRolesAsync(user);
+                if (oldUserRole.FirstOrDefault() != model.RoleType)
+                {
+                    await _userManager.RemoveFromRolesAsync(user, oldUserRole);
+                    await _userManager.AddToRoleAsync(user, model.RoleType);
+                }    
 
                 user.DoB = model.DoB;
                 user.JoinedDate = model.JoinedDate;
                 user.Gender = model.Gender;
-
                 await _dbContext.SaveChangesAsync();
+
+                var newUserRole = await _userManager.GetRolesAsync(user);
 
                 return Ok(new UserResponseModel
                 {
@@ -273,7 +321,8 @@ namespace RookieOnlineAssetManagement.Controllers
                     Location = user.Location,
                     StaffCode = user.StaffCode,
                     JoinedDate = user.JoinedDate,
-                    UserName = user.UserName
+                    UserName = user.UserName,
+                    RoleType = newUserRole
                 });
             }
             catch (Exception ex)
@@ -283,5 +332,36 @@ namespace RookieOnlineAssetManagement.Controllers
 
         }
 
+        [HttpPut("disable/{id}")]
+        public async Task<IActionResult> DisableUser(int id)
+        {
+            var user = await _dbContext.Users.Include(u => u.AssignmentsTo).SingleOrDefaultAsync(u => u.Id == id);
+            var errors = new List<object>();
+
+            if (user == null)
+            {
+                errors.Add(new
+                {
+                    message = "The user is not exist"
+                });
+
+                return BadRequest(new Response<UserResponseModel> { Errors = errors });
+            } 
+                
+
+            if (user.AssignmentsTo.Count > 0)
+            {
+                errors.Add(new 
+                { 
+                    message = "There are valid assignments belonging to this user. Please close all assignments before disabling user." 
+                });
+
+                return BadRequest(new Response<UserResponseModel> { Errors = errors });
+            }
+
+            user.State = UserState.Disable;
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

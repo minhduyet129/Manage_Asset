@@ -12,12 +12,10 @@ namespace RookieOnlineAssetManagement.Responses
         }
         public Response(T data)
         {
-            Message = string.Empty;
             Errors = null;
             Data = data;
         }
         public T Data { get; set; }
         public List<object> Errors { get; set; }
-        public string Message { get; set; }
     }
 }
