@@ -62,6 +62,12 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             return Ok(asset);
         }
+        [HttpGet("GetAssetAvailable")]
+        public  IActionResult GetAssetAvailable()
+        {
+            var asset = _context.Assets.Where(x => x.State == 0);
+            return Ok(asset);
+        }
         [HttpPost]
         public async Task<IActionResult> CreateAsset(AssetModel asset)
         {
