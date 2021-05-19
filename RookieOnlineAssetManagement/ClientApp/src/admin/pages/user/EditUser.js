@@ -1,44 +1,52 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-
-const CreateUser = () => {
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
+import axios from 'axios';
+export const EditUser = () => {
   const [startDate, setStartDate] = useState(null);
   const [joinedDate, setJoinedDate] = useState(null);
-  const isWeekday = (date) => {
-    const day = date.getDay();
-    return day !== 0 && day !== 6;
-  };
+  const [users, setUsers] = useState([]);
+  const {id} = useParams
 
-  async function handlerUser(users) {
-    users.gender = users.gender === 0 ? 0 : 1;
-    return useCreateUser
-      .create(users)
-      .then((response) => {
-        if (response.status === 200) {
-          alert('Add user sucessfully');
-        }
-      })
-      .catch((error) => {
-        alert('Something went wrong!');
-      });
-  }
+  const history = useHistory();
+
+  // const loadUsers = async () => {
+
+  //   const result = axios.get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`)
+  //   reset({ id: result.data.id,
+  //     staffCode: result.data.staffCode,
+  //     firstName: result.data.firstName,
+  //     lastName: result.data.lastName,
+  //     doB: result.data.doB,
+  //     joinedDate: result.data.joinedDate,
+  //     gender: result.data.gender,
+  //     userName: result.data.userName,
+  //     roleType: result.data.roleType,
+  //   });
+  //   setUsers(result.data)
+  // };
+
+  // useEffect(() => {
+  //   loadUsers();
+  // }, []);
+
+  console.log(users);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
+    reset,
   } = useForm();
 
   const onSubmit = async (data) => {
-    await handlerUser(data);
+    //await handlerUser(data);
     // console.log(data);
-    console.log(startDate);
+    //console.log(startDate);
   };
 
   // console.log(startDate.getDay())
@@ -47,7 +55,7 @@ const CreateUser = () => {
     <LayoutAdmin>
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
-          <h2 className='form__title'>Create User</h2>
+          <h2 className='form__title'>Edit User</h2>
           <div className='form__div'>
             <input
               id='firstname'
@@ -114,7 +122,7 @@ const CreateUser = () => {
                     onChange(e);
                     setJoinedDate(e);
                   }}
-                  filterDate={isWeekday}
+                  //filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
                   isClearable
                   withPortal
@@ -134,7 +142,6 @@ const CreateUser = () => {
               Joined Date
             </label>
           </div>
-
 
           <div className='form__div'>
             <select className='form__input' {...register('gender')} id='gender'>
@@ -176,5 +183,3 @@ const CreateUser = () => {
     </LayoutAdmin>
   );
 };
-
-export default CreateUser;

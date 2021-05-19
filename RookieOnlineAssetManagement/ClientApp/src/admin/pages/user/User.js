@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
-import { useQuery } from 'react-query';
-import axios from 'axios';
-import { COLUMNS } from './columns';
 import { UsersTable } from './UsersTable';
 import {useUsers} from './UserHooks'
+import { Link } from 'react-router-dom';
 
 function User() {
+  const Delete =  async  (id) => {};
   // option 1(Usequery to call api)
   const getUsers = useUsers();
   
@@ -15,31 +14,70 @@ function User() {
     [getUsers?.data?.data?.data]
   );
 
-  console.log(data)
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Id',
+        accessor: 'id',
+      },
+      {
+        Header: 'StaffCode',
+        accessor: 'staffCode',
+      },
+      {
+        Header: 'FirstName',
+        accessor: 'firstName',
+      },
+      {
+        Header: 'LastName',
+        accessor: 'lastName',
+      },
+      {
+        Header: 'Date of Birth',
+        accessor: 'doB',
+      },
+      {
+        Header: 'JoinedDate',
+        accessor: 'joinedDate',
+      },
+      {
+        Header: 'Gender',
+        accessor: 'gender',
+      },
+      {
+        Header: 'Location',
+        accessor: 'location',
+      },
+      {
+        Header: 'Username',
+        accessor: 'userName',
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: (data) => {
+          console.log(data)
+          return (
+            <div>
+              <span>
+                <Link to={`/admin/users/edit/${data.data.id}`}>
+                  <i className='far fa-edit action mr-2'></i>
+                </Link>
+              </span>
+              &emsp;
+              <span onClick={() => Delete()}>
+                <i className='fas fa-trash action'></i>
+              </span>
+            </div>
+          );
+        },
+        
+      },
+    ],
+    []
+  )
 
-  // option 2(Useeffect to call api)
-  // const [users, setUser] = useState([]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     axios
-  //       .get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
-  //       .then((res) => res.data)
-  //       .then((data) => {
-  //         setUser(data);
-  //       });
-  //   })();
-  // }, []);
-
-  // console.log(users)
-
-  
-
-  //  const data = React.useMemo(() => users, [users]);
-
-   const columns = React.useMemo(() => COLUMNS, []);
-
-  
+   console.log(data)
 
 
   // if (getUsers.isLoading) {

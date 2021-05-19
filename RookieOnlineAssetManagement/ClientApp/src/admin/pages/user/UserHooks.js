@@ -1,13 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'axios';
 
+
+
 // Get an user
-export const useUser = (userId) => {
-  return useQuery(['users', userId], () =>
-    axios
-      .get(`http://hungbqit-001-site5.itempurl.com/api/Users/${userId}`)
-      .then((res) => res.data)
-  );
+async function edit (id) {
+
+  return axios
+      .get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`)
 };
 
 // Get users
@@ -28,6 +28,7 @@ function create(users)  {
 
 export const useCreateUser = {
   create,
+  edit,
 };
 
 
