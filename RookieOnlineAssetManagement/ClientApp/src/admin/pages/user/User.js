@@ -4,12 +4,12 @@ import { useQuery } from 'react-query';
 import axios from 'axios';
 import { COLUMNS } from './columns';
 import { UsersTable } from './UsersTable';
+import {useUsers} from './UserHooks'
 
 function User() {
   // option 1(Usequery to call api)
-  const getUsers = useQuery('users', () =>
-    axios.get('http://hungbqit-001-site5.itempurl.com/api/Users')
-  );
+  const getUsers = useUsers();
+  
   const data = React.useMemo(
     () => getUsers?.data?.data?.data || [],
     [getUsers?.data?.data?.data]

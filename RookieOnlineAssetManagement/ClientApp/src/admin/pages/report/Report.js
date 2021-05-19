@@ -4,7 +4,9 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 function Report() {
   return (
     <LayoutAdmin>
-      <div>Report</div>
+      <div className='table__view'>
+        <div>Report</div>
+      </div>
     </LayoutAdmin>
   );
 }
