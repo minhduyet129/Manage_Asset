@@ -6,7 +6,7 @@ export const SidebarData = [
   },
   {
     title: 'Home',
-    path: '/admin/home',
+    path: '/admin',
     icon: 'bx bxs-home',
   },
   {

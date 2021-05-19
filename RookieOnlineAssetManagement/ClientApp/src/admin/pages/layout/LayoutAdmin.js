@@ -9,7 +9,7 @@ function LayoutAdmin({ children }) {
   const showSidebar = () => setSidebar(!sidebar);
 
   return (
-      <div className='container'>
+    <div className='container'>
       {/* Start Layout */}
       <nav className={sidebar ? 'nav active' : 'nav'}>
         {/* Render each item of the side bar */}
@@ -27,36 +27,25 @@ function LayoutAdmin({ children }) {
             );
           })}
         </ul>
-        
       </nav>
       {/* End Layout */}
-      
+
       <main className={sidebar ? 'main active' : 'main'}>
         <div className='topbar'>
-          <div class='toggle' onClick={showSidebar}>
-            <i class='bx bx-menu'></i>
+          <div className='toggle' onClick={showSidebar}>
+            <i className='bx bx-menu'></i>
           </div>
-          <form class='search'>
-            <label htmlFor=''></label>
-            <input type='text' placeholder='Search here' />
-            <i class='bx bx-search'></i>
-          </form>
           <div>
             <Link to='/admin/login'>
-              <button className='logout__button'>Logout</button>
+              <button className='btn'>Logout</button>
             </Link>
           </div>
         </div>
 
         {/* The rest of the page */}
-        {children}
+        <div className='main__wrapper'>{children}</div>
       </main>
-
     </div>
-
-
-    
-    
   );
 }
 
