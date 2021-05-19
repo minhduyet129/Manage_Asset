@@ -5,8 +5,6 @@ import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
 
 const CreateUser = () => {
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [joinedDate, setJoinedDate] = useState(null);
   const isWeekday = (date) => {

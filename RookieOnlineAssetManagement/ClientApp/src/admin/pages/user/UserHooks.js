@@ -4,7 +4,7 @@ import axios from 'axios';
 
 
 // Get an user
-async function edit (id) {
+ function edit (id) {
 
   return axios
       .get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`)

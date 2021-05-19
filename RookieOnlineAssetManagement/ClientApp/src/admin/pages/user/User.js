@@ -1,18 +1,32 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { UsersTable } from './UsersTable';
 import {useUsers} from './UserHooks'
-import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 function User() {
   const Delete =  async  (id) => {};
   // option 1(Usequery to call api)
   const getUsers = useUsers();
+  const usersRef = useRef();
+  const history = useHistory();
   
   const data = React.useMemo(
     () => getUsers?.data?.data?.data || [],
     [getUsers?.data?.data?.data]
-  );
+    );
+    
+  usersRef.current = data
+
+
+  const getUserId = (rowIndex) => {
+    if (!usersRef.current) return null;
+    const id = usersRef.current[rowIndex].id;
+    if (id) {
+      history.push(`/admin/users/edit/${id}`)
+    }
+  };
+  
 
   const columns = React.useMemo(
     () => [
@@ -49,24 +63,27 @@ function User() {
         accessor: 'location',
       },
       {
+        Header:'Role',
+        accessor: 'roleType',
+      },
+      {
         Header: 'Username',
         accessor: 'userName',
       },
       {
         Header: 'Actions',
         accessor: 'actions',
-        Cell: (data) => {
-          console.log(data)
+        Cell: (props) => {
+          const rowIdx = props.row.id;
+          
           return (
             <div>
-              <span>
-                <Link to={`/admin/users/edit/${data.data.id}`}>
+              <span onClick={() => getUserId(rowIdx)}>
                   <i className='far fa-edit action mr-2'></i>
-                </Link>
               </span>
               &emsp;
               <span onClick={() => Delete()}>
-                <i className='fas fa-trash action'></i>
+                <i className='fas fa-times '></i>
               </span>
             </div>
           );
@@ -76,8 +93,6 @@ function User() {
     ],
     []
   )
-
-   console.log(data)
 
 
   // if (getUsers.isLoading) {
