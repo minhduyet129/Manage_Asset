@@ -46,7 +46,7 @@ namespace RookieOnlineAssetManagement.Controllers
             };
             await _context.Categories.AddAsync(newcategory);
             await _context.SaveChangesAsync();
-            return Ok("Create category succeed!");
+            return Ok(newcategory);
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(int id, Category category)
@@ -67,7 +67,7 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             _context.Entry(category).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return Ok("Succeed!");
+            return Ok(category);
 
         }
         [HttpDelete("{id}")]
