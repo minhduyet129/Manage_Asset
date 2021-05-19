@@ -12,7 +12,6 @@ function AddUsersTable() {
   async function handleUsers(users) {
 
 
-    
       users.gender = users.gender === 0 ? 0 : 1;
        await axios.post(
         'http://hungbqit-001-site5.itempurl.com/api/Users',
@@ -55,6 +54,7 @@ function AddUsersTable() {
               name='doB'
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <ReactDatePicker
+                
                   onChange={onChange}
                   onBlur={onBlur}
                   selected={value}

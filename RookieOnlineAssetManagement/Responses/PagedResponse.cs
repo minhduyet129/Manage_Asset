@@ -18,7 +18,6 @@ namespace RookieOnlineAssetManagement.Responses
             this.Data = data;
             this.Message = null;
             this.Errors = null;
-            this.StatusCode = 0;
         }
     }
 }
