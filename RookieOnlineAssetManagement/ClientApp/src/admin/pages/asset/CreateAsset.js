@@ -6,7 +6,6 @@ import ReactDatePicker from 'react-datepicker';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { getCategories, createAsset } from './assetsApi';
 import { api } from '../api';
-import axios from 'axios';
 
 const CreateAsset = ({ user }) => {
   const [installedDate, setInstalledDate] = useState(null);
@@ -14,11 +13,7 @@ const CreateAsset = ({ user }) => {
   const queryClient = useQueryClient();
   const categoriesInfo = useQuery('categories', getCategories, { retry: 1 });
   const createNewAsset = useMutation(
-    (newAsset) =>
-      axios.post(
-        'http://hungbqit-001-site5.itempurl.com/api/assets/',
-        newAsset
-      ),
+    (newAsset) => api.post('/assets/', newAsset),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('assets');
