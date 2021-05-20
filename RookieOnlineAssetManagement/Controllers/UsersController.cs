@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
 using RookieOnlineAssetManagement.Enums;
@@ -10,8 +12,11 @@ using RookieOnlineAssetManagement.Models;
 using RookieOnlineAssetManagement.Responses;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -26,12 +31,13 @@ namespace RookieOnlineAssetManagement.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly RoleManager<ApplicationRole> _roleManager;
-
-        public UsersController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        private readonly IConfiguration _configuration;
+        public UsersController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IConfiguration configuration)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
+            _configuration = configuration;
         }
 
         private string AutoGenerateUserName(string firstName, string lastName)
@@ -363,5 +369,42 @@ namespace RookieOnlineAssetManagement.Controllers
             await _dbContext.SaveChangesAsync();
             return Ok();
         }
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            var user = await _userManager.FindByNameAsync(model.Username);
+            if(user !=null && await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name,user.UserName)
+                };
+                foreach(var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }
+                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["JWT:ValidIssuer"],
+                    audience: _configuration["JWT:ValidAudience"],
+                    expires: DateTime.Now.AddHours(3),
+                    claims: authClaims,
+                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                    );
+                return Ok(new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration=token.ValidTo,
+                    role=userRoles[0],
+                    userId=user.Id,
+                    location=user.Location
+                }); 
+
+            }
+            return Unauthorized("Username or password is incorrect. Please try again");
+        }
+
     }
 }
