@@ -5,13 +5,9 @@ using System.Threading.Tasks;
 
 namespace RookieOnlineAssetManagement.Enums
 {
-    public enum AssetState
+    public enum UserState
     {
-        Available,
-        WaitingForApproval,
-        NotAvailable,
-        Assigned,
-        WaitingForRecycling,
-        Recycled
+        Enable,
+        Disable
     }
 }

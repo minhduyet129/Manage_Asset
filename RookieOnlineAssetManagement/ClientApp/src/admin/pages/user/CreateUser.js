@@ -3,6 +3,10 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8338370f584ae4eaee23e92f9eec6240f26ab8ed
 const CreateUser = () => {
   const [startDate, setStartDate] = useState(null);
   const [joinedDate, setJoinedDate] = useState(null);
@@ -11,7 +15,11 @@ const CreateUser = () => {
     return day !== 0 && day !== 6;
   };
 
+<<<<<<< HEAD
    function handlerUser(users) {
+=======
+  async function handlerUser(users) {
+>>>>>>> 8338370f584ae4eaee23e92f9eec6240f26ab8ed
     users.gender = users.gender === 0 ? 0 : 1;
     return useCreateUser
       .create(users)
@@ -19,7 +27,10 @@ const CreateUser = () => {
         if (response.status === 200) {
           alert('Add user sucessfully');
         }
+<<<<<<< HEAD
         console.log(users)
+=======
+>>>>>>> 8338370f584ae4eaee23e92f9eec6240f26ab8ed
       })
       .catch((error) => {
         alert('Something went wrong!');
@@ -35,7 +46,11 @@ const CreateUser = () => {
 
   const onSubmit = async (data) => {
     await handlerUser(data);
+<<<<<<< HEAD
      console.log(data);
+=======
+    // console.log(data);
+>>>>>>> 8338370f584ae4eaee23e92f9eec6240f26ab8ed
     console.log(startDate);
   };
 
@@ -145,6 +160,7 @@ const CreateUser = () => {
           </div>
           {errors.gender && <span>This field is required</span>}
           <div className='form__div'>
+<<<<<<< HEAD
           <select className='form__input' {...register('roleType')} id='roleType'>
               <option value="User">User</option>
             </select>
@@ -158,6 +174,28 @@ const CreateUser = () => {
               className='form__input'
               {...register('location')}
             />
+=======
+            <input
+              className='form__input'
+              {...register('location')}
+              id='location'
+            />
+            <label className='form__label' htmlFor='location'>
+              Location
+            </label>
+          </div>
+          {errors.location && <span>This field is required</span>}
+          <div className='form__div'>
+            <input
+              className='form__input'
+              {...register('type', { required: true })}
+              id='type'
+            />
+            <label className='form__label' htmlFor='type'>
+              Type
+            </label>
+          </div>
+>>>>>>> 8338370f584ae4eaee23e92f9eec6240f26ab8ed
           {errors.type && <span>This field is required</span>}
           <div>
             <input className='btn' type='submit' value='Submit' />

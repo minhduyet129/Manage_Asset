@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
 using RookieOnlineAssetManagement.Enums;
@@ -13,7 +12,12 @@ using RookieOnlineAssetManagement.Models;
 using RookieOnlineAssetManagement.Responses;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Security.Claims;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace RookieOnlineAssetManagement.Controllers
@@ -27,12 +31,13 @@ namespace RookieOnlineAssetManagement.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly RoleManager<ApplicationRole> _roleManager;
-
-        public UsersController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        private readonly IConfiguration _configuration;
+        public UsersController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IConfiguration configuration)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
+            _configuration = configuration;
         }
 
         private string AutoGenerateUserName(string firstName, string lastName)
@@ -63,53 +68,93 @@ namespace RookieOnlineAssetManagement.Controllers
 
         private string AutoGeneratePassword(string userName, DateTime dob)
         {
-            string dateTime = dob.ToString("ddMMyyyy");
-            string password = userName + "@" + dateTime;
+            var dateTime = dob.ToString("ddMMyyyy");
+            var password = userName + "@" + dateTime;
+
+            // Check if password contains at least one upper character
+            if (!Regex.IsMatch(password, "(?=.*[A-Z])"))
+            {
+                password = char.ToUpper(password[0]) + password.Substring(1);
+            }
+
             return password;
         }
 
         private Response<UserResponseModel> UserValidation(UserModel model)
         {
             var error = new List<object> { };
-            int statusCode = 0;
-            string message = null;
 
-            if (DateTime.Now.ToString() == "")
+            if (model.FirstName == string.Empty)
             {
-                statusCode = 422;
-                error.Add(new { joinedDate = "The field is required" });
-            }    
-            else if (DateTime.Now.Year - model.DoB.Year < 18)
+                error.Add(new { firstName = "The first name is required" });
+            }
+
+            if (model.LastName == string.Empty)
             {
-                statusCode = 422;
+                error.Add(new { firstName = "The last name is required" });
+            }
+
+            if (DateTime.Now.Year - model.DoB.Year < 18)
+            {
                 error.Add(new { doB = "User is under 18. Please select a different date" });
             }
 
-            if (model.JoinedDate.ToString() == "")
+            if (model.DoB.Year - model.JoinedDate.Year > 0)
             {
-                statusCode = 422;
-                error.Add(new { joinedDate = "The field is required" });
-            }    
-            else if (model.DoB.Year - model.JoinedDate.Year > 0)
-            {
-                statusCode = 422;
                 error.Add(new { joinedDate = "Joined date is not later than Date of Birth. Please select a different date" });
-            } 
+            }
             else if (model.JoinedDate.DayOfWeek == DayOfWeek.Saturday || model.JoinedDate.DayOfWeek == DayOfWeek.Sunday)
             {
-                statusCode = 422;
                 error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
             }
 
-            else message = "Invalid information";
+            if (model.Roles == string.Empty)
+            {
+                error.Add(new { RoleType = "The role field is required" });
+            }    
+            else if (model.Roles != RoleName.Admin && model.Roles != RoleName.User)
+            {
+                error.Add(new { RoleType = "The role is not found" });
+            }    
 
             var response = new Response<UserResponseModel>
             {
                 Data = null,
-                Errors = error,
-                Message = message,
-                StatusCode = statusCode
+                Errors = error
             };
+
+            return response;
+        }
+
+        private Response<UserResponseModel> UpdateUserValidation(UpdateUserModel model)
+        {
+            var error = new List<object> { };
+
+            if (DateTime.Now.Year - model.DoB.Year < 18)
+            {
+                error.Add(new { doB = "User is under 18. Please select a different date" });
+            }
+
+            if (model.DoB.Year - model.JoinedDate.Year > 0)
+            {
+                error.Add(new { joinedDate = "Joined date is not later than Date of Birth. Please select a different date" });
+            }
+            else if (model.JoinedDate.DayOfWeek == DayOfWeek.Saturday || model.JoinedDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
+            }
+
+            if (model.RoleType != RoleName.Admin && model.RoleType != RoleName.User)
+            {
+                error.Add(new { RoleType = "The role is not found" });
+            }
+
+            var response = new Response<UserResponseModel>
+            {
+                Data = null,
+                Errors = error
+            };
+
             return response;
         }
 
@@ -125,9 +170,9 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _dbContext.Users.Where(a => a.Id == id).FirstOrDefaultAsync();
+            var user = await _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).SingleOrDefaultAsync(u => u.Id == id);
 
-            if (user == null) return BadRequest();
+            if (user == null) return NotFound("Cannot find this user!");
 
             var result = new UserResponseModel
             {
@@ -138,26 +183,62 @@ namespace RookieOnlineAssetManagement.Controllers
                 Gender = GetGender(user.Gender),
                 DoB = user.DoB,
                 JoinedDate = user.JoinedDate,
-                Location = user.Location
+                Location = user.Location,
+                UserName = user.UserName,
+                Roles = user.UserRoles?.Select(r => r.Role.Name) ?? Enumerable.Empty<string>()
             };
 
-            return Ok(new Response<UserResponseModel>
-            {
-                Data = result,
-                StatusCode = 200,
-            });
+            return Ok(new Response<UserResponseModel>(result));
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter)
+        public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
-            var users = await _dbContext.Users.Where(u => u.Location == location).ToListAsync();
+            var queryable = !string.IsNullOrEmpty(location)
+                ? _userManager.Users.Where(u => u.Location == location)
+                : _userManager.Users;
 
-            if (users == null) return BadRequest();
+            queryable = queryable.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).Where(u => u.State == UserState.Enable);
 
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                queryable = queryable.Where(u => u.FirstName.Contains(keyword) || u.LastName.Contains(keyword) || u.StaffCode.Contains(keyword));
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "staffCode":
+                        queryable = asc ? queryable.OrderBy(u => u.StaffCode) : queryable.OrderByDescending(u => u.StaffCode);
+                        break;
+                    case "firstName":
+                        queryable = asc ? queryable.OrderBy(u => u.FirstName) : queryable.OrderByDescending(u => u.FirstName);
+                        break;
+                    case "lastName":
+                        queryable = asc ? queryable.OrderBy(u => u.LastName) : queryable.OrderByDescending(u => u.LastName);
+                        break;
+                    case "joinedDate":
+                        queryable = asc ? queryable.OrderBy(u => u.JoinedDate) : queryable.OrderByDescending(u => u.JoinedDate);
+                        break;
+                    case "type":
+                        queryable = asc ? queryable.OrderBy(u => u.UserRoles.ToString()) : queryable.OrderByDescending(u => u.UserRoles.ToString());
+                        break;
+                    default:
+                        queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
+                        break;
+                }
+            }
+
+            var count = await queryable.CountAsync();
+            var data = await queryable
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+            
             var result = new List<UserResponseModel>();
 
-            foreach (var user in users)
+            foreach (var user in data)
             {
                 result.Add(new UserResponseModel
                 {
@@ -169,92 +250,198 @@ namespace RookieOnlineAssetManagement.Controllers
                     DoB = user.DoB,
                     JoinedDate = user.JoinedDate,
                     Location = user.Location,
-                    UserName = user.UserName
+                    UserName = user.UserName,
+                    Roles = user.UserRoles?.Select(r => r.Role.Name)??Enumerable.Empty<string>()
                 });
             }
 
-            var validFilter = new PaginationFilter(filter.PageNumber, filter.PageSize);
+            var response = PaginationHelper.CreatePagedResponse(result, filter.PageNumber, filter.PageSize, count);
+            return Ok(response);
+        }
 
-            var pagedData = result
-                .Skip((validFilter.PageNumber - 1) * validFilter.PageSize)
-                .Take(validFilter.PageSize).ToList();
-
-            var totalRecords = await _dbContext.Users.CountAsync();
-            var pagedReponse = PaginationHelper.CreatePagedReponse<UserResponseModel>(pagedData, validFilter, totalRecords, 200);
-
-            return Ok(pagedReponse);
+        [HttpGet("roles")]
+        public IActionResult GetRoleList()
+        {
+            return Ok(_roleManager.Roles);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserModel model)
         {
-            string userName = AutoGenerateUserName(model.FirstName, model.LastName);
-            string password = AutoGeneratePassword(userName, model.DoB);
-
-            var userValidation = UserValidation(model);
-
-            if (userValidation.StatusCode == 422)
+            try
             {
-                return StatusCode(422, userValidation);
+                var userValidation = UserValidation(model);
+                if (userValidation.Errors.Count > 0) return BadRequest(userValidation);
+
+                var userName = AutoGenerateUserName(model.FirstName, model.LastName);
+                var password = AutoGeneratePassword(userName, model.DoB);
+
+                var user = new ApplicationUser
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    DoB = model.DoB,
+                    JoinedDate = model.JoinedDate,
+                    Gender = model.Gender,
+                    Location = model.Location,
+                    UserName = userName,
+                    Password = password,
+                    State = UserState.Enable,
+                };
+
+                var result = await _userManager.CreateAsync(user, password);
+                if (result == null) return BadRequest("Something was wrong");
+                if (result.Errors.Any()) return BadRequest(result.Errors);
+
+                if (!await _roleManager.RoleExistsAsync(model.Roles))
+                {
+                    await _roleManager.CreateAsync(new ApplicationRole(model.Roles));
+                }
+                await _userManager.AddToRoleAsync(user, model.Roles);
+
+                user.StaffCode = AutoGenerateStaffCode(user.Id);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok(new UserResponseModel
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    DoB = user.DoB,
+                    Gender = GetGender(user.Gender),
+                    Location = user.Location,
+                    StaffCode = user.StaffCode,
+                    JoinedDate = user.JoinedDate,
+                    UserName = user.UserName,
+                    Password = user.Password,
+                    Roles = await _userManager.GetRolesAsync(user)
+                });
             }
-
-            var user = new ApplicationUser
+            catch (Exception ex)
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                DoB = model.DoB,
-                JoinedDate = model.JoinedDate,
-                Gender = model.Gender,
-                Location = model.Location,
-                UserName = userName,
-                Password = password
-            };
-
-            var result = await _userManager.CreateAsync(user, password);
-
-            if (result == null) return BadRequest("Something was wrong");
-
-            if (!await _roleManager.RoleExistsAsync(RoleName.User))
-            {
-                await _roleManager.CreateAsync(new ApplicationRole(RoleName.User));
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
-            await _userManager.AddToRoleAsync(user, RoleName.User);
-
-            var staffCode = AutoGenerateStaffCode(user.Id);
-
-            var currentUser = _dbContext.Users.Find(user.Id);
-
-            currentUser.StaffCode = staffCode;
-            _dbContext.Users.Update(currentUser);
-            _dbContext.SaveChanges();
-
-            return StatusCode(userValidation.StatusCode, userValidation);
         }
 
         [HttpPut("{id}")]
-        public IActionResult EditUser(int id, UpdateUserModel model)
+        public async Task<IActionResult> EditUser(int id, UpdateUserModel model)
         {
-            var user = _dbContext.Users.SingleOrDefault(u => u.Id == id);
+            try
+            {
+                var user = await _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).SingleOrDefaultAsync(u => u.Id == id && u.State == UserState.Enable);
 
-            if (user == null) return BadRequest("Cannot find this user!");
+                if (user == null) return NotFound("Cannot find this user!");
 
-            //var userValidation = UserValidation(model);
+                var userValidation = UpdateUserValidation(model);
+                if (userValidation.Errors.Count > 0) return BadRequest(userValidation);
 
-            //if (userValidation.StatusCode == 422)
-            //{
-            //    return StatusCode(422, userValidation);
-            //}
+                var oldUserRole = await _userManager.GetRolesAsync(user);
+                if (oldUserRole.FirstOrDefault() != model.RoleType)
+                {
+                    await _userManager.RemoveFromRolesAsync(user, oldUserRole);
 
-            user.DoB = model.DoB;
-            user.JoinedDate = model.JoinedDate;
-            user.Gender = model.Gender;
+                    if (!await _roleManager.RoleExistsAsync(model.RoleType))
+                    {
+                        await _roleManager.CreateAsync(new ApplicationRole(model.RoleType));
+                    }
 
-            _dbContext.Users.Update(user);
-            _dbContext.SaveChanges();
+                    await _userManager.AddToRoleAsync(user, model.RoleType);
+                }    
 
-            return StatusCode(200);
+                user.DoB = model.DoB;
+                user.JoinedDate = model.JoinedDate;
+                user.Gender = model.Gender;
+                await _dbContext.SaveChangesAsync();
+
+                return Ok(new UserResponseModel
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = user.Password,
+                    DoB = user.DoB,
+                    Gender = GetGender(user.Gender),
+                    Location = user.Location,
+                    StaffCode = user.StaffCode,
+                    JoinedDate = user.JoinedDate,
+                    UserName = user.UserName,
+                    Roles = user.UserRoles?.Select(r => r.Role.Name) ?? Enumerable.Empty<string>()
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
+
         }
 
+        [HttpPut("disable/{id}")]
+        public async Task<IActionResult> DisableUser(int id)
+        {
+            var user = await _dbContext.Users.Include(u => u.AssignmentsTo).SingleOrDefaultAsync(u => u.Id == id);
+            var errors = new List<object>();
+
+            if (user == null)
+            {
+                errors.Add(new
+                {
+                    message = "The user is not exist"
+                });
+
+                return BadRequest(new Response<UserResponseModel> { Errors = errors });
+            } 
+                
+
+            if (user.AssignmentsTo.Count > 0)
+            {
+                errors.Add(new 
+                { 
+                    message = "There are valid assignments belonging to this user. Please close all assignments before disabling user." 
+                });
+
+                return BadRequest(new Response<UserResponseModel> { Errors = errors });
+            }
+
+            user.State = UserState.Disable;
+            await _dbContext.SaveChangesAsync();
+            return Ok();
+        }
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            var user = await _userManager.FindByNameAsync(model.Username);
+            if(user !=null && await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name,user.UserName)
+                };
+                foreach(var userRole in userRoles)
+                {
+                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+                }
+                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+                var token = new JwtSecurityToken(
+                    issuer: _configuration["JWT:ValidIssuer"],
+                    audience: _configuration["JWT:ValidAudience"],
+                    expires: DateTime.Now.AddHours(3),
+                    claims: authClaims,
+                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                    );
+                return Ok(new
+                {
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
+                    expiration=token.ValidTo,
+                    role=userRoles[0],
+                    userId=user.Id,
+                    location=user.Location
+                }); 
+
+            }
+            return Unauthorized("Username or password is incorrect. Please try again");
+        }
 
     }
 }

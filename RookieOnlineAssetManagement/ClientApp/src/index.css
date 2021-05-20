@@ -26,6 +26,7 @@
 h2 {
   margin: 0;
 }
+<<<<<<< HEAD
 .font{
   font-size: 25px;
   cursor: pointer;
@@ -40,6 +41,8 @@ h2 {
   top: 300px;
   left:860px;
 }
+=======
+>>>>>>> 8338370f584ae4eaee23e92f9eec6240f26ab8ed
 
 a,
 u {
