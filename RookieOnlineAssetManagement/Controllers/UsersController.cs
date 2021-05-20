@@ -108,11 +108,11 @@ namespace RookieOnlineAssetManagement.Controllers
                 error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
             }
 
-            if (model.RoleType == string.Empty)
+            if (model.Roles == string.Empty)
             {
                 error.Add(new { RoleType = "The role field is required" });
             }    
-            else if (model.RoleType != RoleName.Admin && model.RoleType != RoleName.User)
+            else if (model.Roles != RoleName.Admin && model.Roles != RoleName.User)
             {
                 error.Add(new { RoleType = "The role is not found" });
             }    
@@ -170,7 +170,7 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == id);
+            var user = await _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).SingleOrDefaultAsync(u => u.Id == id);
 
             if (user == null) return NotFound("Cannot find this user!");
 
@@ -185,30 +185,61 @@ namespace RookieOnlineAssetManagement.Controllers
                 JoinedDate = user.JoinedDate,
                 Location = user.Location,
                 UserName = user.UserName,
-                RoleType = await _userManager.GetRolesAsync(user)
+                Roles = user.UserRoles?.Select(r => r.Role.Name) ?? Enumerable.Empty<string>()
             };
 
             return Ok(new Response<UserResponseModel>(result));
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter)
+        public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
             var queryable = !string.IsNullOrEmpty(location)
                 ? _userManager.Users.Where(u => u.Location == location && u.State == UserState.Enable)
                 : _userManager.Users;
+
+            queryable = queryable.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                queryable = queryable.Where(u => u.FirstName.Contains(keyword) || u.LastName.Contains(keyword) || u.StaffCode.Contains(keyword));
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "staffCode":
+                        queryable = asc ? queryable.OrderBy(u => u.StaffCode) : queryable.OrderByDescending(u => u.StaffCode);
+                        break;
+                    case "firstName":
+                        queryable = asc ? queryable.OrderBy(u => u.FirstName) : queryable.OrderByDescending(u => u.FirstName);
+                        break;
+                    case "lastName":
+                        queryable = asc ? queryable.OrderBy(u => u.LastName) : queryable.OrderByDescending(u => u.LastName);
+                        break;
+                    case "joinedDate":
+                        queryable = asc ? queryable.OrderBy(u => u.JoinedDate) : queryable.OrderByDescending(u => u.JoinedDate);
+                        break;
+                    case "type":
+                        queryable = asc ? queryable.OrderBy(u => u.UserRoles.ToString()) : queryable.OrderByDescending(u => u.UserRoles.ToString());
+                        break;
+                    default:
+                        queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
+                        break;
+                }
+            }
+
             var count = await queryable.CountAsync();
             var data = await queryable
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();
-
+            
             var result = new List<UserResponseModel>();
 
             foreach (var user in data)
             {
-                var roleType = await _userManager.GetRolesAsync(user);
-
                 result.Add(new UserResponseModel
                 {
                     Id = user.Id,
@@ -220,7 +251,7 @@ namespace RookieOnlineAssetManagement.Controllers
                     JoinedDate = user.JoinedDate,
                     Location = user.Location,
                     UserName = user.UserName,
-                    RoleType = roleType
+                    Roles = user.UserRoles?.Select(r => r.Role.Name)??Enumerable.Empty<string>()
                 });
             }
 
@@ -255,18 +286,18 @@ namespace RookieOnlineAssetManagement.Controllers
                     Location = model.Location,
                     UserName = userName,
                     Password = password,
-                    State = UserState.Enable
+                    State = UserState.Enable,
                 };
 
                 var result = await _userManager.CreateAsync(user, password);
                 if (result == null) return BadRequest("Something was wrong");
                 if (result.Errors.Any()) return BadRequest(result.Errors);
 
-                if (!await _roleManager.RoleExistsAsync(model.RoleType))
+                if (!await _roleManager.RoleExistsAsync(model.Roles))
                 {
-                    await _roleManager.CreateAsync(new ApplicationRole(model.RoleType));
+                    await _roleManager.CreateAsync(new ApplicationRole(model.Roles));
                 }
-                await _userManager.AddToRoleAsync(user, model.RoleType);
+                await _userManager.AddToRoleAsync(user, model.Roles);
 
                 user.StaffCode = AutoGenerateStaffCode(user.Id);
                 await _dbContext.SaveChangesAsync();
@@ -282,7 +313,8 @@ namespace RookieOnlineAssetManagement.Controllers
                     StaffCode = user.StaffCode,
                     JoinedDate = user.JoinedDate,
                     UserName = user.UserName,
-                    RoleType = await _userManager.GetRolesAsync(user)
+                    Password = user.Password,
+                    Roles = await _userManager.GetRolesAsync(user)
                 });
             }
             catch (Exception ex)
@@ -296,7 +328,7 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             try
             {
-                var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == id);
+                var user = await _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).SingleOrDefaultAsync(u => u.Id == id);
 
                 if (user == null) return NotFound("Cannot find this user!");
 
@@ -307,6 +339,12 @@ namespace RookieOnlineAssetManagement.Controllers
                 if (oldUserRole.FirstOrDefault() != model.RoleType)
                 {
                     await _userManager.RemoveFromRolesAsync(user, oldUserRole);
+
+                    if (!await _roleManager.RoleExistsAsync(model.RoleType))
+                    {
+                        await _roleManager.CreateAsync(new ApplicationRole(model.RoleType));
+                    }
+
                     await _userManager.AddToRoleAsync(user, model.RoleType);
                 }    
 
@@ -315,20 +353,19 @@ namespace RookieOnlineAssetManagement.Controllers
                 user.Gender = model.Gender;
                 await _dbContext.SaveChangesAsync();
 
-                var newUserRole = await _userManager.GetRolesAsync(user);
-
                 return Ok(new UserResponseModel
                 {
                     Id = user.Id,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
+                    Password = user.Password,
                     DoB = user.DoB,
                     Gender = GetGender(user.Gender),
                     Location = user.Location,
                     StaffCode = user.StaffCode,
                     JoinedDate = user.JoinedDate,
                     UserName = user.UserName,
-                    RoleType = newUserRole
+                    Roles = user.UserRoles?.Select(r => r.Role.Name) ?? Enumerable.Empty<string>()
                 });
             }
             catch (Exception ex)
