@@ -108,11 +108,11 @@ namespace RookieOnlineAssetManagement.Controllers
                 error.Add(new { joinedDate = "Joined date is Saturday or Sunday. Please select a different date" });
             }
 
-            if (model.RoleType == string.Empty)
+            if (model.Roles == string.Empty)
             {
                 error.Add(new { RoleType = "The role field is required" });
             }    
-            else if (model.RoleType != RoleName.Admin && model.RoleType != RoleName.User)
+            else if (model.Roles != RoleName.Admin && model.Roles != RoleName.User)
             {
                 error.Add(new { RoleType = "The role is not found" });
             }    
@@ -240,8 +240,6 @@ namespace RookieOnlineAssetManagement.Controllers
 
             foreach (var user in data)
             {
-                //var roleType = await _userManager.GetRolesAsync(user);
-
                 result.Add(new UserResponseModel
                 {
                     Id = user.Id,
@@ -295,11 +293,11 @@ namespace RookieOnlineAssetManagement.Controllers
                 if (result == null) return BadRequest("Something was wrong");
                 if (result.Errors.Any()) return BadRequest(result.Errors);
 
-                if (!await _roleManager.RoleExistsAsync(model.RoleType))
+                if (!await _roleManager.RoleExistsAsync(model.Roles))
                 {
-                    await _roleManager.CreateAsync(new ApplicationRole(model.RoleType));
+                    await _roleManager.CreateAsync(new ApplicationRole(model.Roles));
                 }
-                await _userManager.AddToRoleAsync(user, model.RoleType);
+                await _userManager.AddToRoleAsync(user, model.Roles);
 
                 user.StaffCode = AutoGenerateStaffCode(user.Id);
                 await _dbContext.SaveChangesAsync();
