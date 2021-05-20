@@ -12,6 +12,6 @@ namespace RookieOnlineAssetManagement.Models
         public DateTime JoinedDate { get; set; }
         public Gender Gender { get; set; }
         public string Location { get; set; }
-        public string RoleType { get; set; }
+        public string Roles { get; set; }
     }
 }

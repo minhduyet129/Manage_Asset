@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
@@ -21,9 +22,12 @@ namespace RookieOnlineAssetManagement.Controllers
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public AssignmentController(ApplicationDbContext dbContext)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public AssignmentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
         }
 
         private string GetAssignmentState(AssignmentState state)
@@ -40,6 +44,65 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 return "Declined";
             }
+        }
+
+        private Response<AssignmentResponseModel> ValidateAssignment(AssignmentModel model)
+        {
+            var asset = _dbContext.Assets.SingleOrDefault(a => a.Id == model.AssetId);
+            var assignTo = _userManager.Users.SingleOrDefault(u => u.Id == model.AssignToId && u.State == UserState.Enable);
+            var assignBy = _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).SingleOrDefault(u => u.Id == model.AssignById);
+            var checkAdminRole = assignBy.UserRoles.FirstOrDefault().Role.Name == RoleName.Admin;
+
+            var error = new List<object> { };
+
+            if(model.AssignToId <= 0)
+            {
+                error.Add(new { assignTo = "The field is required" });
+            }    
+            else if (assignTo == null)
+            {
+                error.Add(new { assignTo = "The user does not exist" });
+            }    
+            
+            if (model.AssignById <= 0)
+            {
+                error.Add(new { assignBy = "The field is required" });
+            }
+            else if (!checkAdminRole)
+            {
+                error.Add(new { assignBy = "The admin does not exist" });
+            }
+
+            if (model.AssetId <= 0)
+            {
+                error.Add(new { assetId = "The field is required" });
+            }
+            else if (asset == null)
+            {
+                error.Add(new { assetId = "The asset does not exist" });
+            }
+            else if (asset.State != AssetState.Available)
+            {
+                error.Add(new { assetId = "The asset is not available" });
+            }
+
+            if (model.AssignedDate < DateTime.Now)
+            {
+                error.Add(new { assignedDate = "The assigned date is only current or future date" });
+            }
+
+            if (model.Note.Length >= 255)
+            {
+                error.Add(new { note = "The note has max length is 255 characters" });
+            }
+
+            var response = new Response<AssignmentResponseModel>
+            {
+                Data = null,
+                Errors = error
+            };
+
+            return response;
         }
 
         [HttpGet]
@@ -75,9 +138,11 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             try
             {
+                if (ValidateAssignment(model).Errors.Count > 0) return BadRequest(ValidateAssignment(model));
 
+                var asset = await _dbContext.Assets.SingleOrDefaultAsync(a => a.Id == model.AssetId);
 
-                var user = new Assignment
+                var assignment = new Assignment
                 {
                     AssignToId = model.AssignToId,
                     AssignById = model.AssignById,
@@ -87,11 +152,19 @@ namespace RookieOnlineAssetManagement.Controllers
                     State = AssignmentState.Waiting
                 };
 
-                var result = await _dbContext.Assignments.AddAsync(user);
-                if (result == null) return BadRequest("Something was wrong");
+                var result = await _dbContext.Assignments.AddAsync(assignment);
+                asset.State = AssetState.Assigned;
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(user);
+                return Ok(new AssignmentResponseModel
+                { 
+                    AssetCode = assignment.Asset.AssetCode,
+                    AssetName = assignment.Asset.AssetName,
+                    AssignBy = assignment.AssignBy.UserName,
+                    AssignTo = assignment.AssignTo.UserName,
+                    AssignDate = assignment.AssignedDate,
+                    State = GetAssignmentState(assignment.State),
+                });
             }
             catch (Exception ex)
             {
