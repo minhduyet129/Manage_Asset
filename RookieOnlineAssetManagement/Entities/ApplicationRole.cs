@@ -15,5 +15,7 @@ namespace RookieOnlineAssetManagement.Entities
         public ApplicationRole(string roleName) : base(roleName)
         {
         }
+
+        public ICollection<ApplicationUserRole> UserRoles { get; set; }
     }
 }
