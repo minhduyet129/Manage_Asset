@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
+using RookieOnlineAssetManagement.Filter;
+using RookieOnlineAssetManagement.Helper;
 using RookieOnlineAssetManagement.Models;
 using System;
 using System.Collections.Generic;
@@ -20,9 +22,35 @@ namespace RookieOnlineAssetManagement.Controllers
             _context = context;
         }
         [HttpGet]
-        public IEnumerable<Asset> GetAllCategory()
+        public async Task<IActionResult> GetAllCategory(string location,[FromQuery] PaginationFilter filter)
         {
-            return _context.Assets.ToList();
+            var queryLocation = from a in _context.Assets
+                        join b in _context.Categories
+                        on a.CategoryId equals b.Id
+                        where a.Location ==location
+                        select new
+                        {
+                           a.AssetCode,
+                           a.AssetName,
+                           b.Name,
+                           a.State
+                        };
+            var queryNotLocation= from a in _context.Assets
+                                  join b in _context.Categories
+                                  on a.CategoryId equals b.Id
+                                  select new
+                                  {
+                                      a.AssetCode,
+                                      a.AssetName,
+                                      b.Name,
+                                      a.State
+                                  };
+            var query = !string.IsNullOrEmpty(location) ? queryLocation : queryNotLocation;
+            var count = await query.CountAsync();
+            var data = await query.Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize).ToListAsync();
+            var response = PaginationHelper.CreatePagedResponse(data, filter.PageNumber, filter.PageSize, count);
+            return Ok(response);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAssetDetail(int id)
@@ -32,6 +60,12 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 return BadRequest();
             }
+            return Ok(asset);
+        }
+        [HttpGet("GetAssetAvailable")]
+        public  IActionResult GetAssetAvailable()
+        {
+            var asset = _context.Assets.Where(x => x.State == 0);
             return Ok(asset);
         }
         [HttpPost]

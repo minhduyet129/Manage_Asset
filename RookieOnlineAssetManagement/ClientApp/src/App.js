@@ -10,6 +10,7 @@ import Login from './login/Login';
 import "react-datepicker/dist/react-datepicker.css";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "@fortawesome/fontawesome-free/js/all.js";
+import { EditUser } from './admin/pages/user/EditUser';
 function App() {
   return (
     <div>
@@ -18,6 +19,7 @@ function App() {
           <Route path='/admin' exact component={Home} />
           <Route path='/admin/users' exact component={User} />
           <Route path='/admin/users/create' component={CreateUser} />
+          <Route path='/admin/users/edit/:id' component={EditUser} />
           <Route path='/admin/assets' exact component={Asset} />
           <Route path='/admin/assignments' exact component={Assignment} />
           <Route
