@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -111,11 +112,11 @@ namespace RookieOnlineAssetManagement.Controllers
             if (model.Roles == string.Empty)
             {
                 error.Add(new { RoleType = "The role field is required" });
-            }    
+            }
             else if (model.Roles != RoleName.Admin && model.Roles != RoleName.User)
             {
                 error.Add(new { RoleType = "The role is not found" });
-            }    
+            }
 
             var response = new Response<UserResponseModel>
             {
@@ -235,7 +236,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();
-            
+
             var result = new List<UserResponseModel>();
 
             foreach (var user in data)
@@ -251,7 +252,7 @@ namespace RookieOnlineAssetManagement.Controllers
                     JoinedDate = user.JoinedDate,
                     Location = user.Location,
                     UserName = user.UserName,
-                    Roles = user.UserRoles?.Select(r => r.Role.Name)??Enumerable.Empty<string>()
+                    Roles = user.UserRoles?.Select(r => r.Role.Name) ?? Enumerable.Empty<string>()
                 });
             }
 
@@ -346,7 +347,7 @@ namespace RookieOnlineAssetManagement.Controllers
                     }
 
                     await _userManager.AddToRoleAsync(user, model.RoleType);
-                }    
+                }
 
                 user.DoB = model.DoB;
                 user.JoinedDate = model.JoinedDate;
@@ -389,14 +390,14 @@ namespace RookieOnlineAssetManagement.Controllers
                 });
 
                 return BadRequest(new Response<UserResponseModel> { Errors = errors });
-            } 
-                
+            }
+
 
             if (user.AssignmentsTo.Count > 0)
             {
-                errors.Add(new 
-                { 
-                    message = "There are valid assignments belonging to this user. Please close all assignments before disabling user." 
+                errors.Add(new
+                {
+                    message = "There are valid assignments belonging to this user. Please close all assignments before disabling user."
                 });
 
                 return BadRequest(new Response<UserResponseModel> { Errors = errors });
@@ -411,14 +412,14 @@ namespace RookieOnlineAssetManagement.Controllers
         public async Task<IActionResult> Login(LoginModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
-            if(user !=null && await _userManager.CheckPasswordAsync(user, model.Password))
+            if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name,user.UserName)
                 };
-                foreach(var userRole in userRoles)
+                foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
@@ -430,18 +431,59 @@ namespace RookieOnlineAssetManagement.Controllers
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
+                user.CountLogin = user.CountLogin + 1;
+                await _userManager.UpdateAsync(user);
                 return Ok(new
                 {
                     token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration=token.ValidTo,
-                    role=userRoles[0],
-                    userId=user.Id,
-                    location=user.Location
-                }); 
+                    expiration = token.ValidTo,
+                    role = userRoles[0],
+                    userId = user.Id,
+                    location = user.Location,
+                    countLogin=user.CountLogin
+                });
 
             }
             return Unauthorized("Username or password is incorrect. Please try again");
         }
+
+        [HttpPost("ChangPasswordFirstLogin")]
+        public async Task<IActionResult> ChangePasswordFirstLogin(int userId,string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return NotFound("Not Found User!");
+            }
+            var tokenChangePassword = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var resetPassword =await _userManager.ResetPasswordAsync(user, tokenChangePassword, newPassword);
+            if (!resetPassword.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Password must have 8 characters and include 1 uppercase character, 1 special character and 1 number ");
+            }
+            
+            return Ok("Your password has been changed successfully");
+        }
+        [HttpPost("ChangPassword")]
+        public async Task<IActionResult> ChangPassword(string userId,string oldPassword,string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return NotFound("Not Found User!");
+            }
+            if(!await _userManager.CheckPasswordAsync(user, oldPassword))
+            {
+                return BadRequest("Password is incorrect");
+            }
+            var changePassword = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+            if (!changePassword.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Password must have 8 characters and include 1 uppercase character, 1 special character and 1 number ");
+            }
+            return Ok("Your password has been changed successfully");
+        }
+
 
     }
 }
