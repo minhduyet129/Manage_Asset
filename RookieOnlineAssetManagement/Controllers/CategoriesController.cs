@@ -16,9 +16,15 @@ namespace RookieOnlineAssetManagement.Controllers
 
     {
         private readonly ApplicationDbContext _context;
-        public CategoriesController (ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        [HttpGet]
+        public IEnumerable<Category> GetAllCategory()
+        {
+            return _context.Categories.OrderBy(x => x.Name).ToList();
         }
         [HttpPost]
         public async Task<IActionResult> CreateCategory(CategoryModel category)
@@ -40,7 +46,41 @@ namespace RookieOnlineAssetManagement.Controllers
             };
             await _context.Categories.AddAsync(newcategory);
             await _context.SaveChangesAsync();
-            return Ok("Create category succeed!");
+            return Ok(newcategory);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, Category category)
+        {
+            if (id != category.Id)
+            {
+                return BadRequest();
+            }
+            var catename = _context.Categories.SingleOrDefault(x => x.Name == category.Name);
+            if (catename != null)
+            {
+                return BadRequest("Category name exist!");
+            }
+            var catecode = _context.Categories.SingleOrDefault(x => x.CategoryCode == category.CategoryCode);
+            if (catecode != null)
+            {
+                return BadRequest("Category code exist!");
+            }
+            _context.Entry(category).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Ok(category);
+
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var cate = _context.Categories.SingleOrDefault(x => x.Id == id);
+            if(cate == null)
+            {
+                return NotFound();
+            }
+            _context.Categories.Remove(cate);
+            await _context.SaveChangesAsync();
+            return Ok("Succeed!");
         }
     }
 }

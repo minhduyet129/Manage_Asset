@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RookieOnlineAssetManagement.Data;
 
 namespace RookieOnlineAssetManagement.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210519080426_UpdateUserState")]
+    partial class UpdateUserState
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,6 +86,21 @@ namespace RookieOnlineAssetManagement.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AspNetUserLogins");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -226,21 +243,6 @@ namespace RookieOnlineAssetManagement.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("RookieOnlineAssetManagement.Entities.ApplicationUserRole", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles");
                 });
 
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.Asset", b =>
@@ -391,8 +393,14 @@ namespace RookieOnlineAssetManagement.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
+                    b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -400,23 +408,13 @@ namespace RookieOnlineAssetManagement.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RookieOnlineAssetManagement.Entities.ApplicationUserRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationRole", "Role")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationUser", "User")
-                        .WithMany("UserRoles")
+                    b.HasOne("RookieOnlineAssetManagement.Entities.ApplicationUser", null)
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Role");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.Asset", b =>
@@ -476,11 +474,6 @@ namespace RookieOnlineAssetManagement.Migrations
                     b.Navigation("Assignment");
                 });
 
-            modelBuilder.Entity("RookieOnlineAssetManagement.Entities.ApplicationRole", b =>
-                {
-                    b.Navigation("UserRoles");
-                });
-
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("AssignmentsBy");
@@ -488,8 +481,6 @@ namespace RookieOnlineAssetManagement.Migrations
                     b.Navigation("AssignmentsTo");
 
                     b.Navigation("ReturnRequests");
-
-                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("RookieOnlineAssetManagement.Entities.Asset", b =>
