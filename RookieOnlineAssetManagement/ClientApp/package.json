@@ -9,10 +9,7 @@
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",
-<<<<<<< HEAD
     "date-fns": "^2.21.3",
-=======
->>>>>>> 8338370f584ae4eaee23e92f9eec6240f26ab8ed
     "react": "^17.0.2",
     "react-datepicker": "^3.8.0",
     "react-dom": "^17.0.2",

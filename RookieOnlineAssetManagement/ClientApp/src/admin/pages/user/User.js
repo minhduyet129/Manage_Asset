@@ -13,7 +13,7 @@ function User() {
   const DisableUsers = async (id) => {
     await useCreateUser.disable(id)
     .then((res) => {
-      setUsers(res.data.data);
+      // setUsers(res.data.data);
       if (res.status === 200) {
         alert('User Deleted');
       }
@@ -42,6 +42,8 @@ function User() {
       history.push(`/admin/users/edit/${id}`)
     }
   };
+
+  // const data = React.useMemo(() => users, [users]);
   
   const columns = React.useMemo(
     () => [
