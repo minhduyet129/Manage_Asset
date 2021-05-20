@@ -12,26 +12,26 @@ function Login() {
 
   return (
     <div className='wrapper-form'>
-      <form className='form' onSubmit={handleSubmit(onSubmit)}>
+      <form className='form__login' onSubmit={handleSubmit(onSubmit)}>
         <h2 className='form__title'>Login</h2>
-        <div className='form__div'>
-          <input className='form__input' {...register('username')} />
+        <div className='form__field'>
           <label className='form__label' htmlFor='username'>
             Username
           </label>
+          <input className='form__input' {...register('username')} />
         </div>
         {errors.username && (
           <span className='form__validation'>This field is required</span>
         )}
-        <div className='form__div'>
+        <div className='form__field'>
+          <label className='form__label' htmlFor='password'>
+            Password
+          </label>
           <input
             className='form__input'
             {...register('password', { required: true })}
             type='password'
           />
-          <label className='form__label' htmlFor='password'>
-            Password
-          </label>
         </div>
         {errors.password && (
           <span className='form__validation'>This field is required</span>
