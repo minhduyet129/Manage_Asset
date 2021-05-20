@@ -1,51 +1,76 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-
-const CreateUser = () => {
-  const [startDate, setStartDate] = useState(null);
+export const EditUser = () => {
+  const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState(null);
+  const [users, setUsers] = useState([]);
+  const { id } = useParams();
   const isWeekday = (date) => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
   };
+  console.log(id);
 
-  async function handlerUser(users) {
-    users.gender = users.gender === 0 ? 0 : 1;
-    return useCreateUser
-      .create(users)
-      .then((response) => {
-        if (response.status === 200) {
-          alert('Add user sucessfully');
-        }
+  const loadUsers = () => {
+    const result = useCreateUser
+      .edit(id)
+      .then((res) => {
+        setUsers(res.data.data);
+        setStartDate(setDateTime(res.data.data.doB));
+        setJoinedDate(setDateTime(res.data.data.joinedDate));
+        reset({
+          firstName: res.data.data.firstName,
+          lastName: res.data.data.lastName,
+          gender: res.data.data.gender,
+          location: res.data.data.location,
+          userName: res.data.data.userName,
+          roleType: res.data.data.roleType[0],
+        });
       })
-      .catch((error) => {
-        alert('Something went wrong!');
+      .catch((err) => {
+        console.log(err);
       });
-  }
+
+    setUsers(result.data);
+  };
+
+  console.log(users);
+
+  useEffect(() => {
+    loadUsers();
+  }, [id]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
+    reset,
   } = useForm();
 
   const onSubmit = async (data) => {
-    await handlerUser(data);
+    //await handlerUser(data);
     // console.log(data);
-    console.log(startDate);
+    //console.log(startDate);
   };
 
   // console.log(startDate.getDay())
+
+  const setDateTime = (date) => {
+    date = date.slice(0, 10);
+    let newDate = date.split('-').join(',');
+    return new Date(newDate);
+  };
 
   return (
     <LayoutAdmin>
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
-          <h2 className='form__title'>Create User</h2>
+          <h2 className='form__title'>Edit User</h2>
           <div className='form__div'>
             <input
               id='firstname'
@@ -79,6 +104,7 @@ const CreateUser = () => {
                   onChange={(e) => {
                     onChange(e);
                     setStartDate(e);
+                    console.log(e);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -133,17 +159,19 @@ const CreateUser = () => {
             </label>
           </div>
 
-
           <div className='form__div'>
-            <select className='form__input' {...register('gender')} id='gender'>
-              <option value={0}>Female</option>
-              <option value={1}>Male</option>
-            </select>
+            {users && users.length > 0 && (
+              <select {...register('gender')}>
+                {users.map((user) => (
+                  <option value={user.gender = user.gender === 0 ? 0 : 1}>{user.gender}</option>
+                ))}
+              </select>
+            )}
+            {errors.gender && <span>Please input</span>}
             <label className='form__label' htmlFor='gender'>
               Gender
             </label>
           </div>
-          {errors.gender && <span>This field is required</span>}
           <div className='form__div'>
             <input
               className='form__input'
@@ -174,5 +202,3 @@ const CreateUser = () => {
     </LayoutAdmin>
   );
 };
-
-export default CreateUser;

@@ -1,45 +1,98 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
-import { useQuery } from 'react-query';
-import axios from 'axios';
-import { COLUMNS } from './columns';
 import { UsersTable } from './UsersTable';
 import {useUsers} from './UserHooks'
+import { useHistory } from 'react-router-dom';
 
 function User() {
+  const Delete =  async  (id) => {};
   // option 1(Usequery to call api)
   const getUsers = useUsers();
+  const usersRef = useRef();
+  const history = useHistory();
   
   const data = React.useMemo(
     () => getUsers?.data?.data?.data || [],
     [getUsers?.data?.data?.data]
-  );
+    );
+    
+  usersRef.current = data
 
-  console.log(data)
 
-  // option 2(Useeffect to call api)
-  // const [users, setUser] = useState([]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     axios
-  //       .get('https://609bede52b549f00176e4bd7.mockapi.io/api/users/users')
-  //       .then((res) => res.data)
-  //       .then((data) => {
-  //         setUser(data);
-  //       });
-  //   })();
-  // }, []);
-
-  // console.log(users)
-
+  const getUserId = (rowIndex) => {
+    if (!usersRef.current) return null;
+    const id = usersRef.current[rowIndex].id;
+    if (id) {
+      history.push(`/admin/users/edit/${id}`)
+    }
+  };
   
 
-  //  const data = React.useMemo(() => users, [users]);
-
-   const columns = React.useMemo(() => COLUMNS, []);
-
-  
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Id',
+        accessor: 'id',
+      },
+      {
+        Header: 'StaffCode',
+        accessor: 'staffCode',
+      },
+      {
+        Header: 'FirstName',
+        accessor: 'firstName',
+      },
+      {
+        Header: 'LastName',
+        accessor: 'lastName',
+      },
+      {
+        Header: 'Date of Birth',
+        accessor: 'doB',
+      },
+      {
+        Header: 'JoinedDate',
+        accessor: 'joinedDate',
+      },
+      {
+        Header: 'Gender',
+        accessor: 'gender',
+      },
+      {
+        Header: 'Location',
+        accessor: 'location',
+      },
+      {
+        Header:'Role',
+        accessor: 'roleType',
+      },
+      {
+        Header: 'Username',
+        accessor: 'userName',
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: (props) => {
+          const rowIdx = props.row.id;
+          
+          return (
+            <div>
+              <span onClick={() => getUserId(rowIdx)}>
+                  <i className='far fa-edit action mr-2'></i>
+              </span>
+              &emsp;
+              <span onClick={() => Delete()}>
+                <i className='fas fa-times '></i>
+              </span>
+            </div>
+          );
+        },
+        
+      },
+    ],
+    []
+  )
 
 
   // if (getUsers.isLoading) {
