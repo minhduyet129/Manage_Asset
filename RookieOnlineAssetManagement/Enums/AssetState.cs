@@ -8,6 +8,7 @@ namespace RookieOnlineAssetManagement.Enums
     public enum AssetState
     {
         Available,
+        WaitingForApproval,
         NotAvailable,
         Assigned,
         WaitingForRecycling,
