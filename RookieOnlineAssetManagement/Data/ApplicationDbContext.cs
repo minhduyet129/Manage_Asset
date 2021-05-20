@@ -38,7 +38,13 @@ namespace RookieOnlineAssetManagement.Data
                  .HasForeignKey(a => a.AssignToId)
                  .OnDelete(DeleteBehavior.Restrict)
                  .IsRequired();
+            builder.Entity<ApplicationUser>(entity =>
+            {
+                entity.Property(e => e.CountLogin).HasDefaultValue(0);
+            });
+            
 
+                
             builder.Entity<ApplicationUserRole>(userRole =>
             {
                 userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
