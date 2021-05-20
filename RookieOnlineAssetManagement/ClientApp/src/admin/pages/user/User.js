@@ -1,33 +1,50 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { UsersTable } from './UsersTable';
-import {useUsers} from './UserHooks'
 import { useHistory } from 'react-router-dom';
-
+import {format} from  'date-fns'
+import { useCreateUser } from './UserHooks';
 function User() {
-  const Delete =  async  (id) => {};
-  // option 1(Usequery to call api)
-  const getUsers = useUsers();
-  const usersRef = useRef();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false)
+  const usersRef = useRef(null);
   const history = useHistory();
+
+  const DisableUsers = async (id) => {
+    await useCreateUser.disable(id)
+    .then((res) => {
+      // setUsers(res.data.data);
+      if (res.status === 200) {
+        alert('User Deleted');
+      }
+    })
+    .catch(() => {
+      alert('There are valid assigments belongs to this users. Please close all assignment before disable users');
+    });
+  };
+
   
-  const data = React.useMemo(
-    () => getUsers?.data?.data?.data || [],
-    [getUsers?.data?.data?.data]
-    );
-    
-  usersRef.current = data
-
-
+  useEffect(() => {
+    setLoading(true)
+    useCreateUser.getall()
+    .then(res => {
+      usersRef.current = res.data.data
+      setUsers(res.data.data)
+      setLoading(false)
+    })
+    .catch(err => console.log(err))
+  }, [])  
+  
   const getUserId = (rowIndex) => {
-    if (!usersRef.current) return null;
-    const id = usersRef.current[rowIndex].id;
+    if (!usersRef.current) return
+    const id = usersRef.current[rowIndex].id
     if (id) {
       history.push(`/admin/users/edit/${id}`)
     }
   };
-  
 
+  // const data = React.useMemo(() => users, [users]);
+  
   const columns = React.useMemo(
     () => [
       {
@@ -49,10 +66,12 @@ function User() {
       {
         Header: 'Date of Birth',
         accessor: 'doB',
+        Cell: ({value}) => {return format(new Date(value), 'dd/MM/yyyy')}
       },
       {
         Header: 'JoinedDate',
         accessor: 'joinedDate',
+        Cell: ({value}) => {return format(new Date(value), 'dd/MM/yyyy')}
       },
       {
         Header: 'Gender',
@@ -64,7 +83,7 @@ function User() {
       },
       {
         Header:'Role',
-        accessor: 'roleType',
+        accessor: 'roles',
       },
       {
         Header: 'Username',
@@ -78,11 +97,11 @@ function User() {
           
           return (
             <div>
-              <span onClick={() => getUserId(rowIdx)}>
-                  <i className='far fa-edit action mr-2'></i>
+              <span className='font' onClick={() => getUserId(rowIdx)}>
+                  <i className='bx bx-edit'></i>
               </span>
               &emsp;
-              <span onClick={() => Delete()}>
+              <span className='font' onClick={() => DisableUsers(rowIdx)}>
                 <i className='fas fa-times '></i>
               </span>
             </div>
@@ -95,17 +114,9 @@ function User() {
   )
 
 
-  // if (getUsers.isLoading) {
-  //   return 'Loading...';
-  // }
-
-  // if (getUsers.error) {
-  //   return `Error: ${getUsers.error.message}, try again!`;
-  // }
-
   return (
     <LayoutAdmin>
-      <UsersTable columns={columns} data={data} />
+       <UsersTable columns={columns} data={users} loading={loading}/>
     </LayoutAdmin>
   );
 }

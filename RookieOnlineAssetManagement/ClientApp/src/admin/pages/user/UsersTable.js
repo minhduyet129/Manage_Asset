@@ -1,14 +1,14 @@
 import React from 'react';
 import { useTable, usePagination } from 'react-table';
 import { Link } from 'react-router-dom';
-export const UsersTable = ({ columns, data }) => {
+export const UsersTable = ({ columns, data, loading }) => {
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-  } = useTable({ columns, data }, usePagination);
+  } = useTable({ columns, data,}, usePagination);
   return (
     <div>
       <div className='table__view'>
@@ -41,20 +41,22 @@ export const UsersTable = ({ columns, data }) => {
                 </tr>
               ))}
             </thead>
+            {loading ? <div className='spinner'><i class="fas fa-spinner fa-spin"></i></div> : 
             <tbody {...getTableBodyProps()}>
-              {rows.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()}>
-                    {row.cells.map((cell) => {
-                      return (
-                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()}>
+                  {row.cells.map((cell) => {
+                    return (
+                      <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>   
+            }
           </table>
         </div>
       </div>

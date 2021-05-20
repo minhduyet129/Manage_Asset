@@ -13,36 +13,47 @@ export const EditUser = () => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
   };
-  console.log(id);
 
-  const loadUsers = () => {
-    const result = useCreateUser
-      .edit(id)
+  const loadUsers = async () => {
+    await useCreateUser
+      .getbyid(id)
       .then((res) => {
         setUsers(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
+        console.log(res.data.data.roles)
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
+          id: res.data.data.id,
           firstName: res.data.data.firstName,
           lastName: res.data.data.lastName,
-          gender: res.data.data.gender,
+          gender: getGenderEnum(res.data.data.gender),
           location: res.data.data.location,
           userName: res.data.data.userName,
-          roleType: res.data.data.roleType[0],
+          roleType: res.data.data.roleType,
         });
       })
       .catch((err) => {
         console.log(err);
       });
-
-    setUsers(result.data);
   };
 
-  console.log(users);
+  function updateUsers(users) {
+    return useCreateUser
+      .edit(users, id)
+      .then((response) => {
+        if (response.status === 200) {
+          alert('Update user sucessfully');
+        }
+      })
+      .catch((error) => {
+        alert('Something went wrong!');
+        console.log();
+      });
+  }
 
   useEffect(() => {
     loadUsers();
-  }, [id]);
+  }, []);
 
   const {
     register,
@@ -52,41 +63,44 @@ export const EditUser = () => {
     reset,
   } = useForm();
 
-  const onSubmit = async (data) => {
-    //await handlerUser(data);
-    // console.log(data);
-    //console.log(startDate);
-  };
-
-  // console.log(startDate.getDay())
-
   const setDateTime = (date) => {
     date = date.slice(0, 10);
     let newDate = date.split('-').join(',');
     return new Date(newDate);
   };
 
+  const getGenderEnum = (gender) => {
+    if (gender === 'Female') return 0;
+    return 1;
+  };
+
+  const onSubmit = (data) => {
+    updateUsers(data);
+    console.log(data);
+  };
   return (
     <LayoutAdmin>
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
           <h2 className='form__title'>Edit User</h2>
           <div className='form__div'>
+            <input {...register('id', { required: true })} hidden />
             <input
-              id='firstname'
+              id='firstName'
               className='form__input'
               {...register('firstName')}
+              disabled
             />
-            <label className='form__label' htmlFor='firstname'>
+            <label className='form__label' htmlFor='firstName'>
               First Name
             </label>
-            {errors.firstName && <span>This field is required</span>}
           </div>
           <div className='form__div'>
             <input
               id='lastName'
               className='form__input'
-              {...register('lastName', { required: true })}
+              {...register('lastName')}
+              disabled
             />
             <label className='form__label' htmlFor='lastName'>
               Last Name
@@ -117,9 +131,6 @@ export const EditUser = () => {
                   dropdownMode='select'
                 />
               )}
-              rules={{
-                required: true,
-              }}
             />
             <label className='date-picker__label' htmlFor='doB'>
               Date of Birth
@@ -150,9 +161,6 @@ export const EditUser = () => {
                   dropdownMode='select'
                 />
               )}
-              rules={{
-                required: true,
-              }}
             />
             <label className='date-picker__label' htmlFor='joinedDate'>
               Joined Date
@@ -160,36 +168,24 @@ export const EditUser = () => {
           </div>
 
           <div className='form__div'>
-            {users && users.length > 0 && (
-              <select {...register('gender')}>
-                {users.map((user) => (
-                  <option value={user.gender = user.gender === 0 ? 0 : 1}>{user.gender}</option>
-                ))}
-              </select>
-            )}
+            <select className='form__input' {...register('gender')} id='gender'>
+              <option value={0}>Female</option>
+              <option value={1}>Male</option>
+            </select>
             {errors.gender && <span>Please input</span>}
             <label className='form__label' htmlFor='gender'>
               Gender
             </label>
           </div>
           <div className='form__div'>
-            <input
+            <select
               className='form__input'
-              {...register('location')}
-              id='location'
-            />
-            <label className='form__label' htmlFor='location'>
-              Location
-            </label>
-          </div>
-          {errors.location && <span>This field is required</span>}
-          <div className='form__div'>
-            <input
-              className='form__input'
-              {...register('type', { required: true })}
-              id='type'
-            />
-            <label className='form__label' htmlFor='type'>
+              {...register('roleType')}
+              id='roleType'
+            >
+              <option value='User'>{users.roles}</option>
+            </select>
+            <label className='form__label' htmlFor='roleType'>
               Type
             </label>
           </div>

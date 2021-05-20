@@ -26,6 +26,20 @@
 h2 {
   margin: 0;
 }
+.font{
+  font-size: 25px;
+  cursor: pointer;
+  outline: none;
+}
+
+.spinner{
+  font-size: 50px;
+  position: absolute;
+  right:1361px;
+  bottom: 600px;
+  top: 300px;
+  left:860px;
+}
 
 a,
 u {
