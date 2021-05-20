@@ -105,6 +105,24 @@ namespace RookieOnlineAssetManagement.Controllers
             return response;
         }
 
+        private Response<AssignmentResponseModel> ValidateAssignmentState(AssignmentState state, string message)
+        {
+            var error = new List<object> { };
+
+            if (state != AssignmentState.Waiting)
+            {
+                error.Add(new { assignTo = message });
+            }
+
+            var response = new Response<AssignmentResponseModel>
+            {
+                Data = null,
+                Errors = error
+            };
+
+            return response;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllAssignment([FromQuery] PaginationFilter filter)
         {
@@ -120,12 +138,16 @@ namespace RookieOnlineAssetManagement.Controllers
 
             var result = data.Select(assignment => new AssignmentResponseModel
             {
+                Id = assignment.Id,
                 AssetCode = assignment.Asset.AssetCode,
                 AssetName = assignment.Asset.AssetName,
                 AssignTo = assignment.AssignTo.UserName,
                 AssignBy = assignment.AssignBy.UserName,
                 AssignDate = assignment.AssignedDate,
-                State = GetAssignmentState(assignment.State)
+                State = GetAssignmentState(assignment.State),
+                AssetId = assignment.AssetId,
+                AssignById = assignment.AssignById,
+                AssignToId = assignment.AssignToId
             }).ToList();
 
 
@@ -153,23 +175,77 @@ namespace RookieOnlineAssetManagement.Controllers
                 };
 
                 var result = await _dbContext.Assignments.AddAsync(assignment);
-                asset.State = AssetState.Assigned;
+                asset.State = AssetState.WaitingForApproval;
                 await _dbContext.SaveChangesAsync();
 
                 return Ok(new AssignmentResponseModel
-                { 
+                {
+                    Id = assignment.Id,
                     AssetCode = assignment.Asset.AssetCode,
                     AssetName = assignment.Asset.AssetName,
                     AssignBy = assignment.AssignBy.UserName,
                     AssignTo = assignment.AssignTo.UserName,
                     AssignDate = assignment.AssignedDate,
                     State = GetAssignmentState(assignment.State),
+                    AssetId = assignment.AssetId,
+                    AssignById = assignment.AssignById,
+                    AssignToId = assignment.AssignToId
                 });
             }
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAssignment(int id, AssignmentModel model)
+        {
+            var assignment = await _dbContext.Assignments.SingleOrDefaultAsync(a => a.Id == id);
+
+            var stateMessage = "Cannot edit because the assignment has been responded by assignee";
+            var validateState = ValidateAssignmentState(assignment.State, stateMessage);
+            if (validateState.Errors.Count > 0) return BadRequest(validateState.Errors);
+
+            var validate = ValidateAssignment(model);
+            if (validate.Errors.Count > 0) return BadRequest(validate.Errors);
+
+            assignment.AssignToId = model.AssignToId;
+            assignment.AssignById = model.AssignById;
+            assignment.AssetId = model.AssetId;
+            assignment.AssignedDate = model.AssignedDate;
+            assignment.Note = model.Note;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new AssignmentResponseModel
+            {
+                Id = assignment.Id,
+                AssetCode = assignment.Asset.AssetCode,
+                AssetName = assignment.Asset.AssetName,
+                AssignTo = assignment.AssignTo.UserName,
+                AssignBy = assignment.AssignBy.UserName,
+                AssignDate = assignment.AssignedDate,
+                State = GetAssignmentState(assignment.State),
+                AssetId = assignment.AssetId,
+                AssignById = assignment.AssignById,
+                AssignToId = assignment.AssignToId
+            });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAssignment(int id)
+        {
+            var assignment = await _dbContext.Assignments.SingleOrDefaultAsync(a => a.Id == id);
+
+            var stateMessage = "Cannot delete because the assignment has been responded by assignee";
+            var validateState = ValidateAssignmentState(assignment.State, stateMessage);
+            if (validateState.Errors.Count > 0) return BadRequest(validateState.Errors);
+
+            _dbContext.Remove(assignment);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }
