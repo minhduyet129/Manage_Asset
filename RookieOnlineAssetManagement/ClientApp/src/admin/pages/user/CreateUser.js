@@ -4,16 +4,17 @@ import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
 import { useHistory } from 'react-router';
+
 const CreateUser = () => {
   const [startDate, setStartDate] = useState(null);
   const [joinedDate, setJoinedDate] = useState(null);
-  const history = useHistory()
+  const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
   };
 
-   function handlerUser(users) {
+  function handlerUser(users) {
     users.gender = users.gender === 0 ? 0 : 1;
     return useCreateUser
       .create(users)
@@ -21,7 +22,7 @@ const CreateUser = () => {
         if (response.status === 200) {
           alert('Add user sucessfully');
         }
-        console.log(users)
+        console.log(users);
       })
       .catch((error) => {
         alert('Something went wrong!');
@@ -37,8 +38,8 @@ const CreateUser = () => {
 
   const onSubmit = async (data) => {
     await handlerUser(data);
-    history.push('/admin/users')
-     console.log(data);
+    history.push('/admin/users');
+    console.log(data);
     console.log(startDate);
   };
 
@@ -136,7 +137,6 @@ const CreateUser = () => {
             </label>
           </div>
 
-
           <div className='form__div'>
             <select className='form__input' {...register('gender')} id='gender'>
               <option value={0}>Female</option>
@@ -148,20 +148,25 @@ const CreateUser = () => {
           </div>
           {errors.gender && <span>This field is required</span>}
           <div className='form__div'>
+<<<<<<< HEAD
           <select className='form__input' {...register('roles')} id='roles'>
               <option value="User">User</option>
               <option value="Admin">Admin</option>
+=======
+            <select className='form__input' {...register('roles')} id='roles'>
+              <option value='User'>User</option>
+>>>>>>> origin/develop
             </select>
             <label className='form__label' htmlFor='roles'>
               Type
             </label>
           </div>
           <input
-              id='location'
-              hidden
-              className='form__input'
-              {...register('location')}
-            />
+            id='location'
+            hidden
+            className='form__input'
+            {...register('location')}
+          />
           {errors.type && <span>This field is required</span>}
           <div>
             <input className='btn' type='submit' value='Submit' />
