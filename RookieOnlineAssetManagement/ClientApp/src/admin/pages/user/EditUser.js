@@ -30,7 +30,7 @@ export const EditUser = () => {
           gender: getGenderEnum(res.data.data.gender),
           location: res.data.data.location,
           userName: res.data.data.userName,
-          roleType: res.data.data.roleType,
+          roles: res.data.data.roles
         });
       })
       .catch((err) => {
@@ -74,6 +74,9 @@ export const EditUser = () => {
     if (gender === 'Female') return 0;
     return 1;
   };
+
+
+
 
   const onSubmit = (data) => {
     updateUsers(data);
@@ -191,12 +194,13 @@ export const EditUser = () => {
           <div className='form__div'>
             <select
               className='form__input'
-              {...register('roleType')}
-              id='roleType'
+              {...register('roles')}
+              id='roles'
             >
-              <option value='User'>{users.roles}</option>
+              <option value='Admin'>Admin</option>
+              <option value='User'>User</option>
             </select>
-            <label className='form__label' htmlFor='roleType'>
+            <label className='form__label' htmlFor='roles'>
               Type
             </label>
           </div>

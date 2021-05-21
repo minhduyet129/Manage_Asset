@@ -150,6 +150,7 @@ const CreateUser = () => {
           <div className='form__div'>
           <select className='form__input' {...register('roles')} id='roles'>
               <option value="User">User</option>
+              <option value="Admin">Admin</option>
             </select>
             <label className='form__label' htmlFor='roles'>
               Type
