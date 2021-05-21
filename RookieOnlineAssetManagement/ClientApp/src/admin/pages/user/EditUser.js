@@ -4,13 +4,8 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-<<<<<<< HEAD
 import { useHistory } from 'react-router';
 export const EditUser = () => {
-=======
-
-const EditUser = () => {
->>>>>>> origin/develop
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState(null);
   const [users, setUsers] = useState([]);
