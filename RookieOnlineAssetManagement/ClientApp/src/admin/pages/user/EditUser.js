@@ -4,7 +4,8 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-export const EditUser = () => {
+
+const EditUser = () => {
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState(null);
   const [users, setUsers] = useState([]);
@@ -20,7 +21,7 @@ export const EditUser = () => {
       .then((res) => {
         setUsers(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
-        console.log(res.data.data.roles)
+        console.log(res.data.data.roles);
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
           id: res.data.data.id,
@@ -198,3 +199,5 @@ export const EditUser = () => {
     </LayoutAdmin>
   );
 };
+
+export default EditUser;

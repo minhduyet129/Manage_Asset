@@ -7,10 +7,10 @@ import Assignment from './admin/pages/assignment/Assignment';
 import RequestForReturning from './admin/pages/request/RequestForReturning';
 import Report from './admin/pages/report/Report';
 import Login from './login/Login';
-import "react-datepicker/dist/react-datepicker.css";
-import "@fortawesome/fontawesome-free/css/all.css";
-import "@fortawesome/fontawesome-free/js/all.js";
-import { EditUser } from './admin/pages/user/EditUser';
+import 'react-datepicker/dist/react-datepicker.css';
+import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/js/all.js';
+import EditUser from './admin/pages/user/EditUser';
 function App() {
   return (
     <div>

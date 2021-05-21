@@ -1,53 +1,42 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'axios';
 
-
-
 // Get an user
-  function getbyid (id) {
-
-  return  axios
-      .get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`)
-};
+function getbyid(id) {
+  return axios.get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`);
+}
 
 // Get users
 function getall(pageNumber) {
-  
-    return axios
-      .get(`http://hungbqit-001-site5.itempurl.com/api/Users?PageNumber=${pageNumber}`)
-};
-
+  return axios.get(
+    `http://hungbqit-001-site5.itempurl.com/api/Users?PageNumber=${pageNumber}`
+  );
+}
 
 // Create a new user
-function create(users,)  {
-  return axios.post(
-    'http://hungbqit-001-site5.itempurl.com/api/Users',
-    users
-  )
-};
+function create(users) {
+  return axios.post('http://hungbqit-001-site5.itempurl.com/api/Users', users);
+}
 
 //Edit an user
 
-function edit(users,id) {
-  return axios.put(
-    `http://hungbqit-001-site5.itempurl.com/api/Users/${id}`, {
-      id : users.id,
-      // firstName: users.firstName,
-      // lastName: users.lastName,
-      doB: users.doB,
-      joinedDate: users.joinedDate,
-      gender: users.gender,
-      // location: users.location,
-      // userName: users.userName,
-      roleType: users.roleType,
-    }
-  )
+function edit(users, id) {
+  return axios.put(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`, {
+    id: users.id,
+    // firstName: users.firstName,
+    // lastName: users.lastName,
+    doB: users.doB,
+    joinedDate: users.joinedDate,
+    gender: users.gender,
+    // location: users.location,
+    // userName: users.userName,
+    roleType: users.roleType,
+  });
 }
 
 function disable(id) {
   return axios.put(
-    `http://hungbqit-001-site5.itempurl.com/api/Users/disable/${id}` 
-  )
+    `http://hungbqit-001-site5.itempurl.com/api/Users/disable/${id}`
+  );
 }
 
 export const useCreateUser = {
@@ -57,8 +46,6 @@ export const useCreateUser = {
   disable,
   getall,
 };
-
-
 
 // Disable an existing user
 export const useDisableUser = () => {};

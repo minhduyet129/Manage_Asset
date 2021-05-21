@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
-import { UsersTable } from './UsersTable';
+import UsersTable from './UsersTable';
 import { useHistory } from 'react-router-dom';
-import {format} from  'date-fns'
+import { format } from 'date-fns';
 import { useCreateUser } from './UserHooks';
-function User() {
+
+const User = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [changes, setChanges] = useState(false);
   const [totalPages, setTotalPages] = useState();
   const [pageNumber, setPageNumber] = useState(1);
@@ -14,55 +15,62 @@ function User() {
   const history = useHistory();
 
   const DisableUsers = async (index) => {
-    if (!usersRef.current) return
-    const id = usersRef.current[index].id
-    
-    await useCreateUser.disable(id)
-    .then((res) => {
-      setChanges(prev => {
-        const current = !prev
-        return current
+    if (!usersRef.current) return;
+    const id = usersRef.current[index].id;
+
+    await useCreateUser
+      .disable(id)
+      .then((res) => {
+        setChanges((prev) => {
+          const current = !prev;
+          return current;
+        });
+        if (res.status === 200) {
+          alert('User Deleted');
+        }
       })
-      if (res.status === 200) {
-        alert('User Deleted');
-      }
-    })
-    .catch(() => {
-      alert('There are valid assigments belongs to this users. Please close all assignment before disable users');
-    });
+      .catch(() => {
+        alert(
+          'There are valid assigments belongs to this users. Please close all assignment before disable users'
+        );
+      });
   };
 
-  
   useEffect(() => {
-    setLoading(true)
-    useCreateUser.getall(pageNumber)
-    .then(res => {
-      usersRef.current = res.data.data
-      setUsers(res.data.data)
-      setTotalPages(res.data.totalPages)
-      setLoading(false)
-    })
-    .catch(err => console.log(err))
-  }, [changes, pageNumber])  
-  
+    setLoading(true);
+    useCreateUser
+      .getall(pageNumber)
+      .then((res) => {
+        usersRef.current = res.data.data;
+        setUsers(res.data.data);
+        setTotalPages(res.data.totalPages);
+        setLoading(false);
+      })
+      .catch((err) => console.log(err));
+  }, [changes, pageNumber]);
+
   const getUserId = (rowIndex) => {
-    if (!usersRef.current) return
-    const id = usersRef.current[rowIndex].id
+    if (!usersRef.current) return;
+    const id = usersRef.current[rowIndex].id;
     if (id) {
-      history.push(`/admin/users/edit/${id}`)
+      history.push(`/admin/users/edit/${id}`);
     }
   };
 
   const renderPaginationBtn = () => {
-    let obj = []
-    for(let i = 1; i <= totalPages; i++) {
-      obj.push(<div onClick={() => setPageNumber(i)} key={i}>{i}</div>)
+    let obj = [];
+    for (let i = 1; i <= totalPages; i++) {
+      obj.push(
+        <div onClick={() => setPageNumber(i)} key={i}>
+          {i}
+        </div>
+      );
     }
-    return obj
-  }
+    return obj;
+  };
 
   // const data = React.useMemo(() => users, [users]);
-  
+
   const columns = React.useMemo(
     () => [
       {
@@ -80,12 +88,16 @@ function User() {
       {
         Header: 'Date of Birth',
         accessor: 'doB',
-        Cell: ({value}) => {return format(new Date(value), 'dd/MM/yyyy')}
+        Cell: ({ value }) => {
+          return format(new Date(value), 'dd/MM/yyyy');
+        },
       },
       {
         Header: 'JoinedDate',
         accessor: 'joinedDate',
-        Cell: ({value}) => {return format(new Date(value), 'dd/MM/yyyy')}
+        Cell: ({ value }) => {
+          return format(new Date(value), 'dd/MM/yyyy');
+        },
       },
       {
         Header: 'Gender',
@@ -96,7 +108,7 @@ function User() {
         accessor: 'location',
       },
       {
-        Header:'Type',
+        Header: 'Type',
         accessor: 'roles',
       },
       {
@@ -108,11 +120,11 @@ function User() {
         accessor: 'actions',
         Cell: (props) => {
           const rowIdx = props.row.id;
-          
+
           return (
             <div>
               <span className='font' onClick={() => getUserId(rowIdx)}>
-                  <i className='bx bx-edit'></i>
+                <i className='bx bx-edit'></i>
               </span>
               &emsp;
               <span className='font' onClick={() => DisableUsers(rowIdx)}>
@@ -121,23 +133,19 @@ function User() {
             </div>
           );
         },
-        
       },
     ],
     []
-  )
-
+  );
 
   return (
     <LayoutAdmin>
-       <UsersTable columns={columns} data={users} loading={loading}/>
-       <div className="paging-box">
-         <div className="paging-btn">
-          {totalPages && renderPaginationBtn()}
-         </div>
-       </div>
+      <UsersTable columns={columns} data={users} loading={loading} />
+      <div className='paging-box'>
+        <div className='paging-btn'>{totalPages && renderPaginationBtn()}</div>
+      </div>
     </LayoutAdmin>
   );
-}
+};
 
 export default User;
