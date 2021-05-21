@@ -4,11 +4,14 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
+import { useHistory } from 'react-router';
 export const EditUser = () => {
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState(null);
   const [users, setUsers] = useState([]);
+  const [error,setError] = useState(null)
   const { id } = useParams();
+  const history = useHistory()
   const isWeekday = (date) => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
@@ -30,25 +33,29 @@ export const EditUser = () => {
           gender: getGenderEnum(res.data.data.gender),
           location: res.data.data.location,
           userName: res.data.data.userName,
-          roles: res.data.data.roles
+          roleType: res.data.data.roles,
         });
       })
       .catch((err) => {
+        setError(err)
         console.log(err);
       });
   };
+
+
 
   function updateUsers(users) {
     return useCreateUser
       .edit(users, id)
       .then((response) => {
+
         if (response.status === 200) {
           alert('Update user sucessfully');
         }
       })
       .catch((error) => {
-        alert('Something went wrong!');
-        console.log();
+        setError(error)
+        alert(JSON.stringify(error.response.data.errors[0]));
       });
   }
 
@@ -78,9 +85,9 @@ export const EditUser = () => {
 
 
 
-  const onSubmit = (data) => {
-    updateUsers(data);
-    console.log(data);
+  const onSubmit = async (data) => {
+    await updateUsers(data);
+    history.push('/admin/users')
   };
   return (
     <LayoutAdmin>
@@ -161,7 +168,7 @@ export const EditUser = () => {
                   selected={joinedDate}
                   onChange={(e) => {
                     onChange(e);
-                    setJoinedDate(e);
+                    setJoinedDate(e); 
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
@@ -194,13 +201,13 @@ export const EditUser = () => {
           <div className='form__div'>
             <select
               className='form__input'
-              {...register('roles')}
-              id='roles'
+              {...register('roleType')}
+              id='roleType'
             >
-              <option value='Admin'>Admin</option>
               <option value='User'>User</option>
+              <option value='Admin'>Admin</option>
             </select>
-            <label className='form__label' htmlFor='roles'>
+            <label className='form__label' htmlFor='roleType'>
               Type
             </label>
           </div>
