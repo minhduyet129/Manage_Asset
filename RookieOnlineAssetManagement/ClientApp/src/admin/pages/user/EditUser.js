@@ -24,6 +24,7 @@ export const EditUser = () => {
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
           id: res.data.data.id,
+          staffCode: res.data.data.staffCode,
           firstName: res.data.data.firstName,
           lastName: res.data.data.lastName,
           gender: getGenderEnum(res.data.data.gender),
@@ -84,7 +85,17 @@ export const EditUser = () => {
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
           <h2 className='form__title'>Edit User</h2>
           <div className='form__div'>
-            <input {...register('id', { required: true })} hidden />
+            <input
+              id='staffCode'
+              className='form__input'
+              {...register('staffCode')}
+              disabled
+            />
+            <label className='form__label' htmlFor='staffCode'>
+              StaffCode
+            </label>
+          </div>
+          <div className='form__div'>
             <input
               id='firstName'
               className='form__input'
