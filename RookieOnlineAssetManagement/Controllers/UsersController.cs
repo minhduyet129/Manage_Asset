@@ -196,10 +196,10 @@ namespace RookieOnlineAssetManagement.Controllers
         public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
             var queryable = !string.IsNullOrEmpty(location)
-                ? _userManager.Users.Where(u => u.Location == location && u.State == UserState.Enable)
+                ? _userManager.Users.Where(u => u.Location == location)
                 : _userManager.Users;
 
-            queryable = queryable.Include(u => u.UserRoles).ThenInclude(ur => ur.Role);
+            queryable = queryable.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).Where(u => u.State == UserState.Enable);
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -329,7 +329,7 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             try
             {
-                var user = await _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).SingleOrDefaultAsync(u => u.Id == id);
+                var user = await _userManager.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).SingleOrDefaultAsync(u => u.Id == id && u.State == UserState.Enable);
 
                 if (user == null) return NotFound("Cannot find this user!");
 
