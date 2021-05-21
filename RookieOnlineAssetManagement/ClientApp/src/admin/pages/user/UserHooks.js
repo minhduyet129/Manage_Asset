@@ -11,10 +11,10 @@ import axios from 'axios';
 };
 
 // Get users
-function getall() {
+function getall(pageNumber) {
   
     return axios
-      .get('http://hungbqit-001-site5.itempurl.com/api/Users')
+      .get(`http://hungbqit-001-site5.itempurl.com/api/Users?PageNumber=${pageNumber}`)
 };
 
 

@@ -64,7 +64,7 @@
 /* --- Table --- */
 .table__view {
   position: relative;
-  min-height: 530px;
+  min-height: 800px;
   background: var(--white);
   padding: 1.1rem;
 }

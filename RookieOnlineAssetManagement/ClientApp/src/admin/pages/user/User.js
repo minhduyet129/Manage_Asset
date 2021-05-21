@@ -7,13 +7,22 @@ import { useCreateUser } from './UserHooks';
 function User() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false)
+  const [changes, setChanges] = useState(false);
+  const [totalPages, setTotalPages] = useState();
+  const [pageNumber, setPageNumber] = useState(1);
   const usersRef = useRef(null);
   const history = useHistory();
 
-  const DisableUsers = async (id) => {
+  const DisableUsers = async (index) => {
+    if (!usersRef.current) return
+    const id = usersRef.current[index].id
+    
     await useCreateUser.disable(id)
     .then((res) => {
-      // setUsers(res.data.data);
+      setChanges(prev => {
+        const current = !prev
+        return current
+      })
       if (res.status === 200) {
         alert('User Deleted');
       }
@@ -26,14 +35,15 @@ function User() {
   
   useEffect(() => {
     setLoading(true)
-    useCreateUser.getall()
+    useCreateUser.getall(pageNumber)
     .then(res => {
       usersRef.current = res.data.data
       setUsers(res.data.data)
+      setTotalPages(res.data.totalPages)
       setLoading(false)
     })
     .catch(err => console.log(err))
-  }, [])  
+  }, [changes, pageNumber])  
   
   const getUserId = (rowIndex) => {
     if (!usersRef.current) return
@@ -43,14 +53,18 @@ function User() {
     }
   };
 
+  const renderPaginationBtn = () => {
+    let obj = []
+    for(let i = 1; i <= totalPages; i++) {
+      obj.push(<div onClick={() => setPageNumber(i)} key={i}>{i}</div>)
+    }
+    return obj
+  }
+
   // const data = React.useMemo(() => users, [users]);
   
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Id',
-        accessor: 'id',
-      },
       {
         Header: 'StaffCode',
         accessor: 'staffCode',
@@ -82,7 +96,7 @@ function User() {
         accessor: 'location',
       },
       {
-        Header:'Role',
+        Header:'Type',
         accessor: 'roles',
       },
       {
@@ -117,6 +131,11 @@ function User() {
   return (
     <LayoutAdmin>
        <UsersTable columns={columns} data={users} loading={loading}/>
+       <div className="paging-box">
+         <div className="paging-btn">
+          {totalPages && renderPaginationBtn()}
+         </div>
+       </div>
     </LayoutAdmin>
   );
 }
