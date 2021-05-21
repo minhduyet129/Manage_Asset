@@ -4,19 +4,15 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-<<<<<<< HEAD
-import { useHistory } from 'react-router';
-export const EditUser = () => {
-=======
+import { useHistory } from 'react-router-dom';
 
 const EditUser = () => {
->>>>>>> origin/develop
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState(null);
   const [users, setUsers] = useState([]);
-  const [error,setError] = useState(null)
+  const [error, setError] = useState(null);
   const { id } = useParams();
-  const history = useHistory()
+  const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
@@ -42,24 +38,21 @@ const EditUser = () => {
         });
       })
       .catch((err) => {
-        setError(err)
+        setError(err);
         console.log(err);
       });
   };
-
-
 
   function updateUsers(users) {
     return useCreateUser
       .edit(users, id)
       .then((response) => {
-
         if (response.status === 200) {
           alert('Update user sucessfully');
         }
       })
       .catch((error) => {
-        setError(error)
+        setError(error);
         alert(JSON.stringify(error.response.data.errors[0]));
       });
   }
@@ -87,12 +80,9 @@ const EditUser = () => {
     return 1;
   };
 
-
-
-
   const onSubmit = async (data) => {
     await updateUsers(data);
-    history.push('/admin/users')
+    history.push('/admin/users');
   };
   return (
     <LayoutAdmin>
@@ -173,7 +163,7 @@ const EditUser = () => {
                   selected={joinedDate}
                   onChange={(e) => {
                     onChange(e);
-                    setJoinedDate(e); 
+                    setJoinedDate(e);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
