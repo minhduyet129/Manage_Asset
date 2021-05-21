@@ -19,6 +19,17 @@ function create(users) {
 
 //Edit an user
 
+<<<<<<< HEAD
+function edit(users,id) {
+  return axios.put(
+    `http://hungbqit-001-site5.itempurl.com/api/Users/${id}`, {
+      doB: users.doB,
+      joinedDate: users.joinedDate,
+      gender: users.gender,
+      roleType: users.roleType,
+    }
+  )
+=======
 function edit(users, id) {
   return axios.put(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`, {
     id: users.id,
@@ -31,6 +42,7 @@ function edit(users, id) {
     // userName: users.userName,
     roleType: users.roleType,
   });
+>>>>>>> origin/develop
 }
 
 function disable(id) {
