@@ -78,19 +78,12 @@ const User = () => {
         accessor: 'staffCode',
       },
       {
-        Header: 'FirstName',
-        accessor: 'firstName',
+        Header: 'FullName',
+        accessor: (d) => <div>{d.firstName + ' ' + d.lastName}</div>,
       },
       {
-        Header: 'LastName',
-        accessor: 'lastName',
-      },
-      {
-        Header: 'Date of Birth',
-        accessor: 'doB',
-        Cell: ({ value }) => {
-          return format(new Date(value), 'dd/MM/yyyy');
-        },
+        Header: 'Username',
+        accessor: 'userName',
       },
       {
         Header: 'JoinedDate',
@@ -100,20 +93,8 @@ const User = () => {
         },
       },
       {
-        Header: 'Gender',
-        accessor: 'gender',
-      },
-      {
-        Header: 'Location',
-        accessor: 'location',
-      },
-      {
         Header: 'Type',
         accessor: 'roles',
-      },
-      {
-        Header: 'Username',
-        accessor: 'userName',
       },
       {
         Header: 'Actions',
