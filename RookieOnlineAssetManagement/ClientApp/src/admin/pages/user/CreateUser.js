@@ -148,14 +148,9 @@ const CreateUser = () => {
           </div>
           {errors.gender && <span>This field is required</span>}
           <div className='form__div'>
-<<<<<<< HEAD
           <select className='form__input' {...register('roles')} id='roles'>
               <option value="User">User</option>
               <option value="Admin">Admin</option>
-=======
-            <select className='form__input' {...register('roles')} id='roles'>
-              <option value='User'>User</option>
->>>>>>> origin/develop
             </select>
             <label className='form__label' htmlFor='roles'>
               Type

@@ -36,18 +36,24 @@ const User = () => {
       });
   };
 
-  useEffect(() => {
+  const getusers = () => {
+
     setLoading(true);
     useCreateUser
       .getall(pageNumber)
       .then((res) => {
         usersRef.current = res.data.data;
         setUsers(res.data.data);
+        console.log(res.data)
         setTotalPages(res.data.totalPages);
         setLoading(false);
       })
       .catch((err) => console.log(err));
-  }, [changes, pageNumber]);
+
+
+  }
+
+  useEffect(getusers, [changes, pageNumber]);
 
   const getUserId = (rowIndex) => {
     if (!usersRef.current) return;
