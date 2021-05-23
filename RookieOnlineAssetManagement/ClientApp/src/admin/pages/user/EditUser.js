@@ -4,11 +4,15 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-export const EditUser = () => {
+import { useHistory } from 'react-router-dom';
+
+const EditUser = () => {
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState(null);
   const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
   const { id } = useParams();
+  const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
@@ -20,7 +24,7 @@ export const EditUser = () => {
       .then((res) => {
         setUsers(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
-        console.log(res.data.data.roles)
+        console.log(res.data.data.roles);
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
           id: res.data.data.id,
@@ -30,10 +34,11 @@ export const EditUser = () => {
           gender: getGenderEnum(res.data.data.gender),
           location: res.data.data.location,
           userName: res.data.data.userName,
-          roleType: res.data.data.roleType,
+          roleType: res.data.data.roles,
         });
       })
       .catch((err) => {
+        setError(err);
         console.log(err);
       });
   };
@@ -47,8 +52,8 @@ export const EditUser = () => {
         }
       })
       .catch((error) => {
-        alert('Something went wrong!');
-        console.log();
+        setError(error);
+        alert(JSON.stringify(error.response.data.errors[0]));
       });
   }
 
@@ -75,9 +80,9 @@ export const EditUser = () => {
     return 1;
   };
 
-  const onSubmit = (data) => {
-    updateUsers(data);
-    console.log(data);
+  const onSubmit = async (data) => {
+    await updateUsers(data);
+    history.push('/admin/users');
   };
   return (
     <LayoutAdmin>
@@ -194,7 +199,8 @@ export const EditUser = () => {
               {...register('roleType')}
               id='roleType'
             >
-              <option value='User'>{users.roles}</option>
+              <option value='User'>User</option>
+              <option value='Admin'>Admin</option>
             </select>
             <label className='form__label' htmlFor='roleType'>
               Type
@@ -209,3 +215,5 @@ export const EditUser = () => {
     </LayoutAdmin>
   );
 };
+
+export default EditUser;
