@@ -4,7 +4,7 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 const EditUser = () => {
   const [startDate, setStartDate] = useState();
@@ -89,40 +89,43 @@ const EditUser = () => {
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
           <h2 className='form__title'>Edit User</h2>
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='form__label' htmlFor='staffCode'>
+              StaffCode
+            </label>
             <input
               id='staffCode'
               className='form__input'
               {...register('staffCode')}
               disabled
             />
-            <label className='form__label' htmlFor='staffCode'>
-              StaffCode
-            </label>
           </div>
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='form__label' htmlFor='firstName'>
+              First Name
+            </label>
             <input
               id='firstName'
               className='form__input'
               {...register('firstName')}
               disabled
             />
-            <label className='form__label' htmlFor='firstName'>
-              First Name
-            </label>
           </div>
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='form__label' htmlFor='lastName'>
+              Last Name
+            </label>
             <input
               id='lastName'
               className='form__input'
               {...register('lastName')}
               disabled
             />
-            <label className='form__label' htmlFor='lastName'>
-              Last Name
-            </label>
           </div>
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='date-picker__label' htmlFor='doB'>
+              Date of Birth
+            </label>
             <Controller
               control={control}
               name='doB'
@@ -145,15 +148,16 @@ const EditUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  className='input'
                 />
               )}
             />
-            <label className='date-picker__label' htmlFor='doB'>
-              Date of Birth
-            </label>
           </div>
 
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='date-picker__label' htmlFor='joinedDate'>
+              Joined Date
+            </label>
             <Controller
               control={control}
               name='joinedDate'
@@ -175,40 +179,45 @@ const EditUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  className='input'
                 />
               )}
             />
-            <label className='date-picker__label' htmlFor='joinedDate'>
-              Joined Date
-            </label>
           </div>
 
-          <div className='form__div'>
-            <select className='form__input' {...register('gender')} id='gender'>
-              <option value={0}>Female</option>
-              <option value={1}>Male</option>
-            </select>
-            {errors.gender && <span>Please input</span>}
+          <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
               Gender
             </label>
+            <div className='custom__select'>
+              <select {...register('gender')} id='gender'>
+                <option value={0}>Female</option>
+                <option value={1}>Male</option>
+              </select>
+            </div>
+            {errors.gender && <span>Please input</span>}
           </div>
-          <div className='form__div'>
-            <select
-              className='form__input'
-              {...register('roleType')}
-              id='roleType'
-            >
-              <option value='User'>User</option>
-              <option value='Admin'>Admin</option>
-            </select>
+          <div className='form__field'>
             <label className='form__label' htmlFor='roleType'>
               Type
             </label>
+            <div className='custom__select'>
+              <select
+                className='form__input'
+                {...register('roleType')}
+                id='roleType'
+              >
+                <option value='User'>User</option>
+                <option value='Admin'>Admin</option>
+              </select>
+            </div>
           </div>
           {errors.type && <span>This field is required</span>}
-          <div>
-            <input className='btn' type='submit' value='Submit' />
+          <div className='form__field'>
+            <input type='submit' className='btn' value='Submit' />
+            <Link to='/admin/users/'>
+              <button className='btn__cancel'>Cancel</button>
+            </Link>
           </div>
         </form>
       </div>

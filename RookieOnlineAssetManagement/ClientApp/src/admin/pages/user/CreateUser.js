@@ -3,7 +3,7 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
-import { useHistory } from 'react-router';
+import { Link, useHistory } from 'react-router-dom';
 
 const CreateUser = () => {
   const [startDate, setStartDate] = useState(null);
@@ -50,28 +50,31 @@ const CreateUser = () => {
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
           <h2 className='form__title'>Create User</h2>
-          <div className='form__div'>
-            <input
-              id='firstname'
-              className='form__input'
-              {...register('firstName')}
-            />
+          <div className='form__field'>
             <label className='form__label' htmlFor='firstname'>
               First Name
             </label>
+            <input
+              id='firstname'
+              className='input'
+              {...register('firstName')}
+            />
             {errors.firstName && <span>This field is required</span>}
           </div>
-          <div className='form__div'>
-            <input
-              id='lastName'
-              className='form__input'
-              {...register('lastName', { required: true })}
-            />
+          <div className='form__field'>
             <label className='form__label' htmlFor='lastName'>
               Last Name
             </label>
+            <input
+              id='lastName'
+              className='input'
+              {...register('lastName', { required: true })}
+            />
           </div>
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='date-picker__label' htmlFor='doB'>
+              Date of Birth
+            </label>
             <Controller
               control={control}
               name='doB'
@@ -93,18 +96,19 @@ const CreateUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  className='input'
                 />
               )}
               rules={{
                 required: true,
               }}
             />
-            <label className='date-picker__label' htmlFor='doB'>
-              Date of Birth
-            </label>
           </div>
 
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='date-picker__label' htmlFor='joinedDate'>
+              Joined Date
+            </label>
             <Controller
               control={control}
               name='joinedDate'
@@ -126,35 +130,37 @@ const CreateUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  className='input'
                 />
               )}
               rules={{
                 required: true,
               }}
             />
-            <label className='date-picker__label' htmlFor='joinedDate'>
-              Joined Date
-            </label>
           </div>
 
-          <div className='form__div'>
-            <select className='form__input' {...register('gender')} id='gender'>
-              <option value={0}>Female</option>
-              <option value={1}>Male</option>
-            </select>
+          <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
               Gender
             </label>
+            <div className='custom__select'>
+              <select {...register('gender')} id='gender'>
+                <option value={0}>Female</option>
+                <option value={1}>Male</option>
+              </select>
+            </div>
           </div>
           {errors.gender && <span>This field is required</span>}
-          <div className='form__div'>
-          <select className='form__input' {...register('roles')} id='roles'>
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
-            </select>
+          <div className='form__field'>
             <label className='form__label' htmlFor='roles'>
               Type
             </label>
+            <div className='custom__select'>
+              <select {...register('roles')} id='roles'>
+                <option value='User'>User</option>
+                <option value='Admin'>Admin</option>
+              </select>
+            </div>
           </div>
           <input
             id='location'
@@ -163,8 +169,11 @@ const CreateUser = () => {
             {...register('location')}
           />
           {errors.type && <span>This field is required</span>}
-          <div>
-            <input className='btn' type='submit' value='Submit' />
+          <div className='form__field'>
+            <input type='submit' className='btn' value='Submit' />
+            <Link to='/admin/users/'>
+              <button className='btn__cancel'>Cancel</button>
+            </Link>
           </div>
         </form>
       </div>
