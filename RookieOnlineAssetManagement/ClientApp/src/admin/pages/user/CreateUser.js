@@ -1,27 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
+import ReactDatePicker from 'react-datepicker';
 import { Link, useHistory } from 'react-router-dom';
 
 const CreateUser = () => {
+  const [startDate, setStartDate] = useState(null);
+  const [joinedDate, setJoinedDate] = useState(null);
   const history = useHistory();
+  const isWeekday = (date) => {
+    const day = date.getDay();
+    return day !== 0 && day !== 6;
+  };
+
+  function handlerUser(users) {
+    users.gender = users.gender === 0 ? 0 : 1;
+    return useCreateUser
+      .create(users)
+      .then((response) => {
+        if (response.status === 200) {
+          alert('Add user sucessfully');
+        }
+        console.log(users);
+      })
+      .catch((error) => {
+        alert('Something went wrong!');
+      });
+  }
 
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
+    control,
   } = useForm();
 
-  const userInfo = useCreateUser();
-
-  const onSubmit = (data) => {
-    alert('Add successfully!');
-    // redirect to users list view after submit
+  const onSubmit = async (data) => {
+    await handlerUser(data);
     history.push('/admin/users');
     console.log(data);
+    console.log(startDate);
   };
+
+  // console.log(startDate.getDay())
 
   return (
     <LayoutAdmin>
@@ -32,58 +54,123 @@ const CreateUser = () => {
             <label className='form__label' htmlFor='firstname'>
               First Name
             </label>
-            <input className='form__input' {...register('firstname')} />
+            <input
+              id='firstname'
+              className='input'
+              {...register('firstName')}
+            />
+            {errors.firstName && <span>This field is required</span>}
           </div>
           <div className='form__field'>
-            <label className='form__label' htmlFor='username'>
+            <label className='form__label' htmlFor='lastName'>
               Last Name
             </label>
             <input
-              className='form__input'
-              {...register('username', { required: true })}
+              id='lastName'
+              className='input'
+              {...register('lastName', { required: true })}
             />
           </div>
           <div className='form__field'>
-            <label className='form__label' htmlFor='date'>
+            <label className='date-picker__label' htmlFor='doB'>
               Date of Birth
             </label>
-            <input className='form__input' type='date' {...register('date')} />
+            <Controller
+              control={control}
+              name='doB'
+              required={true}
+              render={({ field: { onChange } }) => (
+                <ReactDatePicker
+                  id='doB'
+                  selected={startDate}
+                  onChange={(e) => {
+                    onChange(e);
+                    setStartDate(e);
+                  }}
+                  placeholderText='MM/DD/YY'
+                  isClearable
+                  withPortal
+                  showYearDropdown
+                  showMonthDropdown
+                  dateFormatCalendar='MMMM'
+                  yearDropdownItemNumber={100}
+                  scrollableYearDropdown
+                  dropdownMode='select'
+                  className='input'
+                />
+              )}
+              rules={{
+                required: true,
+              }}
+            />
           </div>
+
           <div className='form__field'>
-            <label className='form__label' htmlFor='date'>
+            <label className='date-picker__label' htmlFor='joinedDate'>
               Joined Date
             </label>
-            <input className='form__input' type='date' {...register('date')} />
+            <Controller
+              control={control}
+              name='joinedDate'
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <ReactDatePicker
+                  id='joinedDate'
+                  selected={joinedDate}
+                  onChange={(e) => {
+                    onChange(e);
+                    setJoinedDate(e);
+                  }}
+                  filterDate={isWeekday}
+                  placeholderText='MM/DD/YY'
+                  isClearable
+                  withPortal
+                  showYearDropdown
+                  showMonthDropdown
+                  dateFormatCalendar='MMMM'
+                  yearDropdownItemNumber={100}
+                  scrollableYearDropdown
+                  dropdownMode='select'
+                  className='input'
+                />
+              )}
+              rules={{
+                required: true,
+              }}
+            />
           </div>
+
           <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
               Gender
             </label>
             <div className='custom__select'>
-              <select className='form__input' {...register('gender')}>
-                <option value={0}>female</option>
-                <option value={1}>male</option>
+              <select {...register('gender')} id='gender'>
+                <option value={0}>Female</option>
+                <option value={1}>Male</option>
               </select>
             </div>
           </div>
+          {errors.gender && <span>This field is required</span>}
           <div className='form__field'>
-            <label className='form__label' htmlFor='username'>
-              Location
-            </label>
-            <input className='form__input' {...register('location')} />
-          </div>
-          <div className='form__field'>
-            <label className='form__label' htmlFor='username'>
+            <label className='form__label' htmlFor='roles'>
               Type
             </label>
-            <input
-              className='form__input'
-              {...register('type', { required: true })}
-            />
+            <div className='custom__select'>
+              <select {...register('roles')} id='roles'>
+                <option value='User'>User</option>
+                <option value='Admin'>Admin</option>
+              </select>
+            </div>
           </div>
-          {errors.exampleRequired && <span>This field is required</span>}
+          <input
+            id='location'
+            hidden
+            className='form__input'
+            {...register('location')}
+          />
+          {errors.type && <span>This field is required</span>}
           <div className='form__field'>
-            <input className='btn' type='submit' value='Submit' />
+            <input type='submit' className='btn' value='Submit' />
             <Link to='/admin/users/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>

@@ -1,0 +1,67 @@
+.undo-icon svg {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+}
+
+.pagination li {
+  min-width: 50px;
+}
+
+.pagination li a {
+  display: block;
+  padding: 9px 11px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--primary-color);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.pagination li:hover {
+  cursor: pointer;
+}
+
+.previous a:hover,
+.next a:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: var(--primary-color);
+}
+
+.pagination li.active a {
+  color: #fff;
+  background-color: var(--primary-color);
+}
+
+.previous {
+  width: 100px;
+}
+
+.previous.disabled a {
+  color: rgba(0, 0, 0, 0.15);
+}
+
+.previous.disabled a:hover {
+  cursor: text;
+  color: rgba(0, 0, 0, 0.15);
+  background-color: transparent;
+}
+
+.next {
+  width: 100px;
+}
+
+.next.disabled a {
+  color: rgba(0, 0, 0, 0.15);
+}
+
+.next.disabled a:hover {
+  cursor: text;
+  color: rgba(0, 0, 0, 0.15);
+  background-color: transparent;
+}

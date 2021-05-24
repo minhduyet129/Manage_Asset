@@ -2,11 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import axios from 'axios';
 import reportWebVitals from './reportWebVitals';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
 const queryClient = new QueryClient();
+
+axios.defaults.baseURL = 'https://localhost:5001';
+
+// axios.defaults.headers.common['Authorization'] = `Bearer ${window.localStorage.getItem('token')}`;
 
 ReactDOM.render(
   <React.StrictMode>

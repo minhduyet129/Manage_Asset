@@ -18,7 +18,11 @@ function Login() {
           <label className='form__label' htmlFor='username'>
             Username
           </label>
+<<<<<<< HEAD
           <input className='form__input' {...register('username')} />
+=======
+          <input className='input' {...register('username')} />
+>>>>>>> develop
         </div>
         {errors.username && (
           <span className='form__validation'>This field is required</span>
@@ -28,7 +32,7 @@ function Login() {
             Password
           </label>
           <input
-            className='form__input'
+            className='input'
             {...register('password', { required: true })}
             type='password'
           />

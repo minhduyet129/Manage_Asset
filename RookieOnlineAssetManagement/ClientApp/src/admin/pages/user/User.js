@@ -1,135 +1,135 @@
+import React, { useEffect, useState, useRef } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
-import React, { useMemo } from 'react';
-import { useTable } from 'react-table';
-import { Link } from 'react-router-dom';
-import '../TableView.css';
+import UsersTable from './UsersTable';
+import { useHistory } from 'react-router-dom';
+import { format } from 'date-fns';
+import { useCreateUser } from './UserHooks';
 
-function User() {
-  const data = useMemo(
+const User = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [changes, setChanges] = useState(false);
+  const [totalPages, setTotalPages] = useState();
+  const [pageNumber, setPageNumber] = useState(1);
+  const usersRef = useRef(null);
+  const history = useHistory();
+
+  const DisableUsers = async (index) => {
+    if (!usersRef.current) return;
+    const id = usersRef.current[index].id;
+
+    await useCreateUser
+      .disable(id)
+      .then((res) => {
+        setChanges((prev) => {
+          const current = !prev;
+          return current;
+        });
+        if (res.status === 200) {
+          alert('User Deleted');
+        }
+      })
+      .catch(() => {
+        alert(
+          'There are valid assigments belongs to this users. Please close all assignment before disable users'
+        );
+      });
+  };
+
+  const getusers = () => {
+    setLoading(true);
+    useCreateUser
+      .getall(pageNumber)
+      .then((res) => {
+        usersRef.current = res.data.data;
+        setUsers(res.data.data);
+        console.log(res.data);
+        setTotalPages(res.data.totalPages);
+        setLoading(false);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(getusers, [changes, pageNumber]);
+
+  const getUserId = (rowIndex) => {
+    if (!usersRef.current) return;
+    const id = usersRef.current[rowIndex].id;
+    if (id) {
+      history.push(`/admin/users/edit/${id}`);
+    }
+  };
+
+  const renderPaginationBtn = () => {
+    let obj = [];
+    for (let i = 1; i <= totalPages; i++) {
+      obj.push(
+        <div onClick={() => setPageNumber(i)} key={i}>
+          {i}
+        </div>
+      );
+    }
+    return obj;
+  };
+
+  // const data = React.useMemo(() => users, [users]);
+
+  const columns = React.useMemo(
     () => [
       {
-        col1: 'SD1901',
-        col2: 'Nguyen Van Tai',
-        col3: 'nguyenvantai',
-        col4: '26-10-2020',
-        col5: 'Staff',
+        Header: 'StaffCode',
+        accessor: 'staffCode',
       },
       {
-        col1: 'SD1902',
-        col2: 'Dong Chi',
-        col3: 'dongchi',
-        col4: '26-03-2021',
-        col5: 'Staff',
-      },
-      {
-        col1: 'SD1903',
-        col2: 'Nguyen Van Vo',
-        col3: 'nguyenvanvo',
-        col4: '16-09-2020',
-        col5: 'Staff',
-      },
-      {
-        col1: 'SD1904',
-        col2: 'Tran Nam',
-        col3: 'trannam',
-        col4: '23-05-2020',
-        col5: 'Staff',
-      },
-      {
-        col1: 'SD1905',
-        col2: 'Vu Thi Thanh',
-        col3: 'vuthithanh',
-        col4: '26-11-2020',
-        col5: 'Staff',
-      },
-    ],
-    []
-  );
-
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'Staff Code',
-        accessor: 'col1', // accessor is the "key" in the data
-      },
-      {
-        Header: 'Full Name',
-        accessor: 'col2',
+        Header: 'FullName',
+        accessor: (d) => <div>{d.firstName + ' ' + d.lastName}</div>,
       },
       {
         Header: 'Username',
-        accessor: 'col3',
+        accessor: 'userName',
       },
       {
-        Header: 'Joined Date',
-        accessor: 'col4',
+        Header: 'JoinedDate',
+        accessor: 'joinedDate',
+        Cell: ({ value }) => {
+          return format(new Date(value), 'dd/MM/yyyy');
+        },
       },
       {
         Header: 'Type',
-        accessor: 'col5',
+        accessor: 'roles',
       },
       {
-        Header: 'Action',
-        accessor: 'col6',
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: (props) => {
+          const rowIdx = props.row.id;
+
+          return (
+            <div>
+              <span className='font' onClick={() => getUserId(rowIdx)}>
+                <i className='bx bx-edit'></i>
+              </span>
+              &emsp;
+              <span className='font' onClick={() => DisableUsers(rowIdx)}>
+                <i className='fas fa-times '></i>
+              </span>
+            </div>
+          );
+        },
       },
     ],
     []
   );
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data });
-
   return (
     <LayoutAdmin>
-      <div className='table__view'>
-        <h2>Manage User</h2>
-        <div className='table__view--search'>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='State' />
-            <i className='bx bx-filter-alt' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Name' />
-            <i className='bx bx-search' />
-          </form>
-          <Link to='/admin/users/create'>
-            <button className='btn'>Create New User</button>
-          </Link>
-        </div>
-        <div>
-          <table {...getTableProps()}>
-            <thead>
-              {headerGroups.map((headerGroup) => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column) => (
-                    <th {...column.getHeaderProps()}>
-                      {column.render('Header')}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-              {rows.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()}>
-                    {row.cells.map((cell) => {
-                      return (
-                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      <UsersTable columns={columns} data={users} loading={loading} />
+      <div className='paging-box'>
+        <div className='paging-btn'>{totalPages && renderPaginationBtn()}</div>
       </div>
     </LayoutAdmin>
   );
-}
+};
 
 export default User;

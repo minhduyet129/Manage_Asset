@@ -1,4 +1,3 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
 import axios from 'axios';
 
 const api = axios.create({
@@ -6,30 +5,45 @@ const api = axios.create({
 });
 
 // Get an user
-export const useUser = (userId) => {
-  return useQuery(['users', userId], () =>
-    api.get(`/${userId}`).then((res) => res.data)
-  );
-};
+function getbyid(id) {
+  return axios.get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`);
+}
 
 // Get users
-export const useUsers = () => {
-  return useQuery('users', () => api.get('/').then((res) => res.data));
-};
+function getall(pageNumber) {
+  return axios.get(
+    `http://hungbqit-001-site5.itempurl.com/api/Users?PageNumber=${pageNumber}`
+  );
+}
 
 // Create a new user
-export const useCreateUser = () => {
-  const queryClient = useQueryClient();
-  return useMutation(
-    (values) =>
-      axios.post('http://hungbqit-001-site5.itempurl.com/api/Users', values),
-    {
-      onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries('users');
-      },
-    }
+function create(users) {
+  return axios.post('http://hungbqit-001-site5.itempurl.com/api/Users', users);
+}
+
+//Edit an user
+
+function edit(users, id) {
+  return axios.put(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`, {
+    doB: users.doB,
+    joinedDate: users.joinedDate,
+    gender: users.gender,
+    roleType: users.roleType,
+  });
+}
+
+function disable(id) {
+  return axios.put(
+    `http://hungbqit-001-site5.itempurl.com/api/Users/disable/${id}`
   );
+}
+
+export const useCreateUser = {
+  create,
+  getbyid,
+  edit,
+  disable,
+  getall,
 };
 
 // Disable an existing user
