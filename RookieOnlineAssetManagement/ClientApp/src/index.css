@@ -29,6 +29,10 @@ h2 {
   margin: 0;
 }
 
+.invalid-feedback {
+  color: red
+}
+
 a,
 u {
   text-decoration: none;
