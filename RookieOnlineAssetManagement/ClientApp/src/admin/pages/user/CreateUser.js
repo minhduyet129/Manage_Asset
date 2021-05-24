@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker';
 import { useHistory } from 'react-router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
 
 const schema = Yup.object().shape({
   firstName: Yup.string().required('First Name is required'),
@@ -74,7 +75,10 @@ const CreateUser = () => {
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
           <h2 className='form__title'>Create User</h2>
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='form__label' htmlFor='firstname'>
+              First Name
+            </label>
             <input
               id='firstname'
               
@@ -121,13 +125,13 @@ const CreateUser = () => {
                 />
               )}
             />
-            <label className='date-picker__label' htmlFor='doB'>
-              Date of Birth
-            </label>
           </div>
           <p className="invalid-feedback">{errors.doB?.message}</p>
 
-          <div className='form__div'>
+          <div className='form__field'>
+            <label className='date-picker__label' htmlFor='joinedDate'>
+              Joined Date
+            </label>
             <Controller
               control={control}
               name='joinedDate'
@@ -154,28 +158,30 @@ const CreateUser = () => {
                 />
               )}
             />
-            <label className='date-picker__label' htmlFor='joinedDate'>
-              Joined Date
-            </label>
           </div>
-          <p className="invalid-feedback">{errors.joinedDate?.message}</p>
-          <div className='form__div'>
-            <select className='form__input' {...register('gender')} id='gender'>
-              <option value={0}>Female</option>
-              <option value={1}>Male</option>
-            </select>
+
+          <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
               Gender
             </label>
+            <div className='custom__select'>
+              <select {...register('gender')} id='gender'>
+                <option value={0}>Female</option>
+                <option value={1}>Male</option>
+              </select>
+            </div>
           </div>
-          <div className='form__div'>
-          <select className='form__input' {...register('roles')} id='roles'>
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
-            </select>
+          {errors.gender && <span>This field is required</span>}
+          <div className='form__field'>
             <label className='form__label' htmlFor='roles'>
               Type
             </label>
+            <div className='custom__select'>
+              <select {...register('roles')} id='roles'>
+                <option value='User'>User</option>
+                <option value='Admin'>Admin</option>
+              </select>
+            </div>
           </div>
           <input
             id='location'
@@ -183,8 +189,12 @@ const CreateUser = () => {
             className='form__input'
             {...register('location')}
           />
-          <div>
-            <input className='btn' type='submit' value='Submit' />
+          {errors.type && <span>This field is required</span>}
+          <div className='form__field'>
+            <input type='submit' className='btn' value='Submit' />
+            <Link to='/admin/users/'>
+              <button className='btn__cancel'>Cancel</button>
+            </Link>
           </div>
         </form>
       </div>
