@@ -73,6 +73,25 @@ body {
   opacity: 0.8;
 }
 
+.font{
+  font-size: 25px;
+  cursor: pointer;
+  outline: none;
+}
+
+.spinner{
+  font-size: 50px;
+  position: absolute;
+  top: 100px;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 .btn__table {
   display: inline;
   padding: 0.5rem;
