@@ -2,7 +2,7 @@ import axios from 'axios';
 import React from 'react';
 import { format } from 'date-fns';
 import { useHistory } from 'react-router';
-import ReactPaginate from 'react-paginate';
+//import ReactPaginate from 'react-paginate';
 import { useEffect, useRef, useState } from 'react';
 
 import AssignmentTable from './AssignmentTable';
@@ -119,7 +119,7 @@ function Assignment() {
     <LayoutAdmin>
       <AssignmentTable columns={columns} data={assignments} loading={loading} />
       <div className='paging-box'>
-        <ReactPaginate
+        {/* <ReactPaginate
           previousLabel={'Previous'}
           nextLabel={'Next'}
           breakLabel={'...'}
@@ -130,7 +130,7 @@ function Assignment() {
           onPageChange={handlePageClick}
           containerClassName={'pagination'}
           activeClassName={'active'}
-        />
+        /> */}
       </div>
     </LayoutAdmin>
   );
