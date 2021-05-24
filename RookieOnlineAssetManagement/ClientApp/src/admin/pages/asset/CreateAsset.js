@@ -64,15 +64,17 @@ const CreateAsset = ({ user }) => {
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
           <div className='form__title'>Create Asset</div>
+
           <div className='form__field'>
             <label>Name</label>
             <input className='input' {...register('assetName')} />
           </div>
+
           <div className='form__field'>
             <label>Category</label>
             <div className='custom__select'>
               {/* At the moment - 19/5/2021, 'category is named 'name' in api. Change it later */}
-              <select {...register('name')}>
+              <select {...register('name')} disabled>
                 {/* <option value=''>Select</option>
                 <option value='laptop'>Laptop</option>
                 <option value='history'>Something else</option> */}
@@ -87,6 +89,7 @@ const CreateAsset = ({ user }) => {
               </select>
             </div>
           </div>
+
           <div className='form__field'>
             <label>Specification</label>
             <textarea
@@ -119,6 +122,7 @@ const CreateAsset = ({ user }) => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  className='input'
                 />
               )}
               rules={{
@@ -128,26 +132,16 @@ const CreateAsset = ({ user }) => {
           </div>
 
           <div className='form__field'>
-            <p className='radio'>State</p>
-            <span>
-              <input
-                name='state'
-                type='radio'
-                value={0}
-                {...register('state')}
-              />
-            </span>
-            <label>Available</label>
-            <span>
-              <input
-                name='state'
-                type='radio'
-                value={1}
-                {...register('state')}
-              />
-            </span>
-            <label>Not Available</label>
+            <label>State</label>
+            <div className='custom__select'>
+              <select {...register('name')}>
+                <option value=''>Select</option>
+                <option value={0}>Available</option>
+                <option value={1}>Not Available</option>
+              </select>
+            </div>
           </div>
+
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />
             <Link to='/admin/assets/'>

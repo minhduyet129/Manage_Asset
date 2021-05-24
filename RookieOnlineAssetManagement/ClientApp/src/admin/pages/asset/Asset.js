@@ -9,65 +9,18 @@ import { api } from '../api';
 import '../TableView.css';
 
 function Asset(props) {
-  const queryClient = useQueryClient();
   const assetsInfo = useQuery('assets', getAssets, { retry: 1 });
-  // const assetsRef = useRef();
-  // const history = useHistory();
-  const { mutate, isLoading } = useMutation(deleteAsset);
+  // const { mutate, isLoading } = useMutation(deleteAsset);
+
   const removeAsset = (id) => {
-    mutate(id);
-    queryClient.invalidateQueries('assets');
+    // mutate(id);
+    // queryClient.invalidateQueries('assets');
+
+    // write logic for delete asset here
+    alert('remove asset');
   };
-  // const getAssetId = (rowIndex) => {
-  //   if (!assetsRef.current) return null;
-  //   const id = assetsRef.current[rowIndex].id;
-  //   if (id) {
-  //     history.push(`/admin/asset/edit/${id}`);
-  //   }
-  // };
 
   const data = useMemo(() => assetsInfo.data || [], [assetsInfo.data]);
-  // const assetInfo = assetsInfo.data.forEach((element) => {});
-  // const data = useMemo(
-  //   () => [
-  //     {
-  //       col1: 'LA10001',
-  //       col2: 'Laptop Dell',
-  //       col3: 'Laptop',
-  //       col4: 'Available',
-  //       col5: 'sdfsd',
-  //     },
-  //     {
-  //       col1: 'LA10002',
-  //       col2: 'Laptop Acer',
-  //       col3: 'Laptop',
-  //       col4: 'Available',
-  //       col5: '',
-  //     },
-  //     {
-  //       col1: 'LA10003',
-  //       col2: 'Laptop Macbook',
-  //       col3: 'Laptop',
-  //       col4: 'Available',
-  //       col5: '',
-  //     },
-  //     {
-  //       col1: 'LA10004',
-  //       col2: 'Laptop Thinkpad',
-  //       col3: 'Laptop',
-  //       col4: 'Available',
-  //       col5: '',
-  //     },
-  //     {
-  //       col1: 'LA10005',
-  //       col2: 'Laptop Macbook Air',
-  //       col3: 'Laptop',
-  //       col4: 'Available',
-  //       col5: '',
-  //     },
-  //   ],
-  //   []
-  // );
 
   const columns = useMemo(
     () => [
@@ -91,17 +44,17 @@ function Asset(props) {
         Header: '',
         accessor: 'actions',
         Cell: (props) => {
-          const rowIdx = props.row.id;
+          // const rowIdx = props.row.id;
           return (
             <div>
               <Link to={`/admin/assets/edit`}>
                 <span>
-                  <i className='bx bx-edit'></i>
+                  <i className='bx bx-edit' style={{ fontSize: '23px' }}></i>
                 </span>
               </Link>
               &emsp;
               <span onClick={removeAsset}>
-                <i className='bx bx-trash'></i>
+                <i className='bx bx-trash' style={{ fontSize: '23px' }}></i>
               </span>
             </div>
           );
@@ -110,12 +63,6 @@ function Asset(props) {
     ],
     []
   );
-
-  const deleteHandler = (id) => {
-    if (window.confirm('Are you sure')) {
-      // dispatch(deleteProduct(id));
-    }
-  };
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
