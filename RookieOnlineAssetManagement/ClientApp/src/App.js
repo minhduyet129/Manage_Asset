@@ -4,6 +4,8 @@ import User from './admin/pages/user/User';
 import CreateUser from './admin/pages/user/CreateUser';
 import EditUser from './admin/pages/user/EditUser';
 import Asset from './admin/pages/asset/Asset';
+import CreateAsset from './admin/pages/asset/CreateAsset';
+import EditAsset from './admin/pages/asset/EditAsset';
 import Assignment from './admin/pages/assignment/Assignment';
 import RequestForReturning from './admin/pages/request/RequestForReturning';
 import Report from './admin/pages/report/Report';
@@ -22,6 +24,8 @@ function App() {
           <Route path='/admin/users/create' component={CreateUser} />
           <Route path='/admin/users/edit/:id' component={EditUser} />
           <Route path='/admin/assets' exact component={Asset} />
+          <Route path='/admin/assets/:id/edit' component={EditAsset} />
+          <Route path='/admin/assets/create' component={CreateAsset} />
           <Route path='/admin/assignments' exact component={Assignment} />
           <Route
             path='/admin/requests-for-returning'
