@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Home from './admin/pages/Home';
 import User from './admin/pages/user/User';
 import CreateUser from './admin/pages/user/CreateUser';
+import EditUser from './admin/pages/user/EditUser';
 import Asset from './admin/pages/asset/Asset';
 import Assignment from './admin/pages/assignment/Assignment';
 import RequestForReturning from './admin/pages/request/RequestForReturning';
@@ -10,7 +11,7 @@ import Login from './login/Login';
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
-import EditUser from './admin/pages/user/EditUser';
+
 function App() {
   return (
     <div>
