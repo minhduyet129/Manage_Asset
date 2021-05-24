@@ -1,12 +1,12 @@
-import axios from "axios";
-import React from "react";
-import { format } from "date-fns";
-import { useHistory } from "react-router";
+import axios from 'axios';
+import React from 'react';
+import { format } from 'date-fns';
+import { useHistory } from 'react-router';
 import ReactPaginate from 'react-paginate';
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import AssignmentTable from "./AssignmentTable";
-import LayoutAdmin from "../layout/LayoutAdmin";
+import AssignmentTable from './AssignmentTable';
+import LayoutAdmin from '../layout/LayoutAdmin';
 import './Assignment.css';
 
 function Assignment() {
@@ -33,7 +33,7 @@ function Assignment() {
   };
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     callAssignmentsAPI();
   }, [pageNumber]);
 
@@ -48,64 +48,64 @@ function Assignment() {
   const DisableAssignments = () => {};
 
   const handlePageClick = (data) => {
-    const currentPage = data.selected
-    setPageNumber(currentPage + 1)
-  }
+    const currentPage = data.selected;
+    setPageNumber(currentPage + 1);
+  };
 
   const columns = React.useMemo(
     () => [
       {
-        Header: "No.",
+        Header: 'No.',
         Cell: (props) => {
           const rowIdx = props.row.id;
           return <span>{Number(rowIdx) + 1}</span>;
         },
       },
       {
-        Header: "Asset Code",
-        accessor: "assetCode",
+        Header: 'Asset Code',
+        accessor: 'assetCode',
       },
       {
-        Header: "Asset Name",
-        accessor: "assetName",
+        Header: 'Asset Name',
+        accessor: 'assetName',
       },
       {
-        Header: "Assigned to",
-        accessor: "assignTo",
+        Header: 'Assigned to',
+        accessor: 'assignTo',
       },
       {
-        Header: "Assigned by",
-        accessor: "assignBy",
+        Header: 'Assigned by',
+        accessor: 'assignBy',
       },
       {
-        Header: "Assigned Date",
-        accessor: "assignDate",
+        Header: 'Assigned Date',
+        accessor: 'assignDate',
         Cell: ({ value }) => {
-          return format(new Date(value), "dd/MM/yyyy");
+          return format(new Date(value), 'dd/MM/yyyy');
         },
       },
       {
-        Header: "State",
-        accessor: "state",
+        Header: 'State',
+        accessor: 'state',
       },
       {
-        Header: "Actions",
-        accessor: "actions",
+        Header: 'Actions',
+        accessor: 'actions',
         Cell: (props) => {
           const rowIdx = props.row.id;
 
           return (
             <div>
-              <span className="font" onClick={() => getAssignmentId(rowIdx)}>
-                <i className="bx bx-edit"></i>
+              <span className='font' onClick={() => getAssignmentId(rowIdx)}>
+                <i className='bx bx-edit'></i>
               </span>
               &emsp;
-              <span className="font" onClick={() => DisableAssignments(rowIdx)}>
-                <i className="fas fa-times "></i>
+              <span className='font' onClick={() => DisableAssignments(rowIdx)}>
+                <i className='fas fa-times '></i>
               </span>
               &emsp;
-              <span className="font undo-icon">
-              <i class="fas fa-undo"></i>
+              <span className='font undo-icon'>
+                <i class='fas fa-undo'></i>
               </span>
             </div>
           );
@@ -118,19 +118,19 @@ function Assignment() {
   return (
     <LayoutAdmin>
       <AssignmentTable columns={columns} data={assignments} loading={loading} />
-      <div className="paging-box">
+      <div className='paging-box'>
         <ReactPaginate
-            previousLabel={'Previous'}
-            nextLabel={'Next'}
-            breakLabel={'...'}
-            breakClassName={'break-me'}
-            pageCount={totalPages}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={'pagination'}
-            activeClassName={'active'}
-          />
+          previousLabel={'Previous'}
+          nextLabel={'Next'}
+          breakLabel={'...'}
+          breakClassName={'break-me'}
+          pageCount={totalPages}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={'pagination'}
+          activeClassName={'active'}
+        />
       </div>
     </LayoutAdmin>
   );
