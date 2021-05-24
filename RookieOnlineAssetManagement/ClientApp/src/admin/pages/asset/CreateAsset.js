@@ -74,7 +74,7 @@ const CreateAsset = ({ user }) => {
             <label>Category</label>
             <div className='custom__select'>
               {/* At the moment - 19/5/2021, 'category is named 'name' in api. Change it later */}
-              <select {...register('name')} disabled>
+              <select {...register('name')}>
                 {/* <option value=''>Select</option>
                 <option value='laptop'>Laptop</option>
                 <option value='history'>Something else</option> */}
