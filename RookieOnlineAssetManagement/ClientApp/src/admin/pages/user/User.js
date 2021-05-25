@@ -107,12 +107,12 @@ const User = () => {
 
           return (
             <div>
-              <span onClick={() => getUserId(rowIdx)}>
-                <i className='bx bx-edit' style={{ fontSize: '21px' }}></i>
+              <span className='font'  onClick={() => getUserId(rowIdx)}>
+                <i className='bx bx-edit' ></i>
               </span>
               &emsp;
-              <span onClick={() => DisableUsers(rowIdx)}>
-                <i className='bx bx-x' style={{ fontSize: '24px' }}></i>
+              <span className='font'  onClick={() => DisableUsers(rowIdx)}>
+                <i className='fas fa-times' ></i>
               </span>
             </div>
           );
