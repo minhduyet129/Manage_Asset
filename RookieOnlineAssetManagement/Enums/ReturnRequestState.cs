@@ -7,7 +7,9 @@ namespace RookieOnlineAssetManagement.Enums
 {
     public enum ReturnRequestState
     {
-        Waiting,
-        Completed
+        WaitingForReturning,
+        Completed,
+        Declined
+         
     }
 }
