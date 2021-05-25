@@ -10,28 +10,29 @@ import { api } from '../api';
 const CreateAsset = ({ user }) => {
   const [installedDate, setInstalledDate] = useState(null);
   const history = useHistory();
-  const queryClient = useQueryClient();
   const categoriesInfo = useQuery('categories', getCategories, { retry: 1 });
-  const createNewAsset = useMutation(
-    (newAsset) => api.post('/assets/', newAsset),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('assets');
-      },
-      // onMutate: async (newAsset) => {
-      //   await queryClient.cancelQueries('assets');
-      //   const previousAssets = queryClient.getQueryData('todos');
-      //   queryClient.setQueryData('assets', (old) => [...old, newAsset]);
-      //   return { previousAssets };
-      // },
-      onError: (err, newAsset, context) => {
-        queryClient.setQueryData('assets', context.previousAssets);
-      },
-      onSettled: () => {
-        queryClient.invalidateQueries('assets');
-      },
-    }
-  );
+
+  // const queryClient = useQueryClient();
+  // const createNewAsset = useMutation(
+  //   (newAsset) => api.post('/assets/', newAsset),
+  //   {
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries('assets');
+  //     },
+  //     onMutate: async (newAsset) => {
+  //       await queryClient.cancelQueries('assets');
+  //       const previousAssets = queryClient.getQueryData('todos');
+  //       queryClient.setQueryData('assets', (old) => [...old, newAsset]);
+  //       return { previousAssets };
+  //     },
+  //     onError: (err, newAsset, context) => {
+  //       queryClient.setQueryData('assets', context.previousAssets);
+  //     },
+  //     onSettled: () => {
+  //       queryClient.invalidateQueries('assets');
+  //     },
+  //   }
+  // );
 
   const {
     register,
@@ -44,7 +45,7 @@ const CreateAsset = ({ user }) => {
     alert('Add successfully!');
     history.push('/admin/assets');
     console.log(data);
-    createNewAsset.mutate(data);
+    // createNewAsset.mutate(data);
     // return new Promise((resolve, reject) => {
     //   createNewAsset(data, {
     //     onSuccess: resolve,

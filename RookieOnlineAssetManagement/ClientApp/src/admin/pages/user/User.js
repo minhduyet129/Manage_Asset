@@ -37,21 +37,18 @@ const User = () => {
   };
 
   const getusers = () => {
-
     setLoading(true);
     useCreateUser
       .getall(pageNumber)
       .then((res) => {
         usersRef.current = res.data.data;
         setUsers(res.data.data);
-        console.log(res.data)
+        console.log(res.data);
         setTotalPages(res.data.totalPages);
         setLoading(false);
       })
       .catch((err) => console.log(err));
-
-
-  }
+  };
 
   useEffect(getusers, [changes, pageNumber]);
 
@@ -110,12 +107,12 @@ const User = () => {
 
           return (
             <div>
-              <span className='font' onClick={() => getUserId(rowIdx)}>
-                <i className='bx bx-edit'></i>
+              <span onClick={() => getUserId(rowIdx)}>
+                <i className='bx bx-edit' style={{ fontSize: '21px' }}></i>
               </span>
               &emsp;
-              <span className='font' onClick={() => DisableUsers(rowIdx)}>
-                <i className='fas fa-times '></i>
+              <span onClick={() => DisableUsers(rowIdx)}>
+                <i className='bx bx-x' style={{ fontSize: '24px' }}></i>
               </span>
             </div>
           );
