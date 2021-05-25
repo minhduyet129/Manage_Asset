@@ -2,25 +2,25 @@ import axios from 'axios';
 
 // Get an user
 function getbyid(id) {
-  return axios.get(`http://rookies-001-site1.itempurl.com/api/Users/${id}`);
+  return axios.get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`);
 }
 
 // Get users
 function getall(pageNumber) {
   return axios.get(
-    `http://rookies-001-site1.itempurl.com/api/Users?PageNumber=${pageNumber}`
+    `http://hungbqit-001-site5.itempurl.com/api/Users?PageNumber=${pageNumber}`
   );
 }
 
 // Create a new user
 function create(users) {
-  return axios.post('http://rookies-001-site1.itempurl.com/api/Users', users);
+  return axios.post('http://hungbqit-001-site5.itempurl.com/api/Users', users);
 }
 
 //Edit an user
 
 function edit(users, id) {
-  return axios.put(`http://rookies-001-site1.itempurl.com/api/Users/${id}`, {
+  return axios.put(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`, {
     doB: users.doB,
     joinedDate: users.joinedDate,
     gender: users.gender,
@@ -30,7 +30,7 @@ function edit(users, id) {
 
 function disable(id) {
   return axios.put(
-    `http://rookies-001-site1.itempurl.com/api/Users/disable/${id}`
+    `http://hungbqit-001-site5.itempurl.com/api/Users/disable/${id}`
   );
 }
 

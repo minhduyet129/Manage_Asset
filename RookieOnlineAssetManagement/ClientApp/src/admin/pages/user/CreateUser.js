@@ -11,14 +11,22 @@ import { Link } from 'react-router-dom';
 const schema = Yup.object().shape({
   firstName: Yup.string().required('First Name is required'),
   lastName: Yup.string().required('Last name is required'),
-  doB: Yup.date().required('Date of birth is required').typeError('Date of birth is required').test("doB", "You must be 18 or older", function(doB) {
-    const cutoff = new Date();
-    cutoff.setFullYear(cutoff.getFullYear() - 18);      
-    return doB <= cutoff;
-  }),
-  joinedDate: Yup.date().required('Joined Date is required').typeError('Joined Date is required').min(Yup.ref('doB'),({min}) => `Joined Date Must be later than Date of birth` )
+  doB: Yup.date()
+    .required('Date of birth is required')
+    .typeError('Date of birth is required')
+    .test('doB', 'You must be 18 or older', function (doB) {
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - 18);
+      return doB <= cutoff;
+    }),
+  joinedDate: Yup.date()
+    .required('Joined Date is required')
+    .typeError('Joined Date is required')
+    .min(
+      Yup.ref('doB'),
+      ({ min }) => `Joined Date Must be later than Date of birth`
+    ),
 });
-
 
 const CreateUser = () => {
   const [startDate, setStartDate] = useState(new Date());
@@ -45,30 +53,17 @@ const CreateUser = () => {
       });
   }
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState 
-  } = useForm(
-    {
-      resolver:yupResolver(schema),
-    }
-  );
+  const { register, handleSubmit, control, formState } = useForm({
+    resolver: yupResolver(schema),
+  });
   const { errors } = formState;
-  
-
-
 
   const onSubmit = async (data) => {
-     await handlerUser(data);
+    await handlerUser(data);
     console.log(data);
   };
 
-
-
- console.log(errors)
-
+  console.log(errors);
 
   return (
     <LayoutAdmin>
@@ -81,23 +76,26 @@ const CreateUser = () => {
             </label>
             <input
               id='firstname'
-              
-              {...register('firstName')} className={`form__input ${errors.firstName ? 'is-invalid' : ''}`} /> 
-            <label className='form__label' htmlFor='firstname'>
-              First Name
-            </label>
+              {...register('firstName')}
+              className={`input ${errors.firstName ? 'is-invalid' : ''}`}
+            />
           </div>
-          <p className="invalid-feedback">{errors.firstName?.message}</p>
-          <div className='form__div'>
-            <input
-              id='lastName'
-              {...register('lastName')} className={`form__input ${errors.lastName ? 'is-invalid' : ''}`} /> 
-            <label className='form__label' htmlFor='lastName'>
+          <p className='invalid-feedback'>{errors.firstName?.message}</p>
+          <div className='form__field'>
+            <label className='form__label' htmlFor='lastname'>
               Last Name
             </label>
+            <input
+              id='lastName'
+              {...register('lastName')}
+              className={`input ${errors.lastName ? 'is-invalid' : ''}`}
+            />
           </div>
-          <p className="invalid-feedback">{errors.lastName?.message}</p>
-          <div className='form__div'>
+          <p className='invalid-feedback'>{errors.lastName?.message}</p>
+          <div className='form__field'>
+            <label className='form__label' htmlFor='dob'>
+              Date of Birth
+            </label>
             <Controller
               control={control}
               name='doB'
@@ -107,11 +105,10 @@ const CreateUser = () => {
                   id='doB'
                   selected={startDate}
                   onChange={(e) => {
-                    onChange(e)
+                    onChange(e);
                     setStartDate(e);
-                    console.log(e)
+                    console.log(e);
                   }}
-                
                   placeholderText='MM/DD/YY'
                   isClearable
                   withPortal
@@ -121,12 +118,13 @@ const CreateUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
-                  error={(errors.doB)}
+                  error={errors.doB}
+                  className='input'
                 />
               )}
             />
           </div>
-          <p className="invalid-feedback">{errors.doB?.message}</p>
+          <p className='invalid-feedback'>{errors.doB?.message}</p>
 
           <div className='form__field'>
             <label className='date-picker__label' htmlFor='joinedDate'>
@@ -140,10 +138,9 @@ const CreateUser = () => {
                   id='joinedDate'
                   selected={joinedDate}
                   onChange={(e) => {
-                    onChange(e)
+                    onChange(e);
                     setJoinedDate(e);
                   }}
-                  
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -154,7 +151,9 @@ const CreateUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
-                  error={(errors.joinedDate)}
+                  error={errors.joinedDate}
+                  className='input'
+                  styles={{ width: '200px' }}
                 />
               )}
             />
@@ -173,6 +172,7 @@ const CreateUser = () => {
             </div>
           </div>
           {errors.gender && <span>This field is required</span>}
+
           <div className='form__field'>
             <label className='form__label' htmlFor='roles'>
               Type
@@ -191,6 +191,7 @@ const CreateUser = () => {
             {...register('location')}
           />
           {errors.type && <span>This field is required</span>}
+
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />
             <Link to='/admin/users/'>
