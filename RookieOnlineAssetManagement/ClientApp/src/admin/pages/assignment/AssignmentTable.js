@@ -21,7 +21,7 @@ const UsersTable = ({ columns, data, loading }) => {
             <input type='text' placeholder='Name' />
             <i className='bx bx-search' />
           </form>
-          <Link to='/admin/users/create'>
+          <Link to='/admin/assignments/create'>
             <button className='btn'>Create New Assignment</button>
           </Link>
         </div>
