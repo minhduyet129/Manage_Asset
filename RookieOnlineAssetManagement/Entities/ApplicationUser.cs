@@ -17,7 +17,8 @@ namespace RookieOnlineAssetManagement.Entities
         public string Password { get; set; }
         public UserState State { get; set; }
         public int CountLogin { get; set; }
-        public ICollection<ReturnRequest> ReturnRequests { get; set; }
+        public virtual ICollection<ReturnRequest> ReturnsRequest { get; set; }
+        public virtual ICollection<ReturnRequest> ReturnsAccept { get; set; }
         public virtual ICollection<Assignment> AssignmentsTo { get; set; }
         public virtual ICollection<Assignment> AssignmentsBy { get; set; }
         public ICollection<ApplicationUserRole> UserRoles { get; set; }

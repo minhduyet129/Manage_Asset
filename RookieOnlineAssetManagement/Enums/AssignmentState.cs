@@ -9,6 +9,8 @@ namespace RookieOnlineAssetManagement.Enums
     {
         Waiting,
         Accepted,
-        Declined
+        Declined,
+        WaitingForReturning,
+        Returned
     }
 }
