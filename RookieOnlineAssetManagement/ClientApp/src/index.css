@@ -179,6 +179,24 @@ body {
   border-radius: 3px;
 }
 
+.font{
+  font-size: 25px;
+  cursor: pointer;
+  outline: none;
+}
+.spinner{
+  font-size: 50px;
+  position: absolute;
+  top: 100px;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 .form__field input:focus,
 .form__field textarea:focus,
 .form__field .custom__select select:focus {

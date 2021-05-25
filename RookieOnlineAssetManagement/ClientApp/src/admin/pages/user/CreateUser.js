@@ -159,6 +159,7 @@ const CreateUser = () => {
               )}
             />
           </div>
+          <p className="invalid-feedback">{errors.joinedDate?.message}</p>
 
           <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
