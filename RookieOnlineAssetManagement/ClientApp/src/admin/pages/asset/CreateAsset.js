@@ -6,7 +6,7 @@ import ReactDatePicker from 'react-datepicker';
 import { getApiAssets } from './assetsApi';
 
 const CreateAsset = ({ user }) => {
-  const [installedDate, setInstalledDate] = useState(null);
+  const [installedDate, setInstalledDate] = useState(new Date());
   const [categories, setCategories] = useState([]);
   const history = useHistory();
 
@@ -17,10 +17,8 @@ const CreateAsset = ({ user }) => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    handleAsset(data);
-    alert('Add successfully!');
-    // history.push('/admin/assets');
+  const onSubmit = async (data) => {
+    await handleAsset(data);
     console.log(data);
   };
 
@@ -30,7 +28,6 @@ const CreateAsset = ({ user }) => {
       .then((response) => {
         if (response.status === 200) {
           alert('Add asset sucessfully');
-          //history.push('/admin/users');
         }
       })
       .catch((error) => {
