@@ -49,12 +49,12 @@ function Asset(props) {
             <div>
               <Link to={`/admin/assets/edit`}>
                 <span>
-                  <i className='bx bx-edit' style={{ fontSize: '23px' }}></i>
+                  <i className='bx bx-edit' style={{ fontSize: '21px' }}></i>
                 </span>
               </Link>
               &emsp;
               <span onClick={removeAsset}>
-                <i className='bx bx-trash' style={{ fontSize: '23px' }}></i>
+                <i className='bx bx-x' style={{ fontSize: '24px' }}></i>
               </span>
             </div>
           );
