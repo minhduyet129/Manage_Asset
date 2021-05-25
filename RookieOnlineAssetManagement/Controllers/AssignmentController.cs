@@ -124,12 +124,57 @@ namespace RookieOnlineAssetManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAssignment([FromQuery] PaginationFilter filter)
+        public async Task<IActionResult> GetAllAssignment([FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
-            var queryable = _dbContext.Assignments
-                .Include(a => a.Asset)
-                .Include(a => a.AssignTo)
-                .Include(a => a.AssignBy);
+            IQueryable<Assignment> queryable = _dbContext.Assignments;
+            queryable = queryable.Include(a => a.Asset)
+                .Include(a => a.AssignBy)
+                .Include(a => a.AssignTo);
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    queryable = queryable.Where(u => u.Asset.AssetCode.Contains(keyword) 
+                        || u.Asset.AssetName.Contains(keyword) 
+                        || u.AssignTo.UserName.Contains(keyword));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "assetCode":
+                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
+                        break;
+
+                    case "assetName":
+                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetName) : queryable.OrderByDescending(u => u.Asset.AssetName);
+                        break;
+
+                    case "assignTo":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignTo.UserName) : queryable.OrderByDescending(u => u.AssignTo.UserName);
+                        break;
+
+                    case "assignBy":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignBy.UserName) : queryable.OrderByDescending(u => u.AssignBy.UserName);
+                        break;
+
+                    case "assignDate":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignedDate) : queryable.OrderByDescending(u => u.AssignedDate);
+                        break;
+
+                    case "state":
+                        queryable = asc ? queryable.OrderBy(u => u.State) : queryable.OrderByDescending(u => u.State);
+                        break;
+
+                    default:
+                        queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
+                        break;
+                }
+            }
+
             var count = await queryable.CountAsync();
             var data = await queryable
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
