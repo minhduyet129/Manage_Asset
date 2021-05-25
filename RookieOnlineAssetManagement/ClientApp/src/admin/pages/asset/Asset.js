@@ -34,7 +34,7 @@ function Asset(props) {
       },
       {
         Header: 'Category',
-        accessor: 'name',
+        accessor: 'categoryName',
       },
       {
         Header: 'State',
