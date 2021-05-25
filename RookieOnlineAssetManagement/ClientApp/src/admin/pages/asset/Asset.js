@@ -8,6 +8,7 @@ import AssetsTable from './AssetsTable';
 function Asset(props) {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [changes, setChanges] = useState(false);
   const usersRef = useRef(null);
   const history = useHistory();
 
@@ -19,7 +20,6 @@ function Asset(props) {
         usersRef.current = res.data.data;
         setAssets(res.data.data);
         console.log(res.data);
-        // setTotalPages(res.data.totalPages);
         setLoading(false);
       })
       .catch((err) => console.log(err));
@@ -27,13 +27,33 @@ function Asset(props) {
 
   console.log(assets)
 
-  useEffect(getassets, []);
+  useEffect(getassets, [changes]);
+
+  const DeleteAsset = async (index) => {
+    if (!usersRef.current) return;
+    const id = usersRef.current[index].id;
+    await getApiAssets.deleteAsset(id)
+    .then((res) => {
+      setChanges((prev) => {
+        const current = !prev;
+        return current;
+      });
+      if (res.status === 200) {
+        alert('Asset Deleted');
+      }
+    })
+    .catch(() => {
+      alert(
+        'Delete Failed'
+      );
+    });
+  }
 
   const columns = useMemo(
     () => [
       {
         Header: 'Asset Code',
-        accessor: 'assetCode', // accessor is the "key" in the data
+        accessor: 'assetCode',
       },
       {
         Header: 'Asset Name',
@@ -51,14 +71,14 @@ function Asset(props) {
         Header: 'Actions',
         accessor: 'actions',
         Cell: (props) => {
-          // const rowIdx = props.row.id;
+          const rowIdx = props.row.id;
           return (
             <div>
               <span className='font' onClick={''}>
                 <i className='bx bx-edit'></i>
               </span>
               &emsp;
-              <span className='font' onClick={''}>
+              <span className='font' onClick={() => DeleteAsset(rowIdx)}>
                 <i className='fas fa-times'></i>
               </span>
             </div>
