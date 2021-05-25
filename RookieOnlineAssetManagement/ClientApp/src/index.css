@@ -30,7 +30,8 @@ h2 {
 }
 
 .invalid-feedback {
-  color: red
+  color: red;
+  font-size: 13px;
 }
 
 a,
