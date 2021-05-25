@@ -72,14 +72,16 @@ namespace RookieOnlineAssetManagement
             });
 
             // Add CORS policy
-            services.AddCors();
-            //services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowAllOrigin", builder =>
-            //    {
-            //        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowedToAllowWildcardSubdomains();
-            //    });
-            //});
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigin", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                              
+                });
+            });
 
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -142,6 +144,8 @@ namespace RookieOnlineAssetManagement
                 app.UseHsts();
             }
 
+            
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -153,21 +157,14 @@ namespace RookieOnlineAssetManagement
             app.UseSpaStaticFiles();
 
             app.UseRouting();
-
-            //app.UseCors("AllowAllOrigin");
-            app.UseCors(x => x
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .SetIsOriginAllowed(origin => true)
-                .AllowCredentials());
-
+            app.UseCors("AllowAllOrigin");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}/{id?}").RequireCors("AllowAllOrigin");
                 endpoints.MapRazorPages();
             });
 
