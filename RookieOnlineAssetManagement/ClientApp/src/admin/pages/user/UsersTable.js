@@ -1,10 +1,10 @@
 import React from 'react';
-import { useTable, usePagination } from 'react-table';
+import { useTable } from 'react-table';
 import { Link } from 'react-router-dom';
 
 const UsersTable = ({ columns, data, loading }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data }, usePagination);
+    useTable({ columns, data });
 
   return (
     <div>

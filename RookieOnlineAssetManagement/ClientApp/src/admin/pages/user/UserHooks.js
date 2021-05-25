@@ -1,26 +1,27 @@
 import axios from 'axios';
+import { api } from '../api';
 
 // Get an user
 function getbyid(id) {
-  return axios.get(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`);
+  return api.get(`/Users/${id}`);
 }
 
 // Get users
 function getall(pageNumber) {
-  return axios.get(
-    `http://hungbqit-001-site5.itempurl.com/api/Users?PageNumber=${pageNumber}`
+  return api.get(
+    `/Users?PageNumber=${pageNumber}`
   );
 }
 
 // Create a new user
 function create(users) {
-  return axios.post('http://hungbqit-001-site5.itempurl.com/api/Users', users);
+  return api.post('/Users', users);
 }
 
 //Edit an user
 
 function edit(users, id) {
-  return axios.put(`http://hungbqit-001-site5.itempurl.com/api/Users/${id}`, {
+  return api.put(`/Users/${id}`, {
     doB: users.doB,
     joinedDate: users.joinedDate,
     gender: users.gender,
@@ -29,8 +30,8 @@ function edit(users, id) {
 }
 
 function disable(id) {
-  return axios.put(
-    `http://hungbqit-001-site5.itempurl.com/api/Users/disable/${id}`
+  return api.put(
+    `/Users/disable/${id}`
   );
 }
 
@@ -41,9 +42,3 @@ export const useCreateUser = {
   disable,
   getall,
 };
-
-// Disable an existing user
-export const useDisableUser = () => {};
-
-// Update an exsiting user
-export const useUpdateUser = () => {};
