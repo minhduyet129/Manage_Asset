@@ -72,13 +72,14 @@ namespace RookieOnlineAssetManagement
             });
 
             // Add CORS policy
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigin", builder =>
-                {
-                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowedToAllowWildcardSubdomains();
-                });
-            });
+            services.AddCors();
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowAllOrigin", builder =>
+            //    {
+            //        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowedToAllowWildcardSubdomains();
+            //    });
+            //});
 
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -141,8 +142,6 @@ namespace RookieOnlineAssetManagement
                 app.UseHsts();
             }
 
-            app.UseCors("AllowAllOrigin");
-
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -154,6 +153,13 @@ namespace RookieOnlineAssetManagement
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+
+            //app.UseCors("AllowAllOrigin");
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true)
+                .AllowCredentials());
 
             app.UseAuthentication();
             app.UseAuthorization();
