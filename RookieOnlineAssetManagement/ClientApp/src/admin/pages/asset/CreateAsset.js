@@ -18,7 +18,7 @@ const CreateAsset = ({ user }) => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    await handleAsset(data);
+    // await handleAsset(data);
     console.log(data);
   };
 
@@ -46,6 +46,8 @@ const CreateAsset = ({ user }) => {
     })();
   }, []);
 
+
+
   return (
     <LayoutAdmin>
       <div className='table__view'>
@@ -61,9 +63,9 @@ const CreateAsset = ({ user }) => {
             <label>Category</label>
             <div className='custom__select'>
               {categories && (
-                <select {...register('id')}>
+                <select {...register('categoryId')}>
                   {categories.map((category) => (
-                    <option value={category.id}>{category.categoryCode}</option>
+                    <option value={(category.categoryId)}>{category.name}</option>
                   ))}
                 </select>
               )}

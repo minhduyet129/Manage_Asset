@@ -1,5 +1,5 @@
 import { api } from '../api';
-// GET
+import axios from 'axios'
 function getAssets  () {
   return api.get('/Assets')
 } 
@@ -12,7 +12,7 @@ function getAsset (id) {
 
 // CREATE
 function createAsset  (assets) {
-  return api.post('/Assets', assets);
+  return axios.post('/Assets', assets);
 } 
 // Get categories for creating new assets
 function getCategories  () {
