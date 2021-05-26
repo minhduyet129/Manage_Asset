@@ -4,6 +4,22 @@ import { useForm, Controller } from 'react-hook-form';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
 import { getApiAssets } from './assetsApi';
+import { toast } from 'react-toastify';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+
+const schema = Yup.object().shape({
+  assetName: Yup.string()
+    .required('Asset Name is required')
+    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
+  specification: Yup.string()
+    .required('Specification is required')
+    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
+  installedDate: Yup.date()
+    .required('Installed Date is required')
+    .typeError('Installed Date is required'),
+  state: Yup.string().required('Select State is required'),
+});
 const EditAsset = (props) => {
   const [installedDate, setInstalledDate] = useState(null);
   const [assets, setAssets] = useState([]);
@@ -16,7 +32,7 @@ const EditAsset = (props) => {
       .getAsset(id)
       .then((res) => {
         setAssets(res.data);
-        setInstalledDate(setDateTime(res.data[0].installedDate))
+        setInstalledDate(setDateTime(res.data[0].installedDate));
         console.log(res.data);
         reset({
           id: res.data[0].id,
@@ -25,7 +41,7 @@ const EditAsset = (props) => {
           specification: res.data[0].specification,
           installedDate: res.data[0].installedDate,
           categoryName: res.data[0].categoryName,
-          assetState: res.data[0].assetState,
+          state: res.data[0].assetState,
         });
       })
       .catch((err) => {
@@ -46,13 +62,13 @@ const EditAsset = (props) => {
       .updateAsset(assets, id)
       .then((response) => {
         if (response.status === 200) {
-          alert('Update asset sucessfully');
-          //history.push('/admin/assets');
+          toast('Update asset sucessfully');
+           history.push('/admin/assets');
         }
       })
       .catch((error) => {
         setError(error);
-        alert('Update asset failed');
+        toast('Update asset failed');
       });
   }
 
@@ -60,12 +76,14 @@ const EditAsset = (props) => {
     loadAssets();
   }, []);
 
-  const { register, handleSubmit, control, reset, formState } = useForm();
+  const { register, handleSubmit, control, reset, formState } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   const { errors } = formState;
 
   const onSubmit = (data) => {
-      updateAssets(data)
+    updateAssets(data);
     // alert('Edit successfully!');
     // history.push('/admin/assets');
     console.log(data);
@@ -82,17 +100,19 @@ const EditAsset = (props) => {
           </div>
           <div className='form__field'>
             <label>Category</label>
-            <input className='input' {...register('categoryName')} disabled />
+            <input className={`input ${errors.assetName ? 'is-invalid' : ''}`} {...register('categoryName')} disabled />
           </div>
+          <p className='invalid-feedback'>{errors.assetName?.message}</p>
 
           <div className='form__field'>
             <label>Specification</label>
             <textarea
-              className='textarea'
+              className={`input ${errors.specification ? 'is-invalid' : ''}`}
               defaultValue={''}
               {...register('specification')}
             />
           </div>
+          <p className='invalid-feedback'>{errors.specification?.message}</p>
 
           <div className='form__field'>
             <label>Installed Date</label>
@@ -105,8 +125,10 @@ const EditAsset = (props) => {
                   id='doB'
                   selected={installedDate}
                   onChange={(e) => {
-                    onChange(e);
-                    setInstalledDate(e);
+                    let d = new Date(e.setHours(e.getHours() + 10));
+                    onChange(d);
+                    setInstalledDate(d);
+                    console.log(d);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -117,19 +139,20 @@ const EditAsset = (props) => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  className='input'
+                  error={errors.installedDate}
                 />
               )}
-              rules={{
-                required: true,
-              }}
             />
           </div>
+          <p className='invalid-feedback'>{errors.installedDate?.message}</p>
 
           <div className='form__field'>
             <label>State</label>
             <div className='custom__select'>
-              <select {...register('assetState')}>
-                <option value=''>Select</option>
+              <select {...register('state')}
+              className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
+              >
                 <option value={0}>Available</option>
                 <option value={1}>Waiting For Approval</option>
                 <option value={2}>Not Available</option>
@@ -139,6 +162,8 @@ const EditAsset = (props) => {
               </select>
             </div>
           </div>
+          <p className='invalid-feedback'>{errors.state?.message}</p>
+
 
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />
