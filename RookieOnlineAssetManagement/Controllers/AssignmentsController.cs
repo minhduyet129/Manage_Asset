@@ -18,13 +18,13 @@ namespace RookieOnlineAssetManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AssignmentController : ControllerBase
+    public class AssignmentsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
 
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AssignmentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public AssignmentsController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
@@ -123,13 +123,82 @@ namespace RookieOnlineAssetManagement.Controllers
             return response;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllAssignment([FromQuery] PaginationFilter filter)
+        private AssignmentState HandleStateNumber(int state)
         {
-            var queryable = _dbContext.Assignments
-                .Include(a => a.Asset)
-                .Include(a => a.AssignTo)
-                .Include(a => a.AssignBy);
+            if (state == 0) return AssignmentState.Waiting;
+            if (state == 1) return AssignmentState.Accepted;
+            if (state == 2) return AssignmentState.Declined;
+            if (state == 3) return AssignmentState.WaitingForReturning;
+            return AssignmentState.Returned;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllAssignments(
+            [FromQuery] PaginationFilter filter, 
+            string keyword, 
+            string sortBy, 
+            int filterState, 
+            string filterDate,
+            bool asc = true
+        )
+        {
+            IQueryable<Assignment> queryable = _dbContext.Assignments;
+            queryable = queryable.Include(a => a.Asset)
+                .Include(a => a.AssignBy)
+                .Include(a => a.AssignTo);
+
+            
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                 queryable = queryable.Where(u => u.Asset.AssetCode.Contains(keyword) 
+                        || u.Asset.AssetName.Contains(keyword) 
+                        || u.AssignTo.UserName.Contains(keyword));
+            }
+            
+
+            if (!string.IsNullOrEmpty(filterState.ToString()))
+            {
+                queryable = queryable.Where(u => u.State == HandleStateNumber(filterState));
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "id":
+                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
+                        break;
+
+                    case "assetCode":
+                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
+                        break;
+
+                    case "assetName":
+                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetName) : queryable.OrderByDescending(u => u.Asset.AssetName);
+                        break;
+
+                    case "assignTo":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignTo.UserName) : queryable.OrderByDescending(u => u.AssignTo.UserName);
+                        break;
+
+                    case "assignBy":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignBy.UserName) : queryable.OrderByDescending(u => u.AssignBy.UserName);
+                        break;
+
+                    case "assignDate":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignedDate) : queryable.OrderByDescending(u => u.AssignedDate);
+                        break;
+
+                    case "state":
+                        queryable = asc ? queryable.OrderBy(u => u.State) : queryable.OrderByDescending(u => u.State);
+                        break;
+
+                    default:
+                        queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
+                        break;
+                }
+            }
+
             var count = await queryable.CountAsync();
             var data = await queryable
                 .Skip((filter.PageNumber - 1) * filter.PageSize)
@@ -196,6 +265,32 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAssignment(int id)
+        {
+            var assignment = await _dbContext.Assignments
+                .Include(a => a.AssignTo)
+                .Include(a => a.AssignBy)
+                .Include(a => a.Asset)
+                .SingleOrDefaultAsync(a => a.Id == id);
+
+            if (assignment == null) return BadRequest("Cannot find this assignment");
+
+            return Ok(new AssignmentResponseModel
+            {
+                Id = assignment.Id,
+                AssetCode = assignment.Asset.AssetCode,
+                AssetName = assignment.Asset.AssetName,
+                AssignTo = assignment.AssignTo.UserName,
+                AssignBy = assignment.AssignBy.UserName,
+                AssignDate = assignment.AssignedDate,
+                State = GetAssignmentState(assignment.State),
+                AssetId = assignment.AssetId,
+                AssignById = assignment.AssignById,
+                AssignToId = assignment.AssignToId
+            });
         }
 
         [HttpPut("{id}")]

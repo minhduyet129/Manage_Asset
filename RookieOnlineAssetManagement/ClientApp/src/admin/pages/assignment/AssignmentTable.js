@@ -1,28 +1,69 @@
-import React from 'react';
-import { useTable, usePagination } from 'react-table';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { useTable, usePagination } from "react-table";
+import { Link } from "react-router-dom";
 
-const UsersTable = ({ columns, data, loading }) => {
+import "./Assignment.css";
+
+const UsersTable = ({
+  columns,
+  data,
+  loading,
+  onSearch = () => {},
+  onFilterState = () => {},
+  onClickAssignment = () => {},
+}) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data }, usePagination);
 
   return (
     <div>
-      <div className='table__view'>
+      <div className="table__view">
         <h2>Manage Assignment</h2>
-        <div className='table__view--search'>
-          <form className='search'>
+        <div className="table__view--search">
+          <div className="search">
+            <div className="filter-state">
+              <input
+                type="text"
+                placeholder="State"
+                onChange={(e) => onFilterState(e.target.value)}
+              />
+              <i className="bx bx-filter-alt" />
+            </div>
+            {/* <div className="state-options">
+              <label htmlFor="accepted" className="state-input">
+                <input id="accepted" type="radio" name="filterState" />
+                <div id="accepted">Accepted</div>
+              </label>
+              <label htmlFor="accepted" className="state-input">
+                <input id="accepted" type="radio" name="filterState" />
+                <div id="accepted">Accepted</div>
+              </label>
+              <label htmlFor="accepted" className="state-input">
+                <input id="accepted" type="radio" name="filterState" />
+                <div id="accepted">Accepted</div>
+              </label>
+              <label htmlFor="accepted" className="state-input">
+                <input id="accepted" type="radio" name="filterState" />
+                <div id="accepted">Accepted</div>
+              </label>
+              <label htmlFor="accepted" className="state-input">
+                <input id="accepted" type="radio" name="filterState" />
+                <div id="accepted">Accepted</div>
+              </label>
+            </div> */}
+          </div>
+          <div className="search">
             <label />
-            <input type='text' placeholder='State' />
-            <i className='bx bx-filter-alt' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Name' />
-            <i className='bx bx-search' />
-          </form>
-          <Link to='/admin/users/create'>
-            <button className='btn'>Create New Assignment</button>
+            <input
+              type="text"
+              placeholder="Name"
+              id="search"
+              onChange={(e) => onSearch(e.target.value)}
+            />
+            <i className="bx bx-search" />
+          </div>
+          <Link to="/admin/assignments/create">
+            <button className="btn">Create New Assignment</button>
           </Link>
         </div>
         <div>
@@ -32,26 +73,37 @@ const UsersTable = ({ columns, data, loading }) => {
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
                     <th {...column.getHeaderProps()}>
-                      {column.render('Header')}
+                      {column.render("Header")}
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
             {loading ? (
-              <div className='spinner'>
-                <i className='fas fa-spinner fa-spin'></i>
+              <div className="spinner">
+                <i className="fas fa-spinner fa-spin"></i>
               </div>
             ) : (
               <tbody {...getTableBodyProps()}>
-                {rows.map((row) => {
+                {rows.map((row, index) => {
                   prepareRow(row);
                   return (
-                    <tr {...row.getRowProps()}>
+                    <tr
+                      id="tr-hover"
+                      {...row.getRowProps()}
+                      onClick={(e) => {
+                        if (!e.target.closest("#Actions")) {
+                          onClickAssignment(row.original);
+                        }
+                      }}
+                    >
                       {row.cells.map((cell) => {
                         return (
-                          <td {...cell.getCellProps()}>
-                            {cell.render('Cell')}
+                          <td
+                            id={cell.column.Header}
+                            {...cell.getCellProps()}
+                          >
+                            {cell.render("Cell")}
                           </td>
                         );
                       })}

@@ -76,7 +76,10 @@ namespace RookieOnlineAssetManagement
             {
                 options.AddPolicy("AllowAllOrigin", builder =>
                 {
-                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowedToAllowWildcardSubdomains();
+                    builder.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                              
                 });
             });
 
@@ -141,7 +144,7 @@ namespace RookieOnlineAssetManagement
                 app.UseHsts();
             }
 
-            app.UseCors("AllowAllOrigin");
+            
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -154,14 +157,14 @@ namespace RookieOnlineAssetManagement
             app.UseSpaStaticFiles();
 
             app.UseRouting();
-
+            app.UseCors("AllowAllOrigin");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}/{id?}").RequireCors("AllowAllOrigin");
                 endpoints.MapRazorPages();
             });
 
