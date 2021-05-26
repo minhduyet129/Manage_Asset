@@ -18,13 +18,13 @@ namespace RookieOnlineAssetManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AssignmentController : ControllerBase
+    public class AssignmentsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
 
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AssignmentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public AssignmentsController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
