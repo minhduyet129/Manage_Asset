@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RookieOnlineAssetManagement.Data;
+using RookieOnlineAssetManagement.Entities;
+using RookieOnlineAssetManagement.Enums;
+using RookieOnlineAssetManagement.Filter;
+using RookieOnlineAssetManagement.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace RookieOnlineAssetManagement.Controllers
@@ -15,6 +20,119 @@ namespace RookieOnlineAssetManagement.Controllers
         public ReturnsController(ApplicationDbContext context)
         {
             _context = context;
+        }
+        [HttpGet]
+        public IActionResult GetListReturnRequest()
+        {
+            var queryable = from a in _context.Assets
+                            join b in _context.Assignments
+                            on a.Id equals b.AssetId
+                            join c in _context.ReturnRequests
+                            on b.Id equals c.AssignmentId
+                            join d in _context.Users
+                            on c.RequestedByUserId equals d.Id
+                            join f in _context.Users
+                            on c.AcceptedByUserId equals f.Id into g
+                            from f in g.DefaultIfEmpty()
+                            select new
+                            {
+                                ReturnId=c.Id,
+                                AssetCode=a.AssetCode,
+                                AssetName=a.AssetName,
+                                RequestBy=d.UserName,
+                                AssignedDate=b.AssignedDate,
+                                AcceptedBy = f.UserName,
+                                ReturnedDate =c.ReturnedDate,
+                                State=c.State
+                                
+                            };
+            var count = queryable.Count();
+            var data = queryable.ToList();
+            return Ok(data);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateReturn(ReturnModel returnModel)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty((returnModel.RequestedByUserId).ToString()))
+                {
+                    return BadRequest("RequestByUserId is required!");
+                }
+                if (string.IsNullOrEmpty((returnModel.AssignmentId).ToString()))
+                {
+                    return BadRequest("AssignmentId is required!");
+                }
+                var assignment = _context.Assignments.SingleOrDefault(x => x.Id == returnModel.AssignmentId);
+                if (assignment.State != AssignmentState.Accepted) return BadRequest("Assigment must have state accepted!");
+                var newReturn = new ReturnRequest
+                {
+                    State = ReturnRequestState.WaitingForReturning,
+                    RequestedByUserId = returnModel.RequestedByUserId,
+                    AssignmentId = returnModel.AssignmentId
+
+                };
+                await _context.ReturnRequests.AddAsync(newReturn);
+                assignment.State = AssignmentState.WaitingForReturning;
+                await _context.SaveChangesAsync();
+                return Ok(newReturn);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
+        }
+       [HttpPut("{id}/Completed")]
+       public async Task<IActionResult> CompletedReturnRequest(int id,int acceptedByUserId)
+        {
+
+            try
+            {
+                var request = await _context.ReturnRequests.FindAsync(id);
+                if (request == null) return NotFound("Not Found!");
+                if (request.State != ReturnRequestState.WaitingForReturning) return BadRequest("Request must have state waiting for returning ");
+                request.State = ReturnRequestState.Completed;
+                request.ReturnedDate = DateTime.Now;
+                request.AcceptedByUserId = acceptedByUserId;
+                var assignment = _context.Assignments.SingleOrDefault(x => x.Id == request.AssignmentId);
+                if (assignment == null)
+                {
+                    return NotFound("Not found assignment with assignmentId in return asset! ");
+                }
+                assignment.State = AssignmentState.Returned;
+                await _context.SaveChangesAsync();
+                return Ok(request);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
+        }
+        [HttpPut("{id}/Declined")]
+        public async Task<IActionResult> DeclinedReturnRequest(int id, int acceptedByUserId)
+        {
+            try
+            {
+                var request = await _context.ReturnRequests.FindAsync(id);
+                if (request == null) return NotFound("Not Found!");
+                if (request.State != ReturnRequestState.WaitingForReturning) return BadRequest("Request must have state waiting for returning ");
+                request.State = ReturnRequestState.Declined;
+                request.ReturnedDate = DateTime.Now;
+                request.AcceptedByUserId = acceptedByUserId;
+                var assignment = _context.Assignments.SingleOrDefault(x => x.Id == request.AssignmentId);
+                if (assignment == null)
+                {
+                    return NotFound("Not found assignment with assignmentId in return asset! ");
+                }
+                assignment.State = AssignmentState.Accepted;
+                await _context.SaveChangesAsync();
+                return Ok(request);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
+            
         }
         
     }
