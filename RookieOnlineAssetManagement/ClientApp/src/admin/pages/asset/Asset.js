@@ -4,8 +4,8 @@ import { useHistory } from 'react-router-dom';
 import { getApiAssets } from './assetsApi';
 import '../TableView.css';
 import AssetsTable from './AssetsTable';
-
-function Asset(props) {
+import {  toast } from 'react-toastify';
+function Asset() {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [changes, setChanges] = useState(false);
@@ -13,6 +13,7 @@ function Asset(props) {
   const history = useHistory();
 
   const getassets = () => {
+
     setLoading(true);
     getApiAssets
       .getAssets()
@@ -24,8 +25,6 @@ function Asset(props) {
       })
       .catch((err) => console.log(err));
   };
-
-  console.log(assets)
 
   useEffect(getassets, [changes]);
 
@@ -39,14 +38,32 @@ function Asset(props) {
         return current;
       });
       if (res.status === 200) {
-        alert('Asset Deleted');
+        toast('Asset Deleted');
       }
     })
     .catch(() => {
-      alert(
+      toast(
         'Delete Failed'
       );
     });
+  }
+
+  const getAssetId = async (rowIndex) => {
+    if (!usersRef.current) return;
+    const id = usersRef.current[rowIndex].id;
+    if (id) {
+      history.push(`/admin/assets/edit/${id}`);
+    }
+  }
+
+  const handleState = (value) => {
+    if(value === 0) return "Available"
+    if(value === 1) return "Waiting For Approval"
+    if(value === 2) return "Not Available"
+    if(value === 3) return "Assigned"
+    if(value === 4) return "Waiting For Recycling"
+    if(value === 5) return "Recycled"
+    return null;
   }
 
   const columns = useMemo(
@@ -65,7 +82,7 @@ function Asset(props) {
       },
       {
         Header: 'State',
-        accessor: 'state',
+        accessor: (d) => <div>{handleState(d.state)}</div>,
       },
       {
         Header: 'Actions',
@@ -74,7 +91,7 @@ function Asset(props) {
           const rowIdx = props.row.id;
           return (
             <div>
-              <span className='font' onClick={''}>
+              <span className='font' onClick={() => getAssetId(rowIdx)}>
                 <i className='bx bx-edit'></i>
               </span>
               &emsp;

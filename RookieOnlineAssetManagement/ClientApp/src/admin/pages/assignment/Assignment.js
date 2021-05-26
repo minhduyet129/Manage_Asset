@@ -1,6 +1,7 @@
 import axios from "axios";
 import React from "react";
 import { format } from "date-fns";
+import Modal from "react-modal";
 import { useHistory } from "react-router";
 import ReactPaginate from "react-paginate";
 import { useEffect, useRef, useState } from "react";
@@ -10,12 +11,28 @@ import AssignmentTable from "./AssignmentTable";
 import LayoutAdmin from "../layout/LayoutAdmin";
 import "./Assignment.css";
 
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
+Modal.setAppElement("#root");
+
 function Assignment() {
   const [assignments, setAssignments] = useState([]);
+  const [assignment, setAssignment] = useState();
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState();
   const [pageNumber, setPageNumber] = useState(1);
   const [searchText, setSearchText] = useState();
+  const [filterState, setFilterState] = useState();
+  const [modalIsOpen, setIsOpen] = useState(false);
 
   const [sort, setSort] = useState({
     sortBy: "assetCode",
@@ -27,9 +44,12 @@ function Assignment() {
   const assignmentsRef = useRef([]);
 
   const callAssignmentsAPI = () => {
-    let url = `api/Assignment?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
+    let url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
     if (searchText) {
-      url = `api/Assignment?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
+      url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
+    }
+    if (filterState) {
+      url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&filterState=${filterState}`;
     }
 
     axios
@@ -95,10 +115,34 @@ function Assignment() {
     setSearchText(value);
   };
 
-  useDebounce(() => {
-    callAssignmentsAPI();
-  }, 500, [searchText]);
+  useDebounce(
+    () => {
+      callAssignmentsAPI();
+    },
+    500,
+    [searchText, filterState]
+  );
 
+  const handleFilterState = (value) => {
+    setFilterState(Number(value));
+  };
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  const afterOpenModal = () => {
+    // references are now sync'd and can be accessed.
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const handleOnClickAssignment = (value) => {
+    setAssignment(value);
+    openModal();
+  };
 
   const columns = React.useMemo(
     () => [
@@ -197,7 +241,7 @@ function Assignment() {
           const rowIdx = props.row.id;
 
           return (
-            <div>
+            <div id="actions" style={{ display: "flex" }}>
               <span className="font" onClick={() => getAssignmentId(rowIdx)}>
                 <i className="bx bx-edit"></i>
               </span>
@@ -224,6 +268,8 @@ function Assignment() {
         data={assignments}
         loading={loading}
         onSearch={handleSearchChange}
+        onFilterState={handleFilterState}
+        onClickAssignment={handleOnClickAssignment}
       />
       <div className="paging-box">
         <ReactPaginate
@@ -239,6 +285,51 @@ function Assignment() {
           activeClassName={"active"}
         />
       </div>
+      {assignment && (
+        <Modal
+          isOpen={modalIsOpen}
+          onAfterOpen={afterOpenModal}
+          onRequestClose={closeModal}
+          style={customStyles}
+        >
+          <div className="modal-wrapper">
+            <div className="modal-close-btn" onClick={closeModal}>
+              <i class="fas fa-times"></i>
+            </div>
+            <div className="modal-header">
+              <h2>Assignment Details</h2>
+            </div>
+            <div className="modal-body">
+              <div className="body-row">
+                <div className="row-title">Asset Code</div>
+                <div className="row-value">{assignment.assetCode}</div>
+              </div>
+              <div className="body-row">
+                <div className="row-title">Asset Name</div>
+                <div className="row-value">{assignment.assetName}</div>
+              </div>
+              <div className="body-row">
+                <div className="row-title">Assigned to</div>
+                <div className="row-value">{assignment.assignTo}</div>
+              </div>
+              <div className="body-row">
+                <div className="row-title">Assigned by</div>
+                <div className="row-value">{assignment.assignBy}</div>
+              </div>
+              <div className="body-row">
+                <div className="row-title">Assigned Date</div>
+                <div className="row-value">
+                  {assignment.assignDate.slice(0, 10)}
+                </div>
+              </div>
+              <div className="body-row">
+                <div className="row-title">State</div>
+                <div className="row-value">{assignment.state}</div>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </LayoutAdmin>
   );
 }

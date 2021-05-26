@@ -7,19 +7,30 @@ import ReactDatePicker from 'react-datepicker';
 import { Link, useHistory } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-
+import {  toast } from 'react-toastify';
 const schema = Yup.object().shape({
-  doB: Yup.date().required('Enter New Date of Birth! ').typeError('Date of birth is required').test("doB", "You must be 18 or older", function(doB) {
-    const cutoff = new Date();
-    cutoff.setFullYear(cutoff.getFullYear() - 18);      
-    return doB <= cutoff;
-  }),
-  joinedDate: Yup.date().required('Joined Date is required ').typeError('Joined Date is required').min(Yup.ref('doB'),({min}) => `Joined Date Must be later than Date of birth` )
+  doB: Yup.date()
+    .required('Enter New Date of Birth!')
+    .typeError('Date of birth is required')
+    .test('doB', 'You must be 18 or older', function (doB) {
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - 18);
+      return doB <= cutoff;
+    }),
+  joinedDate: Yup.date()
+    .required('Joined Date is required')
+    .typeError('Joined Date is required')
+    .min(
+      Yup.ref('doB'),
+      ({ min }) => `Joined Date Must be later than Date of birth`
+    ),
 });
 
 const EditUser = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [joinedDate, setJoinedDate] = useState(new Date());
+
+
+  const [startDate, setStartDate] = useState();
+  const [joinedDate, setJoinedDate] = useState();
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -29,8 +40,8 @@ const EditUser = () => {
     return day !== 0 && day !== 6;
   };
 
-  const loadUsers =  () => {
-     useCreateUser
+  const loadUsers = () => {
+    useCreateUser
       .getbyid(id)
       .then((res) => {
         setUsers(res.data.data);
@@ -46,7 +57,7 @@ const EditUser = () => {
           gender: getGenderEnum(res.data.data.gender),
           location: res.data.data.location,
           userName: res.data.data.userName,
-          roleType: res.data.data.roles,
+          roleType: res.data.data.roles[0],
         });
       })
       .catch((err) => {
@@ -60,13 +71,13 @@ const EditUser = () => {
       .edit(users, id)
       .then((response) => {
         if (response.status === 200) {
-          alert('Update user sucessfully');
+          toast('Update user sucessfully');
           history.push('/admin/users');
         }
       })
       .catch((error) => {
         setError(error);
-        alert('Update user failed');
+        toast.error('Update user failed');
       });
   }
 
@@ -74,24 +85,17 @@ const EditUser = () => {
     loadUsers();
   }, []);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState,
-    reset
-  } = useForm(
-    {
-      resolver:yupResolver(schema),
-    }
-  );
+  const { register, handleSubmit, control, formState, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
   const { errors } = formState;
-
 
   const setDateTime = (date) => {
     date = date.slice(0, 10);
+
     let newDate = date.split('-').join(',');
     return new Date(newDate);
+    
   };
 
   const getGenderEnum = (gender) => {
@@ -101,7 +105,6 @@ const EditUser = () => {
 
   const onSubmit = async (data) => {
     await updateUsers(data);
-    
   };
   return (
     <LayoutAdmin>
@@ -114,8 +117,8 @@ const EditUser = () => {
             </label>
             <input
               id='staffCode'
-              className='form__input'
               {...register('staffCode')}
+              className={`input`}
               disabled
             />
           </div>
@@ -125,8 +128,8 @@ const EditUser = () => {
             </label>
             <input
               id='firstName'
-              className='form__input'
               {...register('firstName')}
+              className={`input`}
               disabled
             />
           </div>
@@ -136,13 +139,13 @@ const EditUser = () => {
             </label>
             <input
               id='lastName'
-              className='form__input'
               {...register('lastName')}
+              className={`input`}
               disabled
             />
           </div>
           <div className='form__field'>
-            <label className='date-picker__label' htmlFor='doB'>
+            <label className='form__label' htmlFor='doB'>
               Date of Birth
             </label>
             <Controller
@@ -153,25 +156,31 @@ const EditUser = () => {
                   id='doB'
                   selected={startDate}
                   onChange={(date) => {
-                    setStartDate(date);
-                    console.log(date);
+                    let d = new Date(date.setHours(date.getHours() + 10));
+                    onChange(d);
+                    setStartDate(d);
+                    console.log(d);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown
-                   dateFormatCalendar='MMMM'
+                  dateFormatCalendar='MMMM'
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
-                  error={(errors.doB)}
+                  error={errors.doB}
+                  className='input'
                 />
               )}
             />
           </div>
-          <p className="invalid-feedback">{errors.doB?.message}</p>
-          <div className='form__div'>
+          <p className='invalid-feedback'>{errors.doB?.message}</p>
+          <div className='form__field'>
+            <label className='form__label' htmlFor='joinedDate'>
+              Joined Date
+            </label>
             <Controller
               control={control}
               name='joinedDate'
@@ -180,8 +189,10 @@ const EditUser = () => {
                   id='joinedDate'
                   selected={joinedDate}
                   onChange={(date) => {
-                    setJoinedDate(date);
-                    console.log(date);
+                    let d = new Date(date.setHours(date.getHours() + 10));
+                    onChange(d);
+                    setJoinedDate(d);
+                    console.log(d);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
@@ -189,16 +200,18 @@ const EditUser = () => {
                   withPortal
                   showYearDropdown
                   showMonthDropdown
-                   dateFormatCalendar='MMMM'
+                  dateFormatCalendar='MMMM'
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
-                  error={(errors.joinedDate)}
+                  error={errors.joinedDate}
+                  className='input'
+                  styles={{ width: '200px' }}
                 />
               )}
             />
           </div>
-
+          <p className='invalid-feedback'>{errors.joinedDate?.message}</p>
           <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
               Gender
