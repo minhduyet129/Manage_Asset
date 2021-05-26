@@ -94,8 +94,7 @@ const EditUser = () => {
     date = date.slice(0, 10);
 
     let newDate = date.split('-').join(',');
-    let setDate = date.setHours(date.getHours() +10)
-    return new Date(newDate, setDate);
+    return new Date(newDate);
     
   };
 
