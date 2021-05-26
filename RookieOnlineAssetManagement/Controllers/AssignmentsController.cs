@@ -18,13 +18,13 @@ namespace RookieOnlineAssetManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AssignmentController : ControllerBase
+    public class AssignmentsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
 
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AssignmentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public AssignmentsController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
@@ -123,22 +123,42 @@ namespace RookieOnlineAssetManagement.Controllers
             return response;
         }
 
+        private AssignmentState HandleStateNumber(int state)
+        {
+            if (state == 0) return AssignmentState.Waiting;
+            if (state == 1) return AssignmentState.Accepted;
+            if (state == 2) return AssignmentState.Declined;
+            if (state == 3) return AssignmentState.WaitingForReturning;
+            return AssignmentState.Returned;
+        }
+
         [HttpGet]
-        public async Task<IActionResult> GetAllAssignment([FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
+        public async Task<IActionResult> GetAllAssignments(
+            [FromQuery] PaginationFilter filter, 
+            string keyword, 
+            string sortBy, 
+            int filterState, 
+            string filterDate,
+            bool asc = true
+        )
         {
             IQueryable<Assignment> queryable = _dbContext.Assignments;
             queryable = queryable.Include(a => a.Asset)
                 .Include(a => a.AssignBy)
                 .Include(a => a.AssignTo);
 
+            
             if (!string.IsNullOrEmpty(keyword))
             {
-                if (!string.IsNullOrEmpty(keyword))
-                {
-                    queryable = queryable.Where(u => u.Asset.AssetCode.Contains(keyword) 
+                 queryable = queryable.Where(u => u.Asset.AssetCode.Contains(keyword) 
                         || u.Asset.AssetName.Contains(keyword) 
                         || u.AssignTo.UserName.Contains(keyword));
-                }
+            }
+            
+
+            if (!string.IsNullOrEmpty(filterState.ToString()))
+            {
+                queryable = queryable.Where(u => u.State == HandleStateNumber(filterState));
             }
 
             if (!string.IsNullOrEmpty(sortBy))
@@ -245,6 +265,32 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAssignment(int id)
+        {
+            var assignment = await _dbContext.Assignments
+                .Include(a => a.AssignTo)
+                .Include(a => a.AssignBy)
+                .Include(a => a.Asset)
+                .SingleOrDefaultAsync(a => a.Id == id);
+
+            if (assignment == null) return BadRequest("Cannot find this assignment");
+
+            return Ok(new AssignmentResponseModel
+            {
+                Id = assignment.Id,
+                AssetCode = assignment.Asset.AssetCode,
+                AssetName = assignment.Asset.AssetName,
+                AssignTo = assignment.AssignTo.UserName,
+                AssignBy = assignment.AssignBy.UserName,
+                AssignDate = assignment.AssignedDate,
+                State = GetAssignmentState(assignment.State),
+                AssetId = assignment.AssetId,
+                AssignById = assignment.AssignById,
+                AssignToId = assignment.AssignToId
+            });
         }
 
         [HttpPut("{id}")]
