@@ -145,6 +145,10 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 switch (sortBy)
                 {
+                    case "id":
+                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
+                        break;
+
                     case "assetCode":
                         queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
                         break;

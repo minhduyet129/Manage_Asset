@@ -65,3 +65,11 @@
     color: rgba(0, 0, 0, 0.15);
     background-color: transparent;
 }
+
+.table-header span{
+    margin-right: 5px;
+}
+
+.table-header:hover {
+    cursor: pointer;
+}
