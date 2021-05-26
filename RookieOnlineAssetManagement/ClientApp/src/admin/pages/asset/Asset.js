@@ -4,8 +4,8 @@ import { useHistory } from 'react-router-dom';
 import { getApiAssets } from './assetsApi';
 import '../TableView.css';
 import AssetsTable from './AssetsTable';
-
-function Asset(props) {
+import {  toast } from 'react-toastify';
+function Asset() {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [changes, setChanges] = useState(false);
@@ -38,11 +38,11 @@ function Asset(props) {
         return current;
       });
       if (res.status === 200) {
-        alert('Asset Deleted');
+        toast('Asset Deleted');
       }
     })
     .catch(() => {
-      alert(
+      toast(
         'Delete Failed'
       );
     });
