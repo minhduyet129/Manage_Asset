@@ -1,11 +1,6 @@
 .undo-icon svg {
-<<<<<<< HEAD
-  font-size: 20px;
-  margin-bottom: 2px;
-=======
-    font-size: 13px;
-    margin-bottom: 1px;
->>>>>>> develop
+  font-size: 13px;
+  margin-bottom: 1px;
 }
 
 .pagination {
@@ -66,22 +61,15 @@
 }
 
 .next.disabled a:hover {
-<<<<<<< HEAD
   cursor: text;
   color: rgba(0, 0, 0, 0.15);
   background-color: transparent;
 }
-=======
-    cursor: text;
-    color: rgba(0, 0, 0, 0.15);
-    background-color: transparent;
-}
 
-.table-header span{
-    margin-right: 5px;
+.table-header span {
+  margin-right: 5px;
 }
 
 .table-header:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
->>>>>>> develop
