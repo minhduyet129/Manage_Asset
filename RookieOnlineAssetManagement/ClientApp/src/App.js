@@ -7,16 +7,24 @@ import Asset from './admin/pages/asset/Asset';
 import CreateAsset from './admin/pages/asset/CreateAsset';
 import EditAsset from './admin/pages/asset/EditAsset';
 import Assignment from './admin/pages/assignment/Assignment';
+import CreateAssignment from './admin/pages/assignment/CreateAssignment';
+import EditAssignment from './admin/pages/assignment/EditAssignment';
 import RequestForReturning from './admin/pages/request/RequestForReturning';
 import Report from './admin/pages/report/Report';
 import Login from './login/Login';
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
     <div>
+      <ToastContainer
+      position="top-center"
+      hideProgressBar
+      />
       <Router>
         <Switch>
           <Route path='/admin' exact component={Home} />
@@ -24,9 +32,11 @@ function App() {
           <Route path='/admin/users/create' component={CreateUser} />
           <Route path='/admin/users/edit/:id' component={EditUser} />
           <Route path='/admin/assets' exact component={Asset} />
-          <Route path='/admin/assets/:id/edit' component={EditAsset} />
+          <Route path='/admin/assets/edit/:id' component={EditAsset} />
           <Route path='/admin/assets/create' component={CreateAsset} />
           <Route path='/admin/assignments' exact component={Assignment} />
+          <Route path='/admin/assignments/create' component={CreateAssignment} />
+          <Route path='/admin/assignments/:id/edit' component={EditAssignment} />
           <Route
             path='/admin/requests-for-returning'
             exact

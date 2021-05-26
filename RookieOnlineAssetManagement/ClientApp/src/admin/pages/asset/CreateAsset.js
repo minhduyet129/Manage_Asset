@@ -18,16 +18,20 @@ const CreateAsset = ({ user }) => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    // await handleAsset(data);
+    await handleAsset(data);
     console.log(data);
   };
 
   function handleAsset(assets) {
+    
+
+    console.log(assets)
     return getApiAssets
       .createAsset(assets)
       .then((response) => {
         if (response.status === 200) {
           alert('Add asset sucessfully');
+          history.push('/admin/assets');
         }
       })
       .catch((error) => {
@@ -46,8 +50,6 @@ const CreateAsset = ({ user }) => {
     })();
   }, []);
 
-
-
   return (
     <LayoutAdmin>
       <div className='table__view'>
@@ -64,8 +66,9 @@ const CreateAsset = ({ user }) => {
             <div className='custom__select'>
               {categories && (
                 <select {...register('categoryId')}>
+                  <option value=''>Select</option>
                   {categories.map((category) => (
-                    <option value={(category.categoryId)}>{category.name}</option>
+                    <option value={(category.id)}>{category.name}</option>
                   ))}
                 </select>
               )}
@@ -86,7 +89,6 @@ const CreateAsset = ({ user }) => {
             <Controller
               control={control}
               name='installedDate'
-              required={true}
               render={({ field: { onChange } }) => (
                 <ReactDatePicker
                   id='doB'
@@ -107,9 +109,6 @@ const CreateAsset = ({ user }) => {
                   className='input'
                 />
               )}
-              rules={{
-                required: true,
-              }}
             />
           </div>
 
@@ -119,7 +118,11 @@ const CreateAsset = ({ user }) => {
               <select {...register('state')}>
                 <option value=''>Select</option>
                 <option value={0}>Available</option>
-                <option value={1}>Not Available</option>
+                <option value={1}>Waiting For Approval</option>
+                <option value={2}>Not Available</option>
+                <option value={3}>Assigned</option>
+                <option value={4}>Waiting For Recycling</option>
+                <option value={5}>Recycled</option>
               </select>
             </div>
           </div>

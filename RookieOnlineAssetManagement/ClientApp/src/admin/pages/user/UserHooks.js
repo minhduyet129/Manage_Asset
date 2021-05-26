@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
 import { api } from '../api';
 
 // Get an user
