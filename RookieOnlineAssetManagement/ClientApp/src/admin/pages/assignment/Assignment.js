@@ -177,7 +177,8 @@ function Assignment() {
           );
         },
         accessor: "assetName",
-      },
+          },
+
       {
         Header: () => {
           return (
