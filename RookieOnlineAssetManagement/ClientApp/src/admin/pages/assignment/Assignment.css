@@ -1,6 +1,6 @@
 .undo-icon svg {
-    font-size: 20px;
-    margin-bottom: 2px;
+    font-size: 13px;
+    margin-bottom: 1px;
 }
 
 .pagination {
@@ -64,4 +64,12 @@
     cursor: text;
     color: rgba(0, 0, 0, 0.15);
     background-color: transparent;
+}
+
+.table-header span{
+    margin-right: 5px;
+}
+
+.table-header:hover {
+    cursor: pointer;
 }
