@@ -95,6 +95,7 @@ const EditUser = () => {
 
     let newDate = date.split('-').join(',');
     return new Date(newDate);
+    
   };
 
   const getGenderEnum = (gender) => {
