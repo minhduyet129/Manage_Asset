@@ -4,7 +4,7 @@ import UsersTable from './UsersTable';
 import { useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useCreateUser } from './UserHooks';
-
+import {  toast } from 'react-toastify';
 const User = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,11 +26,11 @@ const User = () => {
           return current;
         });
         if (res.status === 200) {
-          alert('User Deleted');
+          toast('User Deleted');
         }
       })
       .catch(() => {
-        alert(
+        toast.error(
           'There are valid assigments belongs to this users. Please close all assignment before disable users'
         );
       });

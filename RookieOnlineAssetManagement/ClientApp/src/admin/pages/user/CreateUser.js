@@ -7,10 +7,11 @@ import { useHistory } from 'react-router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
+import {  toast } from 'react-toastify';
 
 const schema = Yup.object().shape({
-  firstName: Yup.string().required('First Name is required'),
-  lastName: Yup.string().required('Last name is required'),
+  firstName: Yup.string().required('First Name is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
+  lastName: Yup.string().required('Last name is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
   doB: Yup.date()
     .required('Date of birth is required')
     .typeError('Date of birth is required')
@@ -29,8 +30,10 @@ const schema = Yup.object().shape({
 });
 
 const CreateUser = () => {
-  const [startDate, setStartDate] = useState(new Date());
-  const [joinedDate, setJoinedDate] = useState(new Date());
+
+
+  const [startDate, setStartDate] = useState();
+  const [joinedDate, setJoinedDate] = useState();
   const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
@@ -43,13 +46,13 @@ const CreateUser = () => {
       .create(users)
       .then((response) => {
         if (response.status === 200) {
-          alert('Add user sucessfully');
-          //history.push('/admin/users');
+          toast('Add user sucessfully');
+          history.push('/admin/users');
         }
         console.log(users);
       })
       .catch((error) => {
-        alert('Add user failed!');
+        toast.error('Add user failed!');
       });
   }
 
@@ -105,9 +108,9 @@ const CreateUser = () => {
                   id='doB'
                   selected={startDate}
                   onChange={(e) => {
-                    onChange(e);
-                    setStartDate(e);
-                    console.log(e);
+                    let d = new Date(e.setHours(e.getHours() +10));
+                    onChange(d);
+                    setStartDate(d);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -118,8 +121,8 @@ const CreateUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
-                  error={errors.doB}
                   className='input'
+                  error={errors.doB}
                 />
               )}
             />
@@ -138,8 +141,10 @@ const CreateUser = () => {
                   id='joinedDate'
                   selected={joinedDate}
                   onChange={(e) => {
-                    onChange(e);
-                    setJoinedDate(e);
+                    let d = new Date(e.setHours(e.getHours() +10));
+                    onChange(d);
+                    console.log(d)
+                    setJoinedDate(d);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
@@ -158,7 +163,7 @@ const CreateUser = () => {
               )}
             />
           </div>
-          <p className="invalid-feedback">{errors.joinedDate?.message}</p>
+          <p className='invalid-feedback'>{errors.joinedDate?.message}</p>
 
           <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
