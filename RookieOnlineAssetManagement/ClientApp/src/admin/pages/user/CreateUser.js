@@ -2,12 +2,35 @@ import React, { useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
-import ReactDatePicker from 'react-datepicker';
-import { Link, useHistory } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import { useHistory } from 'react-router';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { Link } from 'react-router-dom';
+
+const schema = Yup.object().shape({
+  firstName: Yup.string().required('First Name is required'),
+  lastName: Yup.string().required('Last name is required'),
+  doB: Yup.date()
+    .required('Date of birth is required')
+    .typeError('Date of birth is required')
+    .test('doB', 'You must be 18 or older', function (doB) {
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - 18);
+      return doB <= cutoff;
+    }),
+  joinedDate: Yup.date()
+    .required('Joined Date is required')
+    .typeError('Joined Date is required')
+    .min(
+      Yup.ref('doB'),
+      ({ min }) => `Joined Date Must be later than Date of birth`
+    ),
+});
 
 const CreateUser = () => {
-  const [startDate, setStartDate] = useState(null);
-  const [joinedDate, setJoinedDate] = useState(null);
+  const [startDate, setStartDate] = useState(new Date());
+  const [joinedDate, setJoinedDate] = useState(new Date());
   const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
@@ -21,29 +44,26 @@ const CreateUser = () => {
       .then((response) => {
         if (response.status === 200) {
           alert('Add user sucessfully');
+          //history.push('/admin/users');
         }
         console.log(users);
       })
       .catch((error) => {
-        alert('Something went wrong!');
+        alert('Add user failed!');
       });
   }
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control,
-  } = useForm();
+  const { register, handleSubmit, control, formState } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const { errors } = formState;
 
   const onSubmit = async (data) => {
     await handlerUser(data);
-    history.push('/admin/users');
     console.log(data);
-    console.log(startDate);
   };
 
-  // console.log(startDate.getDay())
+  console.log(errors);
 
   return (
     <LayoutAdmin>
@@ -56,23 +76,24 @@ const CreateUser = () => {
             </label>
             <input
               id='firstname'
-              className='input'
               {...register('firstName')}
+              className={`input ${errors.firstName ? 'is-invalid' : ''}`}
             />
-            {errors.firstName && <span>This field is required</span>}
           </div>
+          <p className='invalid-feedback'>{errors.firstName?.message}</p>
           <div className='form__field'>
-            <label className='form__label' htmlFor='lastName'>
+            <label className='form__label' htmlFor='lastname'>
               Last Name
             </label>
             <input
               id='lastName'
-              className='input'
-              {...register('lastName', { required: true })}
+              {...register('lastName')}
+              className={`input ${errors.lastName ? 'is-invalid' : ''}`}
             />
           </div>
+          <p className='invalid-feedback'>{errors.lastName?.message}</p>
           <div className='form__field'>
-            <label className='date-picker__label' htmlFor='doB'>
+            <label className='form__label' htmlFor='dob'>
               Date of Birth
             </label>
             <Controller
@@ -80,12 +101,13 @@ const CreateUser = () => {
               name='doB'
               required={true}
               render={({ field: { onChange } }) => (
-                <ReactDatePicker
+                <DatePicker
                   id='doB'
                   selected={startDate}
                   onChange={(e) => {
                     onChange(e);
                     setStartDate(e);
+                    console.log(e);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -96,14 +118,13 @@ const CreateUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  error={errors.doB}
                   className='input'
                 />
               )}
-              rules={{
-                required: true,
-              }}
             />
           </div>
+          <p className='invalid-feedback'>{errors.doB?.message}</p>
 
           <div className='form__field'>
             <label className='date-picker__label' htmlFor='joinedDate'>
@@ -113,7 +134,7 @@ const CreateUser = () => {
               control={control}
               name='joinedDate'
               render={({ field: { onChange, onBlur, value, ref } }) => (
-                <ReactDatePicker
+                <DatePicker
                   id='joinedDate'
                   selected={joinedDate}
                   onChange={(e) => {
@@ -130,14 +151,14 @@ const CreateUser = () => {
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
+                  error={errors.joinedDate}
                   className='input'
+                  styles={{ width: '200px' }}
                 />
               )}
-              rules={{
-                required: true,
-              }}
             />
           </div>
+          <p className="invalid-feedback">{errors.joinedDate?.message}</p>
 
           <div className='form__field'>
             <label className='form__label' htmlFor='gender'>
@@ -151,6 +172,7 @@ const CreateUser = () => {
             </div>
           </div>
           {errors.gender && <span>This field is required</span>}
+
           <div className='form__field'>
             <label className='form__label' htmlFor='roles'>
               Type
@@ -169,6 +191,7 @@ const CreateUser = () => {
             {...register('location')}
           />
           {errors.type && <span>This field is required</span>}
+
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />
             <Link to='/admin/users/'>

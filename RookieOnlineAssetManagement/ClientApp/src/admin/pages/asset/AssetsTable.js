@@ -1,15 +1,15 @@
-import React from 'react';
-import { useTable } from 'react-table';
+import React from 'react'
 import { Link } from 'react-router-dom';
+import { useTable } from 'react-table';
 
-const UsersTable = ({ columns, data, loading }) => {
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+function AssetsTable({columns, data , loading}) {
+    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
+    return (
+        <div>
 
-  return (
-    <div>
       <div className='table__view'>
-        <h2>Manage User</h2>
+        <h2>Manage Asset</h2>
         <div className='table__view--search'>
           <form className='search'>
             <label />
@@ -18,11 +18,23 @@ const UsersTable = ({ columns, data, loading }) => {
           </form>
           <form className='search'>
             <label />
+            <input type='text' placeholder='Category' />
+            <i className='bx bx-filter-alt' />
+          </form>
+          <form className='search'>
+            <label />
             <input type='text' placeholder='Name' />
             <i className='bx bx-search' />
           </form>
-          <Link to='/admin/users/create'>
-            <button className='btn'>Create New User</button>
+          <form className='search'>
+            <label />
+            <input type='text' placeholder='Asset Code' />
+            <i className='bx bx-search' />
+          </form>
+          <Link to='/admin/assets/create'>
+            <button href='assets' className='btn'>
+              Create New Asset
+            </button>
           </Link>
         </div>
         <div>
@@ -63,8 +75,10 @@ const UsersTable = ({ columns, data, loading }) => {
           </table>
         </div>
       </div>
-    </div>
-  );
-};
 
-export default UsersTable;
+            
+        </div>
+    )
+}
+
+export default AssetsTable

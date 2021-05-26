@@ -22,7 +22,7 @@ namespace RookieOnlineAssetManagement.Controllers
             _context = context;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllCategory(string location,[FromQuery] PaginationFilter filter)
+        public async Task<IActionResult> GetAllCategory(string location,[FromQuery] PaginationFilter filter,string keyword,string sortBy,bool asc= true)
         {
             var queryLocation = from a in _context.Assets
                         join b in _context.Categories
@@ -30,22 +30,55 @@ namespace RookieOnlineAssetManagement.Controllers
                         where a.Location ==location
                         select new
                         {
-                           a.AssetCode,
-                           a.AssetName,
-                           b.Name,
-                           a.State
+                           Id=a.Id,
+                           AssetCode=a.AssetCode,
+                           AssetName=a.AssetName,
+                           CategoryName=b.Name,
+                           State=a.State
                         };
             var queryNotLocation= from a in _context.Assets
                                   join b in _context.Categories
                                   on a.CategoryId equals b.Id
+                                  
                                   select new
                                   {
-                                      a.AssetCode,
-                                      a.AssetName,
-                                      b.Name,
-                                      a.State
+                                      Id = a.Id,
+                                      AssetCode = a.AssetCode,
+                                      AssetName = a.AssetName,
+                                      CategoryName = b.Name,
+                                      State = a.State
                                   };
             var query = !string.IsNullOrEmpty(location) ? queryLocation : queryNotLocation;
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                query = query.Where(u => u.AssetName.Contains(keyword) || u.AssetCode.Contains(keyword));
+            }
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "assetCode":
+                        query = asc ? query.OrderBy(u => u.AssetCode) : query.OrderByDescending(u => u.AssetCode);
+                        break;
+                    case "assetName":
+                        query = asc ? query.OrderBy(u => u.AssetName) : query.OrderByDescending(u => u.AssetName);
+
+                        break;
+                    case "category":
+                        query = asc ? query.OrderBy(u => u.CategoryName) : query.OrderByDescending(u => u.CategoryName);
+
+                        break;
+                    case "state":
+                        query = asc ? query.OrderBy(u => u.State) : query.OrderByDescending(u => u.State);
+
+                        break;
+                    default:
+                        query = asc ? query.OrderBy(u => u.Id) : query.OrderByDescending(u => u.Id);
+
+                        break;
+
+                }
+            }
             var count = await query.CountAsync();
             var data = await query.Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize).ToListAsync();
@@ -55,11 +88,12 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAssetDetail(int id)
         {
-            var asset = await _context.Assets.SingleOrDefaultAsync(x => x.Id == id);
+            var asset = await _context.Assets.Include(x=>x.Assignments.Where(x=>x.AssetId==id)).SingleOrDefaultAsync(x=>x.Id==id);
             if (asset == null)
             {
                 return BadRequest();
             }
+            
             return Ok(asset);
         }
         [HttpGet("GetAssetAvailable")]

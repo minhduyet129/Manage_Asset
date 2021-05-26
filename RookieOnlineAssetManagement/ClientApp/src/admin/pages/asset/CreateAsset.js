@@ -1,37 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { Link, useHistory } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { getCategories, createAsset } from './assetsApi';
-import { api } from '../api';
+import { getApiAssets } from './assetsApi';
 
 const CreateAsset = ({ user }) => {
-  const [installedDate, setInstalledDate] = useState(null);
+  const [installedDate, setInstalledDate] = useState(new Date());
+  const [categories, setCategories] = useState([]);
   const history = useHistory();
-  const queryClient = useQueryClient();
-  const categoriesInfo = useQuery('categories', getCategories, { retry: 1 });
-  const createNewAsset = useMutation(
-    (newAsset) => api.post('/assets/', newAsset),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('assets');
-      },
-      // onMutate: async (newAsset) => {
-      //   await queryClient.cancelQueries('assets');
-      //   const previousAssets = queryClient.getQueryData('todos');
-      //   queryClient.setQueryData('assets', (old) => [...old, newAsset]);
-      //   return { previousAssets };
-      // },
-      onError: (err, newAsset, context) => {
-        queryClient.setQueryData('assets', context.previousAssets);
-      },
-      onSettled: () => {
-        queryClient.invalidateQueries('assets');
-      },
-    }
-  );
 
   const {
     register,
@@ -40,26 +17,38 @@ const CreateAsset = ({ user }) => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    alert('Add successfully!');
-    history.push('/admin/assets');
+  const onSubmit = async (data) => {
+    // await handleAsset(data);
     console.log(data);
-    createNewAsset.mutate(data);
-    // return new Promise((resolve, reject) => {
-    //   createNewAsset(data, {
-    //     onSuccess: resolve,
-    //     onError: reject,
-    //   });
-    // });
   };
 
-  return categoriesInfo.isLoading ? (
-    <LayoutAdmin>
-      <div className='table__view'>
-        <h3>Loading...</h3>
-      </div>
-    </LayoutAdmin>
-  ) : (
+  function handleAsset(assets) {
+    return getApiAssets
+      .createAsset(assets)
+      .then((response) => {
+        if (response.status === 200) {
+          alert('Add asset sucessfully');
+        }
+      })
+      .catch((error) => {
+        alert('Add asset failed!');
+      });
+  }
+  useEffect(() => {
+    (async () => {
+      getApiAssets.getCategories()
+        .then((res) => res.data)
+        .then((data) => {
+          setCategories(data);
+          console.log(data)
+        })
+        .catch((err) =>(err));
+    })();
+  }, []);
+
+
+
+  return (
     <LayoutAdmin>
       <div className='table__view'>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
@@ -73,20 +62,13 @@ const CreateAsset = ({ user }) => {
           <div className='form__field'>
             <label>Category</label>
             <div className='custom__select'>
-              {/* At the moment - 19/5/2021, 'category is named 'name' in api. Change it later */}
-              <select {...register('name')}>
-                {/* <option value=''>Select</option>
-                <option value='laptop'>Laptop</option>
-                <option value='history'>Something else</option> */}
-                {categoriesInfo.data.map((categoryInfo) => (
-                  <option
-                    key={categoryInfo.categoryCode}
-                    value={categoryInfo.categoryCode}
-                  >
-                    {categoryInfo.categoryCode}
-                  </option>
-                ))}
-              </select>
+              {categories && (
+                <select {...register('categoryId')}>
+                  {categories.map((category) => (
+                    <option value={(category.categoryId)}>{category.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
           </div>
 
@@ -134,7 +116,7 @@ const CreateAsset = ({ user }) => {
           <div className='form__field'>
             <label>State</label>
             <div className='custom__select'>
-              <select {...register('name')}>
+              <select {...register('state')}>
                 <option value=''>Select</option>
                 <option value={0}>Available</option>
                 <option value={1}>Not Available</option>

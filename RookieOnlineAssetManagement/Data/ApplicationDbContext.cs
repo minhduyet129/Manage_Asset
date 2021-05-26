@@ -25,6 +25,16 @@ namespace RookieOnlineAssetManagement.Data
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<ReturnRequest>()
+                .HasOne(u => u.RequestedUser)
+                .WithMany(a => a.ReturnsRequest)
+                .HasForeignKey(u=>u.RequestedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ReturnRequest>()
+                .HasOne(u => u.AcceptedUser)
+                .WithMany(a => a.ReturnsAccept)
+                .HasForeignKey(u=>u.AcceptedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
             builder.Entity<Assignment>()
                  .HasOne(a => a.AssignBy)
                  .WithMany(u => u.AssignmentsBy)
@@ -59,7 +69,7 @@ namespace RookieOnlineAssetManagement.Data
                     .HasForeignKey(ur => ur.UserId)
                     .IsRequired();
             });
-
+            
         }
     }
 }

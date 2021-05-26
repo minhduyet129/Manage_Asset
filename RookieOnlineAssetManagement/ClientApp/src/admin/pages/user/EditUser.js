@@ -5,10 +5,21 @@ import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
 import ReactDatePicker from 'react-datepicker';
 import { Link, useHistory } from 'react-router-dom';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+
+const schema = Yup.object().shape({
+  doB: Yup.date().required('Enter New Date of Birth! ').typeError('Date of birth is required').test("doB", "You must be 18 or older", function(doB) {
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 18);      
+    return doB <= cutoff;
+  }),
+  joinedDate: Yup.date().required('Joined Date is required ').typeError('Joined Date is required').min(Yup.ref('doB'),({min}) => `Joined Date Must be later than Date of birth` )
+});
 
 const EditUser = () => {
-  const [startDate, setStartDate] = useState();
-  const [joinedDate, setJoinedDate] = useState(null);
+  const [startDate, setStartDate] = useState(new Date());
+  const [joinedDate, setJoinedDate] = useState(new Date());
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -18,19 +29,20 @@ const EditUser = () => {
     return day !== 0 && day !== 6;
   };
 
-  const loadUsers = async () => {
-    await useCreateUser
+  const loadUsers =  () => {
+     useCreateUser
       .getbyid(id)
       .then((res) => {
         setUsers(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
-        console.log(res.data.data.roles);
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
           id: res.data.data.id,
           staffCode: res.data.data.staffCode,
           firstName: res.data.data.firstName,
           lastName: res.data.data.lastName,
+          doB: res.data.data.doB,
+          joinedDate: res.data.data.joinedDate,
           gender: getGenderEnum(res.data.data.gender),
           location: res.data.data.location,
           userName: res.data.data.userName,
@@ -49,11 +61,12 @@ const EditUser = () => {
       .then((response) => {
         if (response.status === 200) {
           alert('Update user sucessfully');
+          history.push('/admin/users');
         }
       })
       .catch((error) => {
         setError(error);
-        alert(JSON.stringify(error.response.data.errors[0]));
+        alert('Update user failed');
       });
   }
 
@@ -64,10 +77,16 @@ const EditUser = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
     control,
-    reset,
-  } = useForm();
+    formState,
+    reset
+  } = useForm(
+    {
+      resolver:yupResolver(schema),
+    }
+  );
+  const { errors } = formState;
+
 
   const setDateTime = (date) => {
     date = date.slice(0, 10);
@@ -82,7 +101,7 @@ const EditUser = () => {
 
   const onSubmit = async (data) => {
     await updateUsers(data);
-    history.push('/admin/users');
+    
   };
   return (
     <LayoutAdmin>
@@ -129,45 +148,40 @@ const EditUser = () => {
             <Controller
               control={control}
               name='doB'
-              required={true}
               render={({ field: { onChange } }) => (
                 <ReactDatePicker
                   id='doB'
                   selected={startDate}
-                  onChange={(e) => {
-                    onChange(e);
-                    setStartDate(e);
-                    console.log(e);
+                  onChange={(date) => {
+                    setStartDate(date);
+                    console.log(date);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown
-                  dateFormatCalendar='MMMM'
+                   dateFormatCalendar='MMMM'
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
-                  className='input'
+                  error={(errors.doB)}
                 />
               )}
             />
           </div>
-
-          <div className='form__field'>
-            <label className='date-picker__label' htmlFor='joinedDate'>
-              Joined Date
-            </label>
+          <p className="invalid-feedback">{errors.doB?.message}</p>
+          <div className='form__div'>
             <Controller
               control={control}
               name='joinedDate'
-              render={({ field: { onChange, onBlur, value, ref } }) => (
+              render={({ field: { onChange } }) => (
                 <ReactDatePicker
                   id='joinedDate'
                   selected={joinedDate}
-                  onChange={(e) => {
-                    onChange(e);
-                    setJoinedDate(e);
+                  onChange={(date) => {
+                    setJoinedDate(date);
+                    console.log(date);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
@@ -175,11 +189,11 @@ const EditUser = () => {
                   withPortal
                   showYearDropdown
                   showMonthDropdown
-                  dateFormatCalendar='MMMM'
+                   dateFormatCalendar='MMMM'
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
                   dropdownMode='select'
-                  className='input'
+                  error={(errors.joinedDate)}
                 />
               )}
             />
