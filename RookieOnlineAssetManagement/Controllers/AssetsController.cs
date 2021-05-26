@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
@@ -22,6 +23,7 @@ namespace RookieOnlineAssetManagement.Controllers
             _context = context;
         }
         [HttpGet]
+        [Authorize(Roles =RoleName.Admin)]
         public async Task<IActionResult> GetAllCategory(string location,[FromQuery] PaginationFilter filter,string keyword,string sortBy,bool asc= true)
         {
             var queryLocation = from a in _context.Assets
@@ -86,6 +88,29 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok(response);
         }
         [HttpGet("{id}")]
+        public async Task<IActionResult> GetAssetById(int id)
+        {
+            var queryable = from a in _context.Assets
+                            join b in _context.Categories
+                            on a.CategoryId equals b.Id
+                            where a.Id == id
+                            select new
+                            {
+                                AssetId = a.Id,
+                                AssetName = a.AssetName,
+                                CategoryName = b.Name,
+                                Specification = a.Specification,
+                                InstalledDate = a.InstalledDate,
+                                AssetState = a.State
+                            };
+            if (queryable == null)
+            {
+                return NotFound();
+            }
+            return Ok(queryable);
+
+        }
+        [HttpGet("{id}/Detail")]
         public async Task<IActionResult> GetAssetDetail(int id)
         {
             var asset = await _context.Assets.Include(x=>x.Assignments.Where(x=>x.AssetId==id)).SingleOrDefaultAsync(x=>x.Id==id);
