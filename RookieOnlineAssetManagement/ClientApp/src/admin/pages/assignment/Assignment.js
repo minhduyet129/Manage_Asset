@@ -65,9 +65,26 @@ function Assignment() {
       });
   };
 
+  // const callUsersAPI = () => {
+  //   let url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
+  //   if (searchText) {
+  //     url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
+  //   }
+
+  //   axios
+  //     .get(url)
+  //     .then((res) => {
+  //       console.log(res.data)
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
+
   useEffect(() => {
     setLoading(true);
     callAssignmentsAPI();
+    // callUsersAPI()
   }, [pageNumber, sort]);
 
   const getAssignmentId = (rowIndex) => {
@@ -297,7 +314,7 @@ function Assignment() {
               <i class="fas fa-times"></i>
             </div>
             <div className="modal-header">
-              <h2>Assignment Details</h2>
+              <span>Assignment Details</span>
             </div>
             <div className="modal-body">
               <div className="body-row">

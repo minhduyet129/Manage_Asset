@@ -25,6 +25,7 @@
     "react-table": "^7.7.0",
     "react-toastify": "^7.0.4",
     "react-utc-datepicker": "^0.1.7",
+    "react-waypoint": "^10.1.0",
     "web-vitals": "^1.1.1",
     "yup": "^0.32.9"
   },
