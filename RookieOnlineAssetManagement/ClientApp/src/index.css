@@ -257,6 +257,7 @@ body {
   cursor: pointer;
   border-radius: var(--border-radius-button);
   outline: none;
+;
 }
 
 .form__field .btn:hover {

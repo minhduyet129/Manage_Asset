@@ -1,7 +1,7 @@
 import { api } from '../api';
 
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiY2hpbmhuMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNjIyMDEzMTc2LCJpc3MiOiJodHRwOi8vcm9va2llcy0wMDEtc2l0ZTEuaXRlbXB1cmwuY29tIiwiYXVkIjoiaHR0cDovL3Jvb2tpZXMtMDAxLXNpdGUxLml0ZW1wdXJsLmNvbSJ9.ELuJDSZd5r5t88vYmzcBGSpCmymzF22BANAVb7kobic"
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiY2hpbmhuNCIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNjIyMDk2MzA2LCJpc3MiOiJodHRwOi8vcm9va2llcy0wMDEtc2l0ZTEuaXRlbXB1cmwuY29tIiwiYXVkIjoiaHR0cDovL3Jvb2tpZXMtMDAxLXNpdGUxLml0ZW1wdXJsLmNvbSJ9.4BeRX_gjv_3-E5b1dPKx2vmetF4EEYb7KX3OO9kattQ"
 function getAssets  () {
   return api.get('/Assets' , {
     headers: {
@@ -33,7 +33,7 @@ function updateAsset (assets, id) {
     assetName: assets.assetName,
     specification: assets.specification,
     installedDate: assets.installedDate,
-    assetState: assets.state,
+    state: assets.state,
   })
 }
 

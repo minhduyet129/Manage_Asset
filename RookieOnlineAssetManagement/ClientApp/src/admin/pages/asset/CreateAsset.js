@@ -4,9 +4,22 @@ import { useForm, Controller } from 'react-hook-form';
 import { Link, useHistory } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
 import { getApiAssets } from './assetsApi';
+import {  toast } from 'react-toastify';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
-const CreateAsset = ({ user }) => {
-  const [installedDate, setInstalledDate] = useState(new Date());
+const schema = Yup.object().shape({
+  assetName: Yup.string().required('Asset Name is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
+  specification: Yup.string().required('Specification is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
+  installedDate: Yup.date()
+    .required('Installed Date is required')
+    .typeError('Installed Date is required'),
+  categoryId:Yup.string().required('Select Category is required'),
+  state:Yup.string().required('Select State is required')
+});
+
+const CreateAsset = () => {
+  const [installedDate, setInstalledDate] = useState();
   const [categories, setCategories] = useState([]);
   const history = useHistory();
 
@@ -15,7 +28,9 @@ const CreateAsset = ({ user }) => {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   const onSubmit = async (data) => {
     await handleAsset(data);
@@ -30,12 +45,12 @@ const CreateAsset = ({ user }) => {
       .createAsset(assets)
       .then((response) => {
         if (response.status === 200) {
-          alert('Add asset sucessfully');
+          toast('Add asset sucessfully');
           history.push('/admin/assets');
         }
       })
       .catch((error) => {
-        alert('Add asset failed!');
+        toast('Add asset failed!');
       });
   }
   useEffect(() => {
@@ -58,14 +73,20 @@ const CreateAsset = ({ user }) => {
 
           <div className='form__field'>
             <label>Name</label>
-            <input className='input' {...register('assetName')} />
+            <input {...register('assetName')} 
+            className={`input ${errors.assetName ? 'is-invalid' : ''}`}
+
+            />
           </div>
+          <p className='invalid-feedback'>{errors.assetName?.message}</p>
 
           <div className='form__field'>
             <label>Category</label>
             <div className='custom__select'>
               {categories && (
-                <select {...register('categoryId')}>
+                <select {...register('categoryId')}
+                className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
+                >
                   <option value=''>Select</option>
                   {categories.map((category) => (
                     <option value={(category.id)}>{category.name}</option>
@@ -74,15 +95,17 @@ const CreateAsset = ({ user }) => {
               )}
             </div>
           </div>
+          <p className='invalid-feedback'>{errors.categoryId?.message}</p>
 
           <div className='form__field'>
             <label>Specification</label>
             <textarea
-              className='textarea'
               defaultValue={''}
               {...register('specification')}
+              className={`input ${errors.specification ? 'is-invalid' : ''}`}
             />
           </div>
+          <p className='invalid-feedback'>{errors.specification?.message}</p>
 
           <div className='form__field'>
             <label>Installed Date</label>
@@ -91,11 +114,13 @@ const CreateAsset = ({ user }) => {
               name='installedDate'
               render={({ field: { onChange } }) => (
                 <ReactDatePicker
-                  id='doB'
+                  id='installedDate'
                   selected={installedDate}
                   onChange={(e) => {
-                    onChange(e);
-                    setInstalledDate(e);
+                    let d = new Date(e.setHours(e.getHours() + 10));
+                    onChange(d);
+                    setInstalledDate(d);
+                    console.log(d);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -107,15 +132,20 @@ const CreateAsset = ({ user }) => {
                   scrollableYearDropdown
                   dropdownMode='select'
                   className='input'
+                  styles={{ width: '200px' }}
+                  error={errors.installedDate}
                 />
               )}
             />
           </div>
+          <p className='invalid-feedback'>{errors.installedDate?.message}</p>
 
           <div className='form__field'>
             <label>State</label>
             <div className='custom__select'>
-              <select {...register('state')}>
+              <select {...register('state')}
+              className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
+              >
                 <option value=''>Select</option>
                 <option value={0}>Available</option>
                 <option value={1}>Waiting For Approval</option>
@@ -126,6 +156,7 @@ const CreateAsset = ({ user }) => {
               </select>
             </div>
           </div>
+          <p className='invalid-feedback'>{errors.state?.message}</p>
 
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />
