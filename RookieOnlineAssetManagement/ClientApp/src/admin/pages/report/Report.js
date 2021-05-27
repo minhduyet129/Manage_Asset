@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { getApiReport } from './reportApi';
+import ReportTable from './ReportTable';
 function Report() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -49,7 +50,7 @@ function Report() {
       },
       {
         Header: 'Waiting For Approval',
-        accessor: 'waitingForRecycling',
+        accessor: 'waitingForApproval',
       },
     ],
     []
@@ -59,7 +60,7 @@ function Report() {
   return (
     <LayoutAdmin>
       <div className='table__view'>
-        
+        <ReportTable columns={columns} data={reports} loading={loading} />
       </div>
     </LayoutAdmin>
   );
