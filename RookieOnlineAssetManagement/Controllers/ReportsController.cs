@@ -33,8 +33,8 @@ namespace RookieOnlineAssetManagement.Controllers
                                 Available = c.Assets.Count(a => a.State == AssetState.Available),
                                 NotAvailable = c.Assets.Count(a => a.State == AssetState.NotAvailable),
                                 WaitingForRecycling = c.Assets.Count(a => a.State == AssetState.WaitingForRecycling),
-                                WaitingForApproval = c.Assets.Count(a => a.State == AssetState.WaitingForApproval)
-
+                                WaitingForApproval = c.Assets.Count(a => a.State == AssetState.WaitingForApproval),
+                                Recycled = c.Assets.Count(a => a.State == AssetState.Recycled),
                             };
 
                 return Ok(query);

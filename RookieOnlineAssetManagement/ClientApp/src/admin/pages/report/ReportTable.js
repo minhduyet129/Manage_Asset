@@ -1,43 +1,25 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
 import { useTable } from 'react-table';
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
-function AssetsTable({columns, data , loading}) {
+function ReportTable({columns, data , loading}) {
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
     return (
         <div>
+
       <div className='table__view'>
-        <h2>Manage Asset</h2>
+        <h2>Report</h2>
         <div className='table__view--search'>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='State' />
-            <i className='bx bx-filter-alt' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Category' />
-            <i className='bx bx-filter-alt' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Name' />
-            <i className='bx bx-search' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Asset Code' />
-            <i className='bx bx-search' />
-          </form>
-          <Link to='/admin/assets/create'>
-            <button href='assets' className='btn'>
-              Create New Asset
-            </button>
-          </Link>
+        <ReactHTMLTableToExcel
+                    className="btn"
+                    table="table"
+                    filename="tablexls"
+                    sheet="Sheet"
+                    buttonText="Export as Excel"/>
         </div>
         <div>
-          <table {...getTableProps()}>
+          <table id="table" {...getTableProps()}>
             <thead>
               {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
@@ -80,4 +62,4 @@ function AssetsTable({columns, data , loading}) {
     )
 }
 
-export default AssetsTable
+export default ReportTable
