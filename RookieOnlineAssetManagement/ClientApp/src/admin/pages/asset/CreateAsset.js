@@ -18,8 +18,8 @@ const schema = Yup.object().shape({
   state:Yup.string().required('Select State is required')
 });
 
-const CreateAsset = ({ user }) => {
-  const [installedDate, setInstalledDate] = useState(new Date());
+const CreateAsset = () => {
+  const [installedDate, setInstalledDate] = useState();
   const [categories, setCategories] = useState([]);
   const history = useHistory();
 
