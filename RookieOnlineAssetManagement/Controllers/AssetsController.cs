@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
+using RookieOnlineAssetManagement.Enums;
 using RookieOnlineAssetManagement.Filter;
 using RookieOnlineAssetManagement.Helper;
 using RookieOnlineAssetManagement.Models;
@@ -122,10 +123,65 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok(asset);
         }
         [HttpGet("GetAssetAvailable")]
-        public  IActionResult GetAssetAvailable()
+        public async Task<IActionResult> GetAssetAvailable(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
-            var asset = _context.Assets.Where(x => x.State == 0);
-            return Ok(asset);
+            var queryLocation = from a in _context.Assets
+                                 join b in _context.Categories
+                                 on a.CategoryId equals b.Id
+                                 where a.Location == location
+                                 where a.State==AssetState.Available
+                                 
+                                 select new
+                                 {
+                                     Id = a.Id,
+                                     AssetCode = a.AssetCode,
+                                     AssetName = a.AssetName,
+                                     CategoryName = b.Name
+                                     
+                                 };
+            var queryNotLocation = from a in _context.Assets
+                                   join b in _context.Categories
+                                   on a.CategoryId equals b.Id
+                                   where a.State == AssetState.Available
+                                   select new
+                                   {
+                                       Id = a.Id,
+                                       AssetCode = a.AssetCode,
+                                       AssetName = a.AssetName,
+                                       CategoryName = b.Name
+                                       
+                                   };
+            var query = !string.IsNullOrEmpty(location) ? queryLocation : queryNotLocation;
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                query = query.Where(u => u.AssetName.Contains(keyword) || u.AssetCode.Contains(keyword));
+            }
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "assetCode":
+                        query = asc ? query.OrderBy(u => u.AssetCode) : query.OrderByDescending(u => u.AssetCode);
+                        break;
+                    case "assetName":
+                        query = asc ? query.OrderBy(u => u.AssetName) : query.OrderByDescending(u => u.AssetName);
+
+                        break;
+                    case "category":
+                        query = asc ? query.OrderBy(u => u.CategoryName) : query.OrderByDescending(u => u.CategoryName);
+                        break;
+                    default:
+                        query = asc ? query.OrderBy(u => u.Id) : query.OrderByDescending(u => u.Id);
+                        break;
+
+                }
+            }
+            var count = await query.CountAsync();
+            var data = await query.Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize).ToListAsync();
+            var response = PaginationHelper.CreatePagedResponse(data, filter.PageNumber, filter.PageSize, count);
+            return Ok(response);
+            
         }
         [HttpPost]
         public async Task<IActionResult> CreateAsset(AssetModel asset)
