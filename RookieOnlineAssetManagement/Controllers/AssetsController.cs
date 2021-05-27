@@ -23,7 +23,7 @@ namespace RookieOnlineAssetManagement.Controllers
             _context = context;
         }
         [HttpGet]
-        [Authorize(Roles =RoleName.Admin)]
+        
         public async Task<IActionResult> GetAllCategory(string location,[FromQuery] PaginationFilter filter,string keyword,string sortBy,bool asc= true)
         {
             var queryLocation = from a in _context.Assets
@@ -88,7 +88,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok(response);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAssetById(int id)
+        public IActionResult GetAssetById(int id)
         {
             var queryable = from a in _context.Assets
                             join b in _context.Categories
