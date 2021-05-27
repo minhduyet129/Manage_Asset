@@ -45,14 +45,18 @@ function Report() {
       {
         Header: 'Not Available',
         accessor: 'notAvailable',
+       },
+      {
+        Header: 'Waiting For Approval',
+        accessor: 'waitingForApproval',
       },
       {
         Header: 'Waiting For Recycling',
         accessor: 'waitingForRecycling',
       },
       {
-        Header: 'Waiting For Approval',
-        accessor: 'waitingForApproval',
+        Header: 'Recycled',
+        accessor: 'recycled',
       },
     ],
     []
