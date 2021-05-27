@@ -23,38 +23,48 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             _context = context;
         }
+
         [HttpGet]
-        
-        public async Task<IActionResult> GetAllCategory(string location,[FromQuery] PaginationFilter filter,string keyword,string sortBy,bool asc= true)
+
+        public async Task<IActionResult> GetAllCategory(string location, int state, string categoryName, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
+            
             var queryLocation = from a in _context.Assets
-                        join b in _context.Categories
-                        on a.CategoryId equals b.Id
-                        where a.Location ==location
-                        select new
-                        {
-                           Id=a.Id,
-                           AssetCode=a.AssetCode,
-                           AssetName=a.AssetName,
-                           CategoryName=b.Name,
-                           State=a.State
-                        };
-            var queryNotLocation= from a in _context.Assets
-                                  join b in _context.Categories
-                                  on a.CategoryId equals b.Id
-                                  
-                                  select new
-                                  {
-                                      Id = a.Id,
-                                      AssetCode = a.AssetCode,
-                                      AssetName = a.AssetName,
-                                      CategoryName = b.Name,
-                                      State = a.State
-                                  };
+                                join b in _context.Categories
+                                on a.CategoryId equals b.Id
+                                where a.Location == location
+                                select new
+                                {
+                                    Id = a.Id,
+                                    AssetCode = a.AssetCode,
+                                    AssetName = a.AssetName,
+                                    CategoryName = b.Name,
+                                    State = a.State
+                                };
+            var queryNotLocation = from a in _context.Assets
+                                   join b in _context.Categories
+                                   on a.CategoryId equals b.Id
+
+                                   select new
+                                   {
+                                       Id = a.Id,
+                                       AssetCode = a.AssetCode,
+                                       AssetName = a.AssetName,
+                                       CategoryName = b.Name,
+                                       State = a.State
+                                   };
             var query = !string.IsNullOrEmpty(location) ? queryLocation : queryNotLocation;
             if (!string.IsNullOrEmpty(keyword))
             {
                 query = query.Where(u => u.AssetName.Contains(keyword) || u.AssetCode.Contains(keyword));
+            }
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                query = query.Where(y => y.CategoryName==categoryName);
+            }
+            if (!string.IsNullOrEmpty(state.ToString()))
+            {
+                query = query.Where(z => z.State == (AssetState)state);
             }
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -82,6 +92,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
                 }
             }
+
             var count = await query.CountAsync();
             var data = await query.Skip((filter.PageNumber - 1) * filter.PageSize)
                 .Take(filter.PageSize).ToListAsync();
@@ -114,31 +125,31 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpGet("{id}/Detail")]
         public async Task<IActionResult> GetAssetDetail(int id)
         {
-            var asset = await _context.Assets.Include(x=>x.Assignments.Where(x=>x.AssetId==id)).SingleOrDefaultAsync(x=>x.Id==id);
+            var asset = await _context.Assets.Include(x => x.Assignments.Where(x => x.AssetId == id)).SingleOrDefaultAsync(x => x.Id == id);
             if (asset == null)
             {
                 return BadRequest();
             }
-            
+
             return Ok(asset);
         }
         [HttpGet("GetAssetAvailable")]
         public async Task<IActionResult> GetAssetAvailable(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
             var queryLocation = from a in _context.Assets
-                                 join b in _context.Categories
-                                 on a.CategoryId equals b.Id
-                                 where a.Location == location
-                                 where a.State==AssetState.Available
-                                 
-                                 select new
-                                 {
-                                     Id = a.Id,
-                                     AssetCode = a.AssetCode,
-                                     AssetName = a.AssetName,
-                                     CategoryName = b.Name
-                                     
-                                 };
+                                join b in _context.Categories
+                                on a.CategoryId equals b.Id
+                                where a.Location == location
+                                where a.State == AssetState.Available
+
+                                select new
+                                {
+                                    Id = a.Id,
+                                    AssetCode = a.AssetCode,
+                                    AssetName = a.AssetName,
+                                    CategoryName = b.Name
+
+                                };
             var queryNotLocation = from a in _context.Assets
                                    join b in _context.Categories
                                    on a.CategoryId equals b.Id
@@ -149,7 +160,7 @@ namespace RookieOnlineAssetManagement.Controllers
                                        AssetCode = a.AssetCode,
                                        AssetName = a.AssetName,
                                        CategoryName = b.Name
-                                       
+
                                    };
             var query = !string.IsNullOrEmpty(location) ? queryLocation : queryNotLocation;
             if (!string.IsNullOrEmpty(keyword))
@@ -181,25 +192,25 @@ namespace RookieOnlineAssetManagement.Controllers
                 .Take(filter.PageSize).ToListAsync();
             var response = PaginationHelper.CreatePagedResponse(data, filter.PageNumber, filter.PageSize, count);
             return Ok(response);
-            
+
         }
         [HttpPost]
         public async Task<IActionResult> CreateAsset(AssetModel asset)
         {
-           
+
             var newasset = new Asset
             {
-                AssetCode="",
-                AssetName=asset.AssetName,
-                Specification=asset.Specification,
-                State=asset.State,
-                Location=asset.Location,
-                InstalledDate=asset.InstalledDate,
-                CategoryId=asset.CategoryId
+                AssetCode = "",
+                AssetName = asset.AssetName,
+                Specification = asset.Specification,
+                State = asset.State,
+                Location = asset.Location,
+                InstalledDate = asset.InstalledDate,
+                CategoryId = asset.CategoryId
 
             };
-             _context.Assets.Add(newasset);
-             _context.SaveChanges();
+            _context.Assets.Add(newasset);
+            _context.SaveChanges();
             var assetcode = AutoRenderAssetCode(newasset.Id, newasset.CategoryId);
             if (assetcode != null)
             {
@@ -209,12 +220,12 @@ namespace RookieOnlineAssetManagement.Controllers
                 return Ok(assetupdate);
 
             }
-            
+
 
             return Ok(newasset);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsset(int id,AssetModel asset)
+        public async Task<IActionResult> UpdateAsset(int id, AssetModel asset)
         {
             var assetupdate = _context.Assets.SingleOrDefault(x => x.Id == id);
             if (assetupdate == null)
@@ -229,12 +240,12 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok(assetupdate);
 
         }
-         
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsset(int id)
         {
             var asset = _context.Assets.SingleOrDefault(x => x.Id == id);
-            if(asset == null)
+            if (asset == null)
             {
                 return NotFound();
             }
@@ -247,22 +258,23 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             return BadRequest("Cannot delete the asset because it belongs to one or more historical assignments");
         }
-        private string AutoRenderAssetCode(int assetId,int categoryid)
+        private string AutoRenderAssetCode(int assetId, int categoryid)
         {
             string assetcode = "";
             var cate = _context.Categories.SingleOrDefault(x => x.Id == categoryid);
-            
-                 assetcode = cate.CategoryCode + assetId.ToString("d6");
-                var category = _context.Assets.SingleOrDefault(x => x.AssetCode == assetcode);
-                if (category == null)
-                {
-                    return assetcode;
-                   
-                } 
-            
-            
+
+            assetcode = cate.CategoryCode + assetId.ToString("d6");
+            var category = _context.Assets.SingleOrDefault(x => x.AssetCode == assetcode);
+            if (category == null)
+            {
+                return assetcode;
+
+            }
+
+
             return assetcode;
         }
+        
 
 
     }
