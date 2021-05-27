@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback } from 'react';
 
 function useDebounce(cb, delay, depens) {
   const _cb = useCallback(cb, depens);

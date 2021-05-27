@@ -8,6 +8,10 @@ function LayoutAdmin({ children }) {
 
   const showSidebar = () => setSidebar(!sidebar);
 
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo');
+  };
+
   return (
     <div className='container'>
       {/* Start Layout */}
@@ -36,8 +40,8 @@ function LayoutAdmin({ children }) {
             <i className='bx bx-menu'></i>
           </div>
           <div>
-            <Link to='/admin/login'>
-              <button className='btn'>Logout</button>
+            <Link to='/login' className='btn' onClick={handleLogout}>
+              Logout
             </Link>
           </div>
         </div>

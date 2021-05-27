@@ -6,6 +6,7 @@ import axios from 'axios';
 import reportWebVitals from './reportWebVitals';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 const queryClient = new QueryClient();
 
@@ -15,10 +16,12 @@ axios.defaults.baseURL = 'https://localhost:5001';
 
 ReactDOM.render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-      <ReactQueryDevtools />
-    </QueryClientProvider>
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ReactQueryDevtools />
+      </QueryClientProvider>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
