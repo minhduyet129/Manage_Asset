@@ -1,25 +1,30 @@
-import React from 'react'
+import React from 'react';
 import { useTable } from 'react-table';
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
-function ReportTable({columns, data , loading}) {
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+function ReportTable({ columns, data, loading, fileName }) {
+  const fileType =
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  const fileExtension = '.xlsx';
+
+  const exportToCSV = (data, fileName) => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const datatype = new Blob([excelBuffer], { type: fileType });
+    FileSaver.saveAs(datatype, fileName + fileExtension);
+  };
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
-    return (
-        <div>
-
+  return (
+    <div>
       <div className='table__view'>
         <h2>Report</h2>
-        <div className='table__view--search'>
-        <ReactHTMLTableToExcel
-                    className="btn"
-                    table="table"
-                    filename="tablexls"
-                    sheet="Sheet"
-                    buttonText="Export as Excel"/>
-        </div>
+        <button onClick={(e) => exportToCSV(data, fileName)} className='btn'>Export</button>
+        <div className='table__view--search'></div>
         <div>
-          <table id="table" {...getTableProps()}>
+          <table id='table' {...getTableProps()}>
             <thead>
               {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
@@ -56,10 +61,8 @@ function ReportTable({columns, data , loading}) {
           </table>
         </div>
       </div>
-
-            
-        </div>
-    )
+    </div>
+  );
 }
 
-export default ReportTable
+export default ReportTable;

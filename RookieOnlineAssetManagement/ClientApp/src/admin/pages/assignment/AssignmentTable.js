@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import "./Assignment.css";
 
-const UsersTable = ({
+const AssignmentsTable = ({
   columns,
   data,
   loading,
@@ -119,4 +119,4 @@ const UsersTable = ({
   );
 };
 
-export default UsersTable;
+export default AssignmentsTable;
