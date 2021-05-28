@@ -22,13 +22,6 @@ function Login() {
     });
     const result = await response.data;
     localStorage.setItem('userInfo', JSON.stringify(result));
-
-    if (userInfoObject.role === 'Admin') {
-      history.push('/admin');
-    }
-    if (userInfoObject.role === 'User') {
-      history.push('/');
-    }
     // history.push(`/${userInfoObject.role.toLowerCase()}`);
   };
 
@@ -44,11 +37,14 @@ function Login() {
       if (userInfoObject.role === 'Admin') {
         setIsAdminLoggedIn(true);
         history.push('/admin');
+        window.location.reload();
       } else if (userInfoObject.role === 'User') {
         setIsUserLoggedIn(true);
         history.push('/');
+        window.location.reload();
       } else {
         history.push('/login');
+        window.location.reload();
       }
     }
   }, [history, userInfoObject]);

@@ -10,6 +10,7 @@ function LayoutAdmin({ children }) {
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
+    window.location.reload();
   };
 
   return (
