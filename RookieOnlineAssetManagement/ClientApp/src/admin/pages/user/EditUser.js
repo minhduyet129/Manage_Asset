@@ -45,6 +45,7 @@ const EditUser = () => {
       .getbyid(id)
       .then((res) => {
         setUsers(res.data.data);
+        console.log(res.data.data)
         setStartDate(setDateTime(res.data.data.doB));
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({

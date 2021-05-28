@@ -3,14 +3,18 @@ import { useTable, usePagination } from "react-table";
 import { Link } from "react-router-dom";
 
 import "./Assignment.css";
+import { Controller } from "react-hook-form";
+import ReactDatePicker from "react-datepicker";
 
 const AssignmentsTable = ({
   columns,
-  data,
+  data = [],
   loading,
+  filterAssignedDate,
   onSearch = () => {},
   onFilterState = () => {},
   onClickAssignment = () => {},
+  onFilterAssignedDate = () => {},
 }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data }, usePagination);
@@ -51,6 +55,25 @@ const AssignmentsTable = ({
                 <div id="accepted">Accepted</div>
               </label>
             </div> */}
+          </div>
+          <div className="search">
+            <div className="filter-state">
+              <ReactDatePicker
+                selected={filterAssignedDate}
+                onChange={(e) => onFilterAssignedDate(e)}
+                placeholderText="Assigned Date"
+                isClearable
+                withPortal
+                showYearDropdown
+                showMonthDropdown
+                dateFormat="dd/MM/yyyy"
+                yearDropdownItemNumber={100}
+                scrollableYearDropdown
+                dropdownMode="select"
+                className="input"
+              />
+              <i className="bx bx-filter-alt" />
+            </div>
           </div>
           <div className="search">
             <label />
@@ -99,10 +122,7 @@ const AssignmentsTable = ({
                     >
                       {row.cells.map((cell) => {
                         return (
-                          <td
-                            id={cell.column.Header}
-                            {...cell.getCellProps()}
-                          >
+                          <td id={cell.column.Header} {...cell.getCellProps()}>
                             {cell.render("Cell")}
                           </td>
                         );

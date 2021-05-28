@@ -7,29 +7,20 @@ import SelectAssetTable from "./SelectAssetTable";
 function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
   const [assets, setAssets] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(1);
-  const [searchText, setSearchText] = useState();
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchText, setSearchText] = useState("");
   const [sort, setSort] = useState({
-    sortBy: "assetCode",
+    sortBy: "id",
     asc: true,
   });
 
-  const usersRef = useRef([]);
-
-  const callUsersAPI = () => {
-    
-  };
-
   useEffect(() => {
-    let url = `api/Assets?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
-    if (searchText) {
-      url = `api/Assets?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-    }
+    if (searchText === "") {
+      let url = `api/Assets/GetAssetAvailable?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
     axios
       .get(url)
       .then((res) => {
-        usersRef.current = res.data.data;
-        setTotalRecords(res.data.totalRecords);
+        setTotalPages(res.data.totalPages);
         setAssets(prevState => [
             ...prevState,
             ...res.data.data
@@ -38,7 +29,15 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
       .catch((err) => {
         console.log(err);
       });
-  }, [pageNumber, sort]);
+    }
+  }, [pageNumber, sort, searchText]);
+
+  useEffect(() => {
+    if (searchText !== "") {
+      setAssets([]);
+      setPageNumber(1)
+    }
+  }, [searchText])
 
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
@@ -52,6 +51,8 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
 
   const handleSortBy = (sortBy) => {
     setSort((prevSort) => {
+      setAssets([]);
+      setPageNumber(1)
       if (prevSort.sortBy === sortBy) {
         return {
           ...prevSort,
@@ -70,15 +71,26 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
     setSearchText(value);
   };
 
-  // useDebounce(
-  //   () => {
-  //     // callUsersAPI();
-  //   },
-  //   500,
-  //   [searchText]
-  // );
-
-  // console.log(users)
+  useDebounce(
+    () => {
+      if (searchText !== "") {
+        let url = `api/Assets/GetAssetAvailable?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
+        axios
+          .get(url)
+          .then((res) => {
+            setTotalPages(res.data.totalPages);
+            setAssets((prevState) => {
+              return [...prevState, ...res.data.data];
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+    500,
+    [searchText, sort, pageNumber]
+  );
 
   const columns = React.useMemo(
     () => [
@@ -88,7 +100,7 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
           <>
             <Waypoint
               onEnter={() => {
-                if (assets.length - 1 === Number(d.row.id) && Number(d.row.id) < totalRecords - 1) {
+                if (assets.length - 1 === Number(d.row.id) && Number(d.row.id) < totalPages - 1) {
                   setPageNumber(prev => prev + 1)
                 }
               }}
@@ -98,15 +110,45 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
         ),
       },
       {
-        Header: "Asset Code",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("assetCode")}
+            >
+              <span>Asset Code</span>
+              {handleSortIcon("assetCode")}
+            </div>
+          );
+        },
         accessor: "assetCode",
       },
       {
-        Header: "Asset Name",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("assetName")}
+            >
+              <span>Asset Name</span>
+              {handleSortIcon("assetName")}
+            </div>
+          );
+        },
         accessor: "assetName",
       },
       {
-        Header: "Category",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("assetName")}
+            >
+              <span>Asset Name</span>
+              {handleSortIcon("assetName")}
+            </div>
+          );
+        },
         accessor: "categoryName",
       },
     ],
@@ -119,6 +161,7 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
       onSelectAsset={onSelectAsset}
       onSaveAssetModal={onSaveAssetModal}
       onCancelAssetModal={onCancelAssetModal}
+      onSearchChange={handleSearchChange}
     />
   );
 }
