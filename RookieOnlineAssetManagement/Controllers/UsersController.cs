@@ -439,6 +439,7 @@ namespace RookieOnlineAssetManagement.Controllers
                     expiration = token.ValidTo,
                     role = userRoles[0],
                     userId = user.Id,
+                    userName=user.UserName,
                     location = user.Location,
                     countLogin=user.CountLogin
                 });
