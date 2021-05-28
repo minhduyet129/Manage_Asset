@@ -10,15 +10,9 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
   const [totalPages, setTotalPages] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [sort, setSort] = useState({
-    sortBy: "assetCode",
+    sortBy: "id",
     asc: true,
   });
-
-  const usersRef = useRef([]);
-
-  const callUsersAPI = () => {
-    
-  };
 
   useEffect(() => {
     if (searchText === "") {
@@ -26,8 +20,6 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
     axios
       .get(url)
       .then((res) => {
-        // console.log(res)
-        usersRef.current = res.data.data;
         setTotalPages(res.data.totalPages);
         setAssets(prevState => [
             ...prevState,
@@ -59,6 +51,8 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
 
   const handleSortBy = (sortBy) => {
     setSort((prevSort) => {
+      setAssets([]);
+      setPageNumber(1)
       if (prevSort.sortBy === sortBy) {
         return {
           ...prevSort,
@@ -95,10 +89,8 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
       }
     },
     500,
-    [searchText]
+    [searchText, sort, pageNumber]
   );
-
-  // console.log(users)
 
   const columns = React.useMemo(
     () => [
@@ -118,15 +110,45 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
         ),
       },
       {
-        Header: "Asset Code",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("assetCode")}
+            >
+              <span>Asset Code</span>
+              {handleSortIcon("assetCode")}
+            </div>
+          );
+        },
         accessor: "assetCode",
       },
       {
-        Header: "Asset Name",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("assetName")}
+            >
+              <span>Asset Name</span>
+              {handleSortIcon("assetName")}
+            </div>
+          );
+        },
         accessor: "assetName",
       },
       {
-        Header: "Category",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("assetName")}
+            >
+              <span>Asset Name</span>
+              {handleSortIcon("assetName")}
+            </div>
+          );
+        },
         accessor: "categoryName",
       },
     ],

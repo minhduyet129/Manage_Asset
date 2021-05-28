@@ -10,29 +10,16 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
   const [totalPages, setTotalPages] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [sort, setSort] = useState({
-    sortBy: "assetCode",
+    sortBy: "id",
     asc: true,
   });
 
-  // const callUsersAPI = () => {
-  //   let url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
-  //   if (searchText) {
-  //     url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-  //   }
-  //   axios
-  //     .get(url)
-  //     .then((res) => {
-  //       setTotalRecords(res.data.totalRecords);
-  //       setUsers((prevState) => {
-  //         return [...prevState, ...res.data.data];
-  //       });
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
-  
+  useEffect(() => {
+    if (searchText !== "") {
+      setUsers([]);
+      setPageNumber(1);
+    }
+  }, [searchText]);
 
   useEffect(() => {
     if (searchText === "") {
@@ -51,8 +38,6 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
     }
   }, [pageNumber, sort, searchText]);
 
-  
-
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
       if (sort.asc) {
@@ -65,30 +50,26 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
 
   const handleSortBy = (sortBy) => {
     setSort((prevSort) => {
+      setUsers([]);
+      setPageNumber(1);
       if (prevSort.sortBy === sortBy) {
         return {
           ...prevSort,
           asc: !prevSort.asc,
         };
+      } else {
+        return {
+          ...prevSort,
+          sortBy: sortBy,
+          asc: true,
+        };
       }
-      return {
-        ...prevSort,
-        sortBy: sortBy,
-        asc: true,
-      };
     });
   };
 
   const handleSearchChange = (value) => {
     setSearchText(value);
   };
-
-  useEffect(() => {
-    if (searchText !== "") {
-      setUsers([]);
-      setPageNumber(1)
-    }
-  }, [searchText])
 
   useDebounce(
     () => {
@@ -108,7 +89,7 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
       }
     },
     500,
-    [searchText]
+    [searchText, sort, pageNumber]
   );
 
   // console.log(users)
@@ -134,15 +115,43 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
         ),
       },
       {
-        Header: "StaffCode",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("staffCode")}
+            >
+              <span>Staff Code</span>
+              {handleSortIcon("staffCode")}
+            </div>
+          );
+        },
         accessor: "staffCode",
       },
       {
-        Header: "FullName",
+        id: "firstName",
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("firstName")}
+            >
+              <span>Full Name</span>
+              {handleSortIcon("firstName")}
+            </div>
+          );
+        },
         accessor: (d) => <div>{d.firstName + " " + d.lastName}</div>,
       },
       {
-        Header: "Type",
+        Header: () => {
+          return (
+            <div className="table-header" onClick={() => handleSortBy("type")}>
+              <span>Type</span>
+              {handleSortIcon("type")}
+            </div>
+          );
+        },
         accessor: "roles",
       },
     ],

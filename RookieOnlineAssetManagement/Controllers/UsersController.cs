@@ -223,7 +223,7 @@ namespace RookieOnlineAssetManagement.Controllers
                         queryable = asc ? queryable.OrderBy(u => u.JoinedDate) : queryable.OrderByDescending(u => u.JoinedDate);
                         break;
                     case "type":
-                        queryable = asc ? queryable.OrderBy(u => u.UserRoles.ToString()) : queryable.OrderByDescending(u => u.UserRoles.ToString());
+                        queryable = asc ? queryable.OrderBy(user => user.UserRoles.Select(r => r.Role.Name).First()) : queryable.OrderByDescending(user => user.UserRoles.Select(r => r.Role.Name).First());
                         break;
                     default:
                         queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
@@ -237,7 +237,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 .Take(filter.PageSize)
                 .ToListAsync();
 
-            var result = new List<UserResponseModel>();
+           var result = new List<UserResponseModel>();
 
             foreach (var user in data)
             {
