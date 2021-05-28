@@ -149,7 +149,7 @@ namespace RookieOnlineAssetManagement.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAssignment([FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
+        public async Task<IActionResult> GetAllAssignment(string assignedDate, [FromQuery] PaginationFilter filter, string keyword, int? filterState, string sortBy, bool asc = true)
         {
             IQueryable<Assignment> queryable = _dbContext.Assignments;
             queryable = queryable.Include(a => a.Asset)
@@ -164,6 +164,22 @@ namespace RookieOnlineAssetManagement.Controllers
                         || u.Asset.AssetName.Contains(keyword) 
                         || u.AssignTo.UserName.Contains(keyword));
                 }
+            }
+
+            if (!string.IsNullOrEmpty(assignedDate))
+            {
+                DateTime date;
+                if (DateTime.TryParseExact(assignedDate, "dd/MM/yyyy",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out date)) 
+                { 
+                    queryable = queryable.Where(a => a.AssignedDate.Date == date.Date);
+                } 
+            }
+
+            if (filterState != null && !string.IsNullOrEmpty(filterState.ToString()))
+            {
+                queryable = queryable.Where(a => a.State == (AssignmentState)filterState);
             }
 
             if (!string.IsNullOrEmpty(sortBy))
