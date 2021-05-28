@@ -58,11 +58,7 @@ function Asset() {
 
   const handleState = (value) => {
     if(value === 0) return "Available"
-    if(value === 1) return "Waiting For Approval"
-    if(value === 2) return "Not Available"
-    if(value === 3) return "Assigned"
-    if(value === 4) return "Waiting For Recycling"
-    if(value === 5) return "Recycled"
+    if(value === 1) return "Not Available"
     return null;
   }
 
