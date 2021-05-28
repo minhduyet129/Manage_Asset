@@ -90,9 +90,9 @@ function Assignment() {
   const getAssignmentId = (rowIndex) => {
     if (!assignmentsRef.current) return;
     const id = assignmentsRef.current[rowIndex].id;
-    // if (id) {
-    //   history.push(`/admin/users/edit/${id}`);
-    // }
+    if (id) {
+      history.push(`/admin/assignments/${id}/edit`);
+    }
   };
 
   const DisableAssignments = () => {};
@@ -164,7 +164,7 @@ function Assignment() {
   const columns = React.useMemo(
     () => [
       {
-        Header: "No.",
+        Header: "Id",
         accessor: "id",
       },
       {

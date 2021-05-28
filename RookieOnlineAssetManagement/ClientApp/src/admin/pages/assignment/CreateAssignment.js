@@ -1,11 +1,13 @@
 import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import LayoutAdmin from "../layout/LayoutAdmin";
 import ReactDatePicker from "react-datepicker";
-import DatePicker from "react-datepicker";
 import { useHistory } from "react-router";
 import React, { useState } from "react";
+import { toast } from 'react-toastify';
 import { Link } from "react-router-dom";
 import Modal from "react-modal";
+import * as Yup from "yup";
 
 import SelectUser from "./SelectUser/SelectUser";
 import SelectAsset from "./SelectAsset/SelectAsset";
@@ -23,6 +25,15 @@ const customStyles = {
   },
 };
 
+const schema = Yup.object().shape({
+  assignToId: Yup.number().required("User is required"),
+  assetId: Yup.number().required("Asset is required"),
+  assignedDate: Yup.date()
+    .required("Assigned Date is required")
+    .typeError("Assigned Date is required")
+    .min(new Date(), "Assigned Date must be later than today."),
+});
+
 function CreateAssignment() {
   const [userModal, setUserModal] = useState(false);
   const [assetModal, setAssetModal] = useState(false);
@@ -32,19 +43,29 @@ function CreateAssignment() {
     assignToId: "",
     assetId: "",
     assignedDate: "",
-    assignById: 2
+    assignById: 2,
   });
 
-  const { register, handleSubmit, control, formState, reset } = useForm();
+  const history = useHistory();
+
+  const { register, handleSubmit, control, formState, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const { errors } = formState;
 
   const onSubmit = (data) => {
-    axios.post('/api/Assignments', data)
+    axios
+      .post("/api/Assignments", data)
       .then((res) => {
-        console.log(res)
+        if (res.status === 200) {
+          toast.success('Add assignment sucessfully');
+          history.push('/admin/assignments');
+        } 
       })
       .catch((err) => {
-        console.log(err)
-      })
+        toast.error('Add assignment failed');
+        console.log(err);
+      });
   };
 
   const openUserModal = () => {
@@ -59,13 +80,19 @@ function CreateAssignment() {
     setUserModal(false);
     reset({
       ...submitData,
-      assignToId: submitData.user,
+      assignToId: submitData.assignToId,
     });
   };
 
   const handleCancelUserModal = () => {
     setUserModal(false);
     setFullName("");
+    setSubmitData((prev) => {
+      return {
+        ...submitData,
+        assignToId: "",
+      };
+    });
     reset({
       ...submitData,
       assignToId: "",
@@ -83,6 +110,12 @@ function CreateAssignment() {
   const handleCancelAssetModal = () => {
     setAssetModal(false);
     setAssetName("");
+    setSubmitData((prev) => {
+      return {
+        ...submitData,
+        assetId: "",
+      };
+    });
     reset({
       ...submitData,
       assetId: "",
@@ -129,19 +162,30 @@ function CreateAssignment() {
           <div className="form__field">
             <label>User</label>
             <input className="input" {...register("assignToId")} hidden />
-            <input className="input" value={fullName} disabled />
+            <input className="input" value={fullName} disabled required />
             <div className="search-btn" onClick={openUserModal}>
               <i class="fas fa-search"></i>
             </div>
+          </div>
+          <div className="invalid-feedback">
+            <p>{errors.assignToId?.message}</p>
           </div>
 
           <div className="form__field">
             <label>Asset</label>
             <input className="input" {...register("assetId")} hidden />
-            <input className="input" value={assetName} disabled />
+            <input
+              className="input"
+              value={assetName}
+              name="assetName"
+              disabled
+            />
             <div className="search-btn" onClick={openAssetModal}>
               <i class="fas fa-search"></i>
             </div>
+          </div>
+          <div className="invalid-feedback">
+            <p>{errors.assetId?.message}</p>
           </div>
 
           <div className="form__field">
@@ -152,7 +196,6 @@ function CreateAssignment() {
               required={true}
               render={({ field: { onChange } }) => (
                 <ReactDatePicker
-                  id="doB"
                   selected={submitData.assignedDate}
                   onChange={(e) => handleSetAssignedDate(e, onChange)}
                   placeholderText="MM/DD/YY"
@@ -165,12 +208,16 @@ function CreateAssignment() {
                   scrollableYearDropdown
                   dropdownMode="select"
                   className="input"
+                  error={errors.assignedDate}
                 />
               )}
               rules={{
                 required: true,
               }}
             />
+          </div>
+          <div className="invalid-feedback">
+            <p>{errors.assignedDate?.message}</p>
           </div>
 
           <div className="form__field">
@@ -187,20 +234,16 @@ function CreateAssignment() {
                 })
               }
             />
-            <div className="search-btn" onClick={openAssetModal}>
-              <i class="fas fa-search"></i>
-            </div>
           </div>
 
           <div className="form__field">
             <input type="submit" className="btn" value="Submit" />
-            <Link to="/admin/assets/">
+            <Link to="/admin/assignments/">
               <button className="btn__cancel">Cancel</button>
             </Link>
           </div>
         </form>
       </div>
-      <button onClick={openUserModal}>Open Modal</button>
 
       <Modal
         isOpen={userModal}
