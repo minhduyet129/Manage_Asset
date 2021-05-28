@@ -7,8 +7,8 @@ import SelectAssetTable from "./SelectAssetTable";
 function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
   const [assets, setAssets] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(1);
-  const [searchText, setSearchText] = useState();
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchText, setSearchText] = useState("");
   const [sort, setSort] = useState({
     sortBy: "assetCode",
     asc: true,
@@ -21,15 +21,14 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
   };
 
   useEffect(() => {
-    let url = `api/Assets?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
-    if (searchText) {
-      url = `api/Assets?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-    }
+    if (searchText === "") {
+      let url = `api/Assets/GetAssetAvailable?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
     axios
       .get(url)
       .then((res) => {
+        // console.log(res)
         usersRef.current = res.data.data;
-        setTotalRecords(res.data.totalRecords);
+        setTotalPages(res.data.totalPages);
         setAssets(prevState => [
             ...prevState,
             ...res.data.data
@@ -38,7 +37,15 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
       .catch((err) => {
         console.log(err);
       });
-  }, [pageNumber, sort]);
+    }
+  }, [pageNumber, sort, searchText]);
+
+  useEffect(() => {
+    if (searchText !== "") {
+      setAssets([]);
+      setPageNumber(1)
+    }
+  }, [searchText])
 
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
@@ -70,13 +77,26 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
     setSearchText(value);
   };
 
-  // useDebounce(
-  //   () => {
-  //     // callUsersAPI();
-  //   },
-  //   500,
-  //   [searchText]
-  // );
+  useDebounce(
+    () => {
+      if (searchText !== "") {
+        let url = `api/Assets/GetAssetAvailable?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
+        axios
+          .get(url)
+          .then((res) => {
+            setTotalPages(res.data.totalPages);
+            setAssets((prevState) => {
+              return [...prevState, ...res.data.data];
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    },
+    500,
+    [searchText]
+  );
 
   // console.log(users)
 
@@ -88,7 +108,7 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
           <>
             <Waypoint
               onEnter={() => {
-                if (assets.length - 1 === Number(d.row.id) && Number(d.row.id) < totalRecords - 1) {
+                if (assets.length - 1 === Number(d.row.id) && Number(d.row.id) < totalPages - 1) {
                   setPageNumber(prev => prev + 1)
                 }
               }}
@@ -119,6 +139,7 @@ function SelectAsset({onSelectAsset, onSaveAssetModal, onCancelAssetModal}) {
       onSelectAsset={onSelectAsset}
       onSaveAssetModal={onSaveAssetModal}
       onCancelAssetModal={onCancelAssetModal}
+      onSearchChange={handleSearchChange}
     />
   );
 }

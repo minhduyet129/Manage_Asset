@@ -1,7 +1,8 @@
 import axios from "axios";
 import React from "react";
-import { format } from "date-fns";
 import Modal from "react-modal";
+import { format } from "date-fns";
+import { toast } from "react-toastify";
 import { useHistory } from "react-router";
 import ReactPaginate from "react-paginate";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +11,7 @@ import useDebounce from "../../../useDebounce";
 import AssignmentTable from "./AssignmentTable";
 import LayoutAdmin from "../layout/LayoutAdmin";
 import "./Assignment.css";
+import DeleteModal from "./DeleteModal";
 
 const customStyles = {
   content: {
@@ -33,6 +35,8 @@ function Assignment() {
   const [searchText, setSearchText] = useState();
   const [filterState, setFilterState] = useState();
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState();
 
   const [sort, setSort] = useState({
     sortBy: "assetCode",
@@ -65,26 +69,9 @@ function Assignment() {
       });
   };
 
-  // const callUsersAPI = () => {
-  //   let url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
-  //   if (searchText) {
-  //     url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-  //   }
-
-  //   axios
-  //     .get(url)
-  //     .then((res) => {
-  //       console.log(res.data)
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
   useEffect(() => {
     setLoading(true);
     callAssignmentsAPI();
-    // callUsersAPI()
   }, [pageNumber, sort]);
 
   const getAssignmentId = (rowIndex) => {
@@ -95,7 +82,14 @@ function Assignment() {
     }
   };
 
-  const DisableAssignments = () => {};
+  const HandleClickDeleteBtn = (rowIndex) => {
+    if (!assignmentsRef.current) return;
+    const id = assignmentsRef.current[rowIndex].id;
+    if (id) {
+      setDeleteId(id)
+    }
+    setDeleteModal(true)
+  };
 
   const handlePageClick = (data) => {
     const currentPage = data.selected;
@@ -148,18 +142,31 @@ function Assignment() {
     setIsOpen(true);
   };
 
-  const afterOpenModal = () => {
-    // references are now sync'd and can be accessed.
-  };
-
   const closeModal = () => {
     setIsOpen(false);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal(false);
   };
 
   const handleOnClickAssignment = (value) => {
     setAssignment(value);
     openModal();
   };
+
+  const handleDeleteAssignment = () => {
+    axios.delete(`/api/Assignments/${deleteId}`)
+      .then((res) => {
+        callAssignmentsAPI();
+        setDeleteModal(false);
+        toast.success("Delete Successfully")
+      })
+      .catch(err => {
+        toast.success("Delete Failed")
+        console.log(err);
+      })
+  }
 
   const columns = React.useMemo(
     () => [
@@ -263,7 +270,7 @@ function Assignment() {
                 <i className="bx bx-edit"></i>
               </span>
               &emsp;
-              <span className="font" onClick={() => DisableAssignments(rowIdx)}>
+              <span className="font" onClick={() => HandleClickDeleteBtn(rowIdx)}>
                 <i className="fas fa-times "></i>
               </span>
               &emsp;
@@ -305,7 +312,6 @@ function Assignment() {
       {assignment && (
         <Modal
           isOpen={modalIsOpen}
-          onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           style={customStyles}
         >
@@ -347,6 +353,15 @@ function Assignment() {
           </div>
         </Modal>
       )}
+      <Modal
+          isOpen={deleteModal}
+          style={customStyles}
+        >
+          <DeleteModal
+            closeDeleteModal={closeDeleteModal}
+            onDeleteAssignment={handleDeleteAssignment}
+          />
+        </Modal>
     </LayoutAdmin>
   );
 }

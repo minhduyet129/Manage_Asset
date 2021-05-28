@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 
 const SelectUserTable = ({
   columns,
-  data, 
+  data = [], 
   onSelectUser,
   onSaveUserModal,
-  onCancelUserModal
+  onCancelUserModal,
+  onSearchChange
 }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
@@ -22,7 +23,7 @@ const SelectUserTable = ({
           <div className="table__view--search select-user-search">
             <form className="search">
               <label />
-              <input type="text" placeholder="Name" />
+              <input type="text" placeholder="Name" onChange={e => onSearchChange(e.target.value)}/>
               <i className="bx bx-search" />
             </form>
           </div>

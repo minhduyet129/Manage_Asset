@@ -6,7 +6,7 @@ import "./Assignment.css";
 
 const AssignmentsTable = ({
   columns,
-  data,
+  data = [],
   loading,
   onSearch = () => {},
   onFilterState = () => {},
