@@ -26,7 +26,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllCategory(string location, int state, string categoryName, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
+        public async Task<IActionResult> GetAllCategory(string location, int? state, string categoryName, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
             
             var queryLocation = from a in _context.Assets
@@ -62,7 +62,7 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 query = query.Where(y => y.CategoryName==categoryName);
             }
-            if (!string.IsNullOrEmpty(state.ToString()))
+            if (state!=null &&!string.IsNullOrEmpty(state.ToString()))
             {
                 query = query.Where(z => z.State == (AssetState)state);
             }
@@ -211,7 +211,7 @@ namespace RookieOnlineAssetManagement.Controllers
             };
             _context.Assets.Add(newasset);
             _context.SaveChanges();
-            var assetcode = AutoRenderAssetCode(newasset.Id, newasset.CategoryId);
+            var assetcode = AutoRenderAssetCode(newasset.CategoryId);
             if (assetcode != null)
             {
                 var assetupdate = await _context.Assets.FindAsync(newasset.Id);
@@ -258,18 +258,23 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             return BadRequest("Cannot delete the asset because it belongs to one or more historical assignments");
         }
-        private string AutoRenderAssetCode(int assetId, int categoryid)
+        private string AutoRenderAssetCode(int categoryid)
         {
             string assetcode = "";
             var cate = _context.Categories.SingleOrDefault(x => x.Id == categoryid);
-
-            assetcode = cate.CategoryCode + assetId.ToString("d6");
-            var category = _context.Assets.SingleOrDefault(x => x.AssetCode == assetcode);
-            if (category == null)
+            var listAssetCode = new List<string>();
+            var query = _context.Assets.Select(a =>a.AssetCode);
+            listAssetCode.AddRange(query);
+            for(int i = 1; i < 1000000; i++)
             {
-                return assetcode;
+                assetcode = cate.CategoryCode + i.ToString("d6");
 
+                if (!listAssetCode.Contains(assetcode))
+                {
+                    return assetcode;
+                }
             }
+            
 
 
             return assetcode;
