@@ -43,7 +43,7 @@ function CreateAssignment() {
     assignToId: "",
     assetId: "",
     assignedDate: "",
-    assignById: 2,
+    assignById: 92,
   });
 
   const history = useHistory();
