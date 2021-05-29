@@ -22,10 +22,12 @@ import { ToastContainer } from 'react-toastify';
 function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const userInfoObject = JSON.parse(localStorage.getItem('userInfo'));
-  const userLocalStorage = localStorage.getItem('userInfo');
   const history = useHistory();
 
+  const userLocalStorage = localStorage.getItem('userInfo');
+  const userInfoObject = JSON.parse(userLocalStorage);
+
+  // If a user is logged in, redirect that user to pages according to their role
   useEffect(() => {
     if (userLocalStorage) {
       if (userInfoObject.role === 'Admin') {
@@ -37,6 +39,7 @@ function App() {
     }
   }, [history, userInfoObject, userLocalStorage]);
 
+  // If a user is not logged in, redirect that user to login page
   useEffect(() => {
     if (!userLocalStorage || userLocalStorage === null) {
       setIsUserLoggedIn(false);
