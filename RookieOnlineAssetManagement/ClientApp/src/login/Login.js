@@ -25,12 +25,6 @@ function Login() {
     // history.push(`/${userInfoObject.role.toLowerCase()}`);
   };
 
-  // This is just for demo for log out
-  const onRemoveLocalStorage = () => {
-    localStorage.removeItem('userInfo');
-    history.push('/login');
-  };
-
   // Redirect users to different URL according to their roles
   useEffect(() => {
     if (localStorage.getItem('userInfo')) {
@@ -80,8 +74,6 @@ function Login() {
 
         <input className='btn' type='submit' value='Login' />
       </form>
-
-      <button onClick={onRemoveLocalStorage}>Remove Local Storage</button>
     </div>
   );
 }
