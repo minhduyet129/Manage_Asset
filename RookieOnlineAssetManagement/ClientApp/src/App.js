@@ -21,10 +21,7 @@ import { ToastContainer } from 'react-toastify';
 function App() {
   return (
     <div>
-      <ToastContainer
-      position="top-center"
-      hideProgressBar
-      />
+      <ToastContainer position='top-center' hideProgressBar />
       <Router>
         <Switch>
           <Route path='/admin' exact component={Home} />
@@ -35,8 +32,14 @@ function App() {
           <Route path='/admin/assets/edit/:id' component={EditAsset} />
           <Route path='/admin/assets/create' component={CreateAsset} />
           <Route path='/admin/assignments' exact component={Assignment} />
-          <Route path='/admin/assignments/create' component={CreateAssignment} />
-          <Route path='/admin/assignments/:id/edit' component={EditAssignment} />
+          <Route
+            path='/admin/assignments/create'
+            component={CreateAssignment}
+          />
+          <Route
+            path='/admin/assignments/:id/edit'
+            component={EditAssignment}
+          />
           <Route
             path='/admin/requests-for-returning'
             exact

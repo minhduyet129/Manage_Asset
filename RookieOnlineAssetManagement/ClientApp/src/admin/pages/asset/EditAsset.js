@@ -20,6 +20,7 @@ const schema = Yup.object().shape({
     .typeError('Installed Date is required'),
   state: Yup.string().required('Select State is required'),
 });
+
 const EditAsset = (props) => {
   const [installedDate, setInstalledDate] = useState(null);
   const [assets, setAssets] = useState([]);
@@ -63,7 +64,7 @@ const EditAsset = (props) => {
       .then((response) => {
         if (response.status === 200) {
           toast('Update asset sucessfully');
-           history.push('/admin/assets');
+          history.push('/admin/assets');
         }
       })
       .catch((error) => {
@@ -100,7 +101,11 @@ const EditAsset = (props) => {
           </div>
           <div className='form__field'>
             <label>Category</label>
-            <input className={`input ${errors.assetName ? 'is-invalid' : ''}`} {...register('categoryName')} disabled />
+            <input
+              className={`input ${errors.assetName ? 'is-invalid' : ''}`}
+              {...register('categoryName')}
+              disabled
+            />
           </div>
           <p className='invalid-feedback'>{errors.assetName?.message}</p>
 
@@ -150,8 +155,9 @@ const EditAsset = (props) => {
           <div className='form__field'>
             <label>State</label>
             <div className='custom__select'>
-              <select {...register('state')}
-              className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
+              <select
+                {...register('state')}
+                className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
               >
                 <option value={0}>Available</option>
                 <option value={1}>Not Available</option>
@@ -159,7 +165,6 @@ const EditAsset = (props) => {
             </div>
           </div>
           <p className='invalid-feedback'>{errors.state?.message}</p>
-
 
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />

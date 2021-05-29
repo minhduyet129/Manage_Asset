@@ -1,12 +1,12 @@
-import React from 'react'
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTable } from 'react-table';
 
-function AssetsTable({columns, data , loading}) {
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+function AssetsTable({ columns, data, loading }) {
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
-    return (
-        <div>
+  return (
+    <div>
       <div className='table__view'>
         <h2>Manage Asset</h2>
         <div className='table__view--search'>
@@ -74,10 +74,8 @@ function AssetsTable({columns, data , loading}) {
           </table>
         </div>
       </div>
-
-            
-        </div>
-    )
+    </div>
+  );
 }
 
-export default AssetsTable
+export default AssetsTable;

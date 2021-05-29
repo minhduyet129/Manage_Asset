@@ -71,8 +71,8 @@ const CreateAsset = () => {
   }, []);
 
   const handleChange = () => {
-    setModelIsOpen(true)
-  }
+    setModelIsOpen(true);
+  };
 
   return (
     <LayoutAdmin>
@@ -92,22 +92,20 @@ const CreateAsset = () => {
           <div className='form__field'>
             <label>Category</label>
             <div className='custom__select'>
-              
               {categories && (
                 <select
                   {...register('categoryId')}
                   className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
                 >
-                  
                   <option value=''>Select</option>
                   {categories.map((category) => (
                     <option value={category.id}>{category.name}</option>
                   ))}
-                  
                 </select>
               )}
-              <button className='btn' onClick={handleChange}>Create Category</button>
-              
+              <button className='btn' onClick={handleChange}>
+                Create Category
+              </button>
             </div>
           </div>
           <p className='invalid-feedback'>{errors.categoryId?.message}</p>
@@ -175,7 +173,6 @@ const CreateAsset = () => {
             <Link to='/admin/assets/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>
-            
           </div>
         </form>
       </div>

@@ -1,4 +1,3 @@
-
 import { api } from '../api';
 
 // Get an user
@@ -8,9 +7,7 @@ function getbyid(id) {
 
 // Get users
 function getall(pageNumber) {
-  return api.get(
-    `/Users?PageNumber=${pageNumber}`
-  );
+  return api.get(`/Users?PageNumber=${pageNumber}`);
 }
 
 // Create a new user
@@ -30,9 +27,7 @@ function edit(users, id) {
 }
 
 function disable(id) {
-  return api.put(
-    `/Users/disable/${id}`
-  );
+  return api.put(`/Users/disable/${id}`);
 }
 
 export const useCreateUser = {

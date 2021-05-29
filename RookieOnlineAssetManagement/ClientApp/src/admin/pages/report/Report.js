@@ -6,11 +6,9 @@ import ReportTable from './ReportTable';
 function Report() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
-  const fileName = "Report File";
-
+  const fileName = 'Report File';
 
   const getreports = () => {
-
     setLoading(true);
     getApiReport
       .getReports()
@@ -45,7 +43,7 @@ function Report() {
       {
         Header: 'Not Available',
         accessor: 'notAvailable',
-       },
+      },
       {
         Header: 'Waiting For Approval',
         accessor: 'waitingForApproval',
@@ -62,11 +60,15 @@ function Report() {
     []
   );
 
-
   return (
     <LayoutAdmin>
       <div className='table__view'>
-        <ReportTable columns={columns} data={reports} loading={loading} fileName={fileName} />
+        <ReportTable
+          columns={columns}
+          data={reports}
+          loading={loading}
+          fileName={fileName}
+        />
       </div>
     </LayoutAdmin>
   );

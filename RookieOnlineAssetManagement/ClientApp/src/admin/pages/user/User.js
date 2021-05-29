@@ -4,7 +4,7 @@ import UsersTable from './UsersTable';
 import { useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useCreateUser } from './UserHooks';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 const User = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -107,12 +107,12 @@ const User = () => {
 
           return (
             <div>
-              <span className='font'  onClick={() => getUserId(rowIdx)}>
-                <i className='bx bx-edit' ></i>
+              <span className='font' onClick={() => getUserId(rowIdx)}>
+                <i className='bx bx-edit'></i>
               </span>
               &emsp;
-              <span className='font'  onClick={() => DisableUsers(rowIdx)}>
-                <i className='fas fa-times' ></i>
+              <span className='font' onClick={() => DisableUsers(rowIdx)}>
+                <i className='fas fa-times'></i>
               </span>
             </div>
           );
