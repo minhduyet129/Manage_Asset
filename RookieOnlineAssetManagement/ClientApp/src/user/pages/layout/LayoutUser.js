@@ -8,6 +8,11 @@ function LayoutUser({ children }) {
 
   const showSidebar = () => setSidebar(!sidebar);
 
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo');
+    window.location.reload();
+  };
+
   return (
     <div className='container'>
       {/* Start Layout */}
@@ -36,8 +41,8 @@ function LayoutUser({ children }) {
             <i className='bx bx-menu'></i>
           </div>
           <div>
-            <Link to='/admin/login'>
-              <button className='btn'>Logout</button>
+            <Link to='/login' className='btn' onClick={handleLogout}>
+              Logout
             </Link>
           </div>
         </div>
