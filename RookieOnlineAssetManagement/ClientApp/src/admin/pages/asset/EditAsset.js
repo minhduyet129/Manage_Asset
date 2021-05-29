@@ -154,11 +154,7 @@ const EditAsset = (props) => {
               className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
               >
                 <option value={0}>Available</option>
-                <option value={1}>Waiting For Approval</option>
-                <option value={2}>Not Available</option>
-                <option value={3}>Assigned</option>
-                <option value={4}>Waiting For Recycling</option>
-                <option value={5}>Recycled</option>
+                <option value={1}>Not Available</option>
               </select>
             </div>
           </div>

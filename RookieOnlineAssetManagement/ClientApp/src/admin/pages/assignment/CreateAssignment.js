@@ -1,62 +1,214 @@
-import React, { useState } from "react";
-import LayoutAdmin from "../layout/LayoutAdmin";
 import { useForm, Controller } from "react-hook-form";
-import DatePicker from "react-datepicker";
-import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
+import { yupResolver } from "@hookform/resolvers/yup";
+import LayoutAdmin from "../layout/LayoutAdmin";
 import ReactDatePicker from "react-datepicker";
+import { useHistory } from "react-router";
+import React, { useState } from "react";
+import { toast } from 'react-toastify';
+import { Link } from "react-router-dom";
+import Modal from "react-modal";
+import * as Yup from "yup";
+
+import SelectUser from "./SelectUser/SelectUser";
+import SelectAsset from "./SelectAsset/SelectAsset";
+import "./Assignment.css";
+import axios from "axios";
+
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
+const schema = Yup.object().shape({
+  assignToId: Yup.number().required("User is required"),
+  assetId: Yup.number().required("Asset is required"),
+  assignedDate: Yup.date()
+    .required("Assigned Date is required")
+    .typeError("Assigned Date is required")
+    .min(new Date(), "Assigned Date must be later than today."),
+});
 
 function CreateAssignment() {
-  const { register, handleSubmit, control, formState } = useForm();
+  const [userModal, setUserModal] = useState(false);
+  const [assetModal, setAssetModal] = useState(false);
+  const [fullName, setFullName] = useState();
+  const [assetName, setAssetName] = useState();
+  const [submitData, setSubmitData] = useState({
+    assignToId: "",
+    assetId: "",
+    assignedDate: "",
+    assignById: 2,
+  });
+
+  const history = useHistory();
+
+  const { register, handleSubmit, control, formState, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const { errors } = formState;
 
   const onSubmit = (data) => {
-    console.log(data);
+    axios
+      .post("/api/Assignments", data)
+      .then((res) => {
+        if (res.status === 200) {
+          toast.success('Add assignment sucessfully');
+          history.push('/admin/assignments');
+        } 
+      })
+      .catch((err) => {
+        toast.error('Add assignment failed');
+        console.log(err);
+      });
+  };
+
+  const openUserModal = () => {
+    setUserModal(true);
+  };
+
+  const openAssetModal = () => {
+    setAssetModal(true);
+  };
+
+  const handleSaveUserModal = () => {
+    setUserModal(false);
+    reset({
+      ...submitData,
+      assignToId: submitData.assignToId,
+    });
+  };
+
+  const handleCancelUserModal = () => {
+    setUserModal(false);
+    setFullName("");
+    setSubmitData((prev) => {
+      return {
+        ...submitData,
+        assignToId: "",
+      };
+    });
+    reset({
+      ...submitData,
+      assignToId: "",
+    });
+  };
+
+  const handleSaveAssetModal = () => {
+    setAssetModal(false);
+    reset({
+      ...submitData,
+      assetId: submitData.assetId,
+    });
+  };
+
+  const handleCancelAssetModal = () => {
+    setAssetModal(false);
+    setAssetName("");
+    setSubmitData((prev) => {
+      return {
+        ...submitData,
+        assetId: "",
+      };
+    });
+    reset({
+      ...submitData,
+      assetId: "",
+    });
+  };
+
+  const handleSelectUser = (value) => {
+    setSubmitData((prev) => {
+      return {
+        ...prev,
+        assignToId: value.id,
+      };
+    });
+    setFullName(value.firstName + " " + value.lastName);
+  };
+
+  const handleSelectAsset = (value) => {
+    setSubmitData((prev) => {
+      return {
+        ...prev,
+        assetId: value.id,
+      };
+    });
+    setAssetName(value.assetName);
+  };
+
+  const handleSetAssignedDate = (e, onChange) => {
+    let utcDate = new Date(e.setHours(e.getHours() + 10));
+    onChange(utcDate);
+    setSubmitData((prev) => {
+      return {
+        ...submitData,
+        assignedDate: utcDate,
+      };
+    });
   };
 
   return (
     <LayoutAdmin>
-      <div className='table__view'>
-        <form className='form' onSubmit={handleSubmit(onSubmit)}>
-          <div className='form__title'>Create Asset</div>
+      <div className="table__view">
+        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+          <div className="form__title">Create Assignment</div>
 
-          <div className='form__field'>
-            <label>Name</label>
-            <input className='input' {...register('assetName')} />
+          <div className="form__field">
+            <label>User</label>
+            <input className="input" {...register("assignToId")} hidden />
+            <input className="input" value={fullName} disabled required />
+            <div className="search-btn" onClick={openUserModal}>
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div className="invalid-feedback">
+            <p>{errors.assignToId?.message}</p>
           </div>
 
-          <div className='form__field'>
-            <label>Specification</label>
-            <textarea
-              className='textarea'
-              defaultValue={''}
-              {...register('specification')}
+          <div className="form__field">
+            <label>Asset</label>
+            <input className="input" {...register("assetId")} hidden />
+            <input
+              className="input"
+              value={assetName}
+              name="assetName"
+              disabled
             />
+            <div className="search-btn" onClick={openAssetModal}>
+              <i class="fas fa-search"></i>
+            </div>
+          </div>
+          <div className="invalid-feedback">
+            <p>{errors.assetId?.message}</p>
           </div>
 
-          <div className='form__field'>
-            <label>Installed Date</label>
+          <div className="form__field">
+            <label>Assigned Date</label>
             <Controller
               control={control}
-              name='installedDate'
+              name="assignedDate"
               required={true}
               render={({ field: { onChange } }) => (
                 <ReactDatePicker
-                  id='doB'
-                //   selected={installedDate}
-                //   onChange={(e) => {
-                //     onChange(e);
-                //     setInstalledDate(e);
-                //   }}
-                  placeholderText='MM/DD/YY'
+                  selected={submitData.assignedDate}
+                  onChange={(e) => handleSetAssignedDate(e, onChange)}
+                  placeholderText="MM/DD/YY"
                   isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown
-                  dateFormatCalendar='MMMM'
+                  dateFormatCalendar="MMMM"
                   yearDropdownItemNumber={100}
                   scrollableYearDropdown
-                  dropdownMode='select'
-                  className='input'
+                  dropdownMode="select"
+                  className="input"
+                  error={errors.assignedDate}
                 />
               )}
               rules={{
@@ -64,26 +216,68 @@ function CreateAssignment() {
               }}
             />
           </div>
-
-          <div className='form__field'>
-            <label>State</label>
-            <div className='custom__select'>
-              <select {...register('name')}>
-                <option value=''>Select</option>
-                <option value={0}>Available</option>
-                <option value={1}>Not Available</option>
-              </select>
-            </div>
+          <div className="invalid-feedback">
+            <p>{errors.assignedDate?.message}</p>
           </div>
 
-          <div className='form__field'>
-            <input type='submit' className='btn' value='Submit' />
-            <Link to='/admin/assets/'>
-              <button className='btn__cancel'>Cancel</button>
+          <div className="form__field">
+            <label>Note</label>
+            <textarea
+              className="input"
+              {...register("note")}
+              onChange={(e) =>
+                setSubmitData((prev) => {
+                  return {
+                    ...submitData,
+                    note: e.target.value,
+                  };
+                })
+              }
+            />
+          </div>
+
+          <div className="form__field">
+            <input type="submit" className="btn" value="Submit" />
+            <Link to="/admin/assignments/">
+              <button className="btn__cancel">Cancel</button>
             </Link>
           </div>
         </form>
       </div>
+
+      <Modal
+        isOpen={userModal}
+        // onAfterOpen={afterOpenModal}
+        // onRequestClose={closeUserModal}
+        style={customStyles}
+      >
+        <div className="modal-wrapper">
+          <div className="modal-body">
+            <SelectUser
+              onSelectUser={handleSelectUser}
+              onSaveUserModal={handleSaveUserModal}
+              onCancelUserModal={handleCancelUserModal}
+            />
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={assetModal}
+        // onAfterOpen={afterOpenModal}
+        // onRequestClose={closeAssetModal}
+        style={customStyles}
+      >
+        <div className="modal-wrapper">
+          <div className="modal-body">
+            <SelectAsset
+              onSelectAsset={handleSelectAsset}
+              onSaveAssetModal={handleSaveAssetModal}
+              onCancelAssetModal={handleCancelAssetModal}
+            />
+          </div>
+        </div>
+      </Modal>
     </LayoutAdmin>
   );
 }

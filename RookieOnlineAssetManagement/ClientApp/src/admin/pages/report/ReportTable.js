@@ -1,43 +1,30 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
+import React from 'react';
 import { useTable } from 'react-table';
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
 
-function AssetsTable({columns, data , loading}) {
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+function ReportTable({ columns, data, loading, fileName }) {
+  const fileType =
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  const fileExtension = '.xlsx';
+
+  const exportToCSV = (data, fileName) => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const datatype = new Blob([excelBuffer], { type: fileType });
+    FileSaver.saveAs(datatype, fileName + fileExtension);
+  };
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
-    return (
-        <div>
+  return (
+    <div>
       <div className='table__view'>
-        <h2>Manage Asset</h2>
-        <div className='table__view--search'>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='State' />
-            <i className='bx bx-filter-alt' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Category' />
-            <i className='bx bx-filter-alt' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Name' />
-            <i className='bx bx-search' />
-          </form>
-          <form className='search'>
-            <label />
-            <input type='text' placeholder='Asset Code' />
-            <i className='bx bx-search' />
-          </form>
-          <Link to='/admin/assets/create'>
-            <button href='assets' className='btn'>
-              Create New Asset
-            </button>
-          </Link>
-        </div>
+        <h2>Report</h2>
+        <button onClick={(e) => exportToCSV(data, fileName)} className='btn'>Export</button>
+        <div className='table__view--search'></div>
         <div>
-          <table {...getTableProps()}>
+          <table id='table' {...getTableProps()}>
             <thead>
               {headerGroups.map((headerGroup) => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
@@ -74,10 +61,8 @@ function AssetsTable({columns, data , loading}) {
           </table>
         </div>
       </div>
-
-            
-        </div>
-    )
+    </div>
+  );
 }
 
-export default AssetsTable
+export default ReportTable;

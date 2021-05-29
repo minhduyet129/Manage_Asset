@@ -86,7 +86,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 error.Add(new { assetId = "The asset is not available" });
             }
 
-            if (model.AssignedDate < DateTime.Now)
+            if (model.AssignedDate < DateTime.Today)
             {
                 error.Add(new { assignedDate = "The assigned date is only current or future date" });
             }
@@ -123,8 +123,33 @@ namespace RookieOnlineAssetManagement.Controllers
             return response;
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> UpdateAssignment(int id)
+        {
+            var assignment = await _dbContext.Assignments
+                .Include(a => a.Asset)
+                .Include(a => a.AssignBy)
+                .Include(a => a.AssignTo)
+                .SingleOrDefaultAsync(a => a.Id == id);
+
+            return Ok(new AssignmentResponseModel
+            {
+                Id = assignment.Id,
+                AssetCode = assignment.Asset.AssetCode,
+                AssetName = assignment.Asset.AssetName,
+                AssignTo = assignment.AssignTo.FirstName + " " + assignment.AssignTo.LastName,
+                AssignBy = assignment.AssignBy.FirstName + " " + assignment.AssignBy.LastName,
+                AssignDate = assignment.AssignedDate,
+                State = GetAssignmentState(assignment.State),
+                AssetId = assignment.AssetId,
+                AssignById = assignment.AssignById,
+                AssignToId = assignment.AssignToId,
+                Note = assignment.Note,
+            });
+        }
+
         [HttpGet]
-        public async Task<IActionResult> GetAllAssignment([FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
+        public async Task<IActionResult> GetAllAssignment(string assignedDate, [FromQuery] PaginationFilter filter, string keyword, int? filterState, string sortBy, bool asc = true)
         {
             IQueryable<Assignment> queryable = _dbContext.Assignments;
             queryable = queryable.Include(a => a.Asset)
@@ -141,16 +166,32 @@ namespace RookieOnlineAssetManagement.Controllers
                 }
             }
 
+            if (!string.IsNullOrEmpty(assignedDate))
+            {
+                DateTime date;
+                if (DateTime.TryParseExact(assignedDate, "dd/MM/yyyy",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out date)) 
+                { 
+                    queryable = queryable.Where(a => a.AssignedDate.Date == date.Date);
+                } 
+            }
+
+            if (filterState != null && !string.IsNullOrEmpty(filterState.ToString()))
+            {
+                queryable = queryable.Where(a => a.State == (AssignmentState)filterState);
+            }
+
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy)
                 {
                     case "id":
-                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
+                        queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
                         break;
 
                     case "assetCode":
-                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
+                        queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
                         break;
 
                     case "assetName":
@@ -290,6 +331,9 @@ namespace RookieOnlineAssetManagement.Controllers
             var stateMessage = "Cannot delete because the assignment has been responded by assignee";
             var validateState = ValidateAssignmentState(assignment.State, stateMessage);
             if (validateState.Errors.Count > 0) return BadRequest(validateState.Errors);
+
+            var asset = await _dbContext.Assets.SingleOrDefaultAsync(a => a.Id == assignment.AssetId);
+            asset.State = AssetState.Available;
 
             _dbContext.Remove(assignment);
             await _dbContext.SaveChangesAsync();

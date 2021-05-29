@@ -45,6 +45,7 @@ const EditUser = () => {
       .getbyid(id)
       .then((res) => {
         setUsers(res.data.data);
+        console.log(res.data.data)
         setStartDate(setDateTime(res.data.data.doB));
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
@@ -155,8 +156,7 @@ const EditUser = () => {
                 <ReactDatePicker
                   id='doB'
                   selected={startDate}
-                  onChange={(date) => {
-                    let d = new Date(date.setHours(date.getHours() + 10));
+                  onChange={(d) => {
                     onChange(d);
                     setStartDate(d);
                     console.log(d);
@@ -188,8 +188,7 @@ const EditUser = () => {
                 <ReactDatePicker
                   id='joinedDate'
                   selected={joinedDate}
-                  onChange={(date) => {
-                    let d = new Date(date.setHours(date.getHours() + 10));
+                  onChange={(d) => {
                     onChange(d);
                     setJoinedDate(d);
                     console.log(d);

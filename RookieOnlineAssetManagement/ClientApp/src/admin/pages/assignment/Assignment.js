@@ -1,7 +1,8 @@
 import axios from "axios";
 import React from "react";
-import { format } from "date-fns";
 import Modal from "react-modal";
+import { format } from "date-fns";
+import { toast } from "react-toastify";
 import { useHistory } from "react-router";
 import ReactPaginate from "react-paginate";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +11,9 @@ import useDebounce from "../../../useDebounce";
 import AssignmentTable from "./AssignmentTable";
 import LayoutAdmin from "../layout/LayoutAdmin";
 import "./Assignment.css";
+import DeleteModal from "./DeleteModal";
+import HandleAPIUrl from "./HandleAPIUrl";
+import AssignmentDetailModal from "./AssignmentDetailModal";
 
 const customStyles = {
   content: {
@@ -30,10 +34,12 @@ function Assignment() {
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState();
   const [pageNumber, setPageNumber] = useState(1);
-  const [searchText, setSearchText] = useState();
-  const [filterState, setFilterState] = useState();
+  const [searchText, setSearchText] = useState("");
+  const [filterState, setFilterState] = useState(-1);
   const [modalIsOpen, setIsOpen] = useState(false);
-
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState();
+  const [filterAssignedDate, setFilterAssignedDate] = useState();
   const [sort, setSort] = useState({
     sortBy: "assetCode",
     asc: true,
@@ -43,17 +49,17 @@ function Assignment() {
 
   const assignmentsRef = useRef([]);
 
-  const callAssignmentsAPI = () => {
-    let url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
-    if (searchText) {
-      url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-    }
-    if (filterState) {
-      url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&filterState=${filterState}`;
-    }
-
+  const callAssignmentsAPI = async () => {
     axios
-      .get(url)
+      .get(
+        HandleAPIUrl(
+          pageNumber,
+          sort,
+          filterState,
+          filterAssignedDate,
+          searchText
+        )
+      )
       .then((res) => {
         assignmentsRef.current = res.data.data;
         setAssignments(res.data.data);
@@ -68,17 +74,24 @@ function Assignment() {
   useEffect(() => {
     setLoading(true);
     callAssignmentsAPI();
-  }, [pageNumber, sort]);
+  }, [pageNumber, sort, filterState, filterAssignedDate]);
 
   const getAssignmentId = (rowIndex) => {
     if (!assignmentsRef.current) return;
     const id = assignmentsRef.current[rowIndex].id;
-    // if (id) {
-    //   history.push(`/admin/users/edit/${id}`);
-    // }
+    if (id) {
+      history.push(`/admin/assignments/${id}/edit`);
+    }
   };
 
-  const DisableAssignments = () => {};
+  const HandleClickDeleteBtn = (rowIndex) => {
+    if (!assignmentsRef.current) return;
+    const id = assignmentsRef.current[rowIndex].id;
+    if (id) {
+      setDeleteId(id);
+    }
+    setDeleteModal(true);
+  };
 
   const handlePageClick = (data) => {
     const currentPage = data.selected;
@@ -117,26 +130,40 @@ function Assignment() {
 
   useDebounce(
     () => {
+      setTotalPages(0);
+      setPageNumber(1);
       callAssignmentsAPI();
     },
     500,
-    [searchText, filterState]
+    [searchText, filterState, filterAssignedDate]
   );
 
   const handleFilterState = (value) => {
-    setFilterState(Number(value));
+    setTotalPages(0);
+    setPageNumber(1);
+    if (value === "") {
+      setFilterState(-1);
+    } else {
+      setFilterState(Number(value));
+    }
+  };
+
+  const handleFilterAssignedDate = (value) => {
+    setTotalPages(0);
+    setPageNumber(1);
+    setFilterAssignedDate(value);
   };
 
   const openModal = () => {
     setIsOpen(true);
   };
 
-  const afterOpenModal = () => {
-    // references are now sync'd and can be accessed.
-  };
-
   const closeModal = () => {
     setIsOpen(false);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal(false);
   };
 
   const handleOnClickAssignment = (value) => {
@@ -144,10 +171,24 @@ function Assignment() {
     openModal();
   };
 
+  const handleDeleteAssignment = () => {
+    axios
+      .delete(`/api/Assignments/${deleteId}`)
+      .then((res) => {
+        callAssignmentsAPI();
+        setDeleteModal(false);
+        toast.success("Delete Successfully");
+      })
+      .catch((err) => {
+        toast.success("Delete Failed");
+        console.log(err);
+      });
+  };
+
   const columns = React.useMemo(
     () => [
       {
-        Header: "No.",
+        Header: "Id",
         accessor: "id",
       },
       {
@@ -246,7 +287,10 @@ function Assignment() {
                 <i className="bx bx-edit"></i>
               </span>
               &emsp;
-              <span className="font" onClick={() => DisableAssignments(rowIdx)}>
+              <span
+                className="font"
+                onClick={() => HandleClickDeleteBtn(rowIdx)}
+              >
                 <i className="fas fa-times "></i>
               </span>
               &emsp;
@@ -267,69 +311,46 @@ function Assignment() {
         columns={columns}
         data={assignments}
         loading={loading}
+        filterAssignedDate={filterAssignedDate}
         onSearch={handleSearchChange}
         onFilterState={handleFilterState}
         onClickAssignment={handleOnClickAssignment}
+        onFilterAssignedDate={handleFilterAssignedDate}
       />
       <div className="paging-box">
-        <ReactPaginate
-          previousLabel={"Previous"}
-          nextLabel={"Next"}
-          breakLabel={"..."}
-          breakClassName={"break-me"}
-          pageCount={totalPages}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-        />
+        {totalPages && (
+          <ReactPaginate
+            previousLabel={"Previous"}
+            nextLabel={"Next"}
+            breakLabel={"..."}
+            breakClassName={"break-me"}
+            pageCount={totalPages}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+          />
+        )}
       </div>
       {assignment && (
         <Modal
           isOpen={modalIsOpen}
-          onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           style={customStyles}
         >
-          <div className="modal-wrapper">
-            <div className="modal-close-btn" onClick={closeModal}>
-              <i class="fas fa-times"></i>
-            </div>
-            <div className="modal-header">
-              <h2>Assignment Details</h2>
-            </div>
-            <div className="modal-body">
-              <div className="body-row">
-                <div className="row-title">Asset Code</div>
-                <div className="row-value">{assignment.assetCode}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Asset Name</div>
-                <div className="row-value">{assignment.assetName}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Assigned to</div>
-                <div className="row-value">{assignment.assignTo}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Assigned by</div>
-                <div className="row-value">{assignment.assignBy}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Assigned Date</div>
-                <div className="row-value">
-                  {assignment.assignDate.slice(0, 10)}
-                </div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">State</div>
-                <div className="row-value">{assignment.state}</div>
-              </div>
-            </div>
-          </div>
+          <AssignmentDetailModal
+            closeModal={closeModal}
+            assignment={assignment}
+          />
         </Modal>
       )}
+      <Modal isOpen={deleteModal} style={customStyles}>
+        <DeleteModal
+          closeDeleteModal={closeDeleteModal}
+          onDeleteAssignment={handleDeleteAssignment}
+        />
+      </Modal>
     </LayoutAdmin>
   );
 }
