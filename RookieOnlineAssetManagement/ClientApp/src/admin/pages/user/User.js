@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useCreateUser } from './UserHooks';
 import { toast } from 'react-toastify';
+
 const User = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);

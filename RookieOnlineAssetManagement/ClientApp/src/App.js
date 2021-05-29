@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Switch, Route, useHistory } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Home from './admin/pages/Home';
 import User from './admin/pages/user/User';
 import CreateUser from './admin/pages/user/CreateUser';
@@ -19,37 +20,65 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
 function App() {
-  return (
-    <div>
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const userInfoObject = JSON.parse(localStorage.getItem('userInfo'));
+  const userLocalStorage = localStorage.getItem('userInfo');
+  const history = useHistory();
+
+  useEffect(() => {
+    if (userLocalStorage) {
+      if (userInfoObject.role === 'Admin') {
+        setIsAdminLoggedIn(true);
+      }
+      if (userInfoObject.role === 'User') {
+        setIsUserLoggedIn(true);
+      }
+    }
+  }, [history, userInfoObject, userLocalStorage]);
+
+  useEffect(() => {
+    if (!userLocalStorage || userLocalStorage === null) {
+      setIsUserLoggedIn(false);
+      setIsAdminLoggedIn(false);
+      history.push('/login');
+    }
+  }, [history, userLocalStorage]);
+
+  return isAdminLoggedIn ? (
+    <>
       <ToastContainer position='top-center' hideProgressBar />
-      <Router>
-        <Switch>
-          <Route path='/admin' exact component={Home} />
-          <Route path='/admin/users' exact component={User} />
-          <Route path='/admin/users/create' component={CreateUser} />
-          <Route path='/admin/users/edit/:id' component={EditUser} />
-          <Route path='/admin/assets' exact component={Asset} />
-          <Route path='/admin/assets/edit/:id' component={EditAsset} />
-          <Route path='/admin/assets/create' component={CreateAsset} />
-          <Route path='/admin/assignments' exact component={Assignment} />
-          <Route
-            path='/admin/assignments/create'
-            component={CreateAssignment}
-          />
-          <Route
-            path='/admin/assignments/:id/edit'
-            component={EditAssignment}
-          />
-          <Route
-            path='/admin/requests-for-returning'
-            exact
-            component={RequestForReturning}
-          />
-          <Route path='/admin/reports' exact component={Report} />
-          <Route path='/admin/login' exact component={Login} />
-        </Switch>
-      </Router>
-    </div>
+      <Switch>
+        <Route path='/admin' exact component={Home} />
+        <Route path='/admin/users' exact component={User} />
+        <Route path='/admin/users/create' component={CreateUser} />
+        <Route path='/admin/users/edit/:id' component={EditUser} />
+        <Route path='/admin/assets' exact component={Asset} />
+        <Route path='/admin/assets/edit/:id' component={EditAsset} />
+        <Route path='/admin/assets/create' component={CreateAsset} />
+        <Route path='/admin/assignments' exact component={Assignment} />
+        <Route path='/admin/assignments/create' component={CreateAssignment} />
+        <Route path='/admin/assignments/:id/edit' component={EditAssignment} />
+        <Route
+          path='/admin/requests-for-returning'
+          exact
+          component={RequestForReturning}
+        />
+        <Route path='/admin/reports' exact component={Report} />
+      </Switch>
+    </>
+  ) : isUserLoggedIn ? (
+    <>
+      <ToastContainer position='top-center' hideProgressBar />
+      {/* Add Pages for normal users later */}
+      <Switch>
+        <Route path='/login' exact component={Login} />
+      </Switch>
+    </>
+  ) : (
+    <Switch>
+      <Route path='/login' exact component={Login} />
+    </Switch>
   );
 }
 
