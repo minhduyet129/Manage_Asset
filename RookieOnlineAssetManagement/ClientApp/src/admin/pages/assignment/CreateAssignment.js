@@ -164,7 +164,7 @@ function CreateAssignment() {
             <input className='input' {...register('assignToId')} hidden />
             <input className='input' value={fullName} disabled required />
             <div className='search-btn' onClick={openUserModal}>
-              <i class='fas fa-search'></i>
+              <i className='fas fa-search'></i>
             </div>
           </div>
           <div className='invalid-feedback'>
@@ -181,7 +181,7 @@ function CreateAssignment() {
               disabled
             />
             <div className='search-btn' onClick={openAssetModal}>
-              <i class='fas fa-search'></i>
+              <i className='fas fa-search'></i>
             </div>
           </div>
           <div className='invalid-feedback'>

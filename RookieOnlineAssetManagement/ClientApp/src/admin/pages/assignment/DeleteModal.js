@@ -2,7 +2,7 @@ function DeleteModal({ closeDeleteModal, onDeleteAssignment }) {
   return (
     <div className='confirm-modal'>
       <div className='confirm-close-btn' onClick={closeDeleteModal}>
-        <i class='fas fa-times'></i>
+        <i className='fas fa-times'></i>
       </div>
       <div className='confirm-modal-body'>
         <div>Are you sure delete this assignment?</div>

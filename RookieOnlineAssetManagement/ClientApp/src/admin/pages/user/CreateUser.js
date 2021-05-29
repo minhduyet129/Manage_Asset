@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
@@ -42,7 +42,7 @@ const CreateUser = () => {
     return day !== 0 && day !== 6;
   };
 
-  function handlerUser(users) {
+  const handlerUser = (users) => {
     users.gender = users.gender === 0 ? 0 : 1;
     return useCreateUser
       .create(users)
@@ -56,7 +56,7 @@ const CreateUser = () => {
       .catch((error) => {
         toast.error('Add user failed!');
       });
-  }
+  };
 
   const { register, handleSubmit, control, formState } = useForm({
     resolver: yupResolver(schema),

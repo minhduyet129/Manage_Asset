@@ -22,7 +22,6 @@ function Login() {
     });
     const result = await response.data;
     localStorage.setItem('userInfo', JSON.stringify(result));
-    // history.push(`/${userInfoObject.role.toLowerCase()}`);
   };
 
   // Redirect users to different URL according to their roles

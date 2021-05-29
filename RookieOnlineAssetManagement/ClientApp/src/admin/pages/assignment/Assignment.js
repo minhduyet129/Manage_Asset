@@ -1,19 +1,17 @@
 import axios from 'axios';
-import React from 'react';
 import Modal from 'react-modal';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 import { useHistory } from 'react-router';
 import ReactPaginate from 'react-paginate';
-import { useEffect, useRef, useState } from 'react';
-
+import { useEffect, useRef, useState, useMemo } from 'react';
 import useDebounce from '../../../useDebounce';
 import AssignmentTable from './AssignmentTable';
 import LayoutAdmin from '../layout/LayoutAdmin';
-import './Assignment.css';
 import DeleteModal from './DeleteModal';
 import HandleAPIUrl from './HandleAPIUrl';
 import AssignmentDetailModal from './AssignmentDetailModal';
+import './Assignment.css';
 
 const customStyles = {
   content: {
@@ -101,11 +99,11 @@ function Assignment() {
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
       if (sort.asc) {
-        return <i class='fas fa-caret-down'></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i class='fas fa-caret-up'></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i class='fas fa-caret-down'></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSortBy = (sortBy) => {
@@ -185,7 +183,7 @@ function Assignment() {
       });
   };
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: 'Id',
@@ -295,7 +293,7 @@ function Assignment() {
               </span>
               &emsp;
               <span className='font undo-icon'>
-                <i class='fas fa-undo'></i>
+                <i className='fas fa-undo'></i>
               </span>
             </div>
           );

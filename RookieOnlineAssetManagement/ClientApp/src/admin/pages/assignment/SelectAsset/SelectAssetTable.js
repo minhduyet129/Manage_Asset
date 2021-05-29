@@ -1,6 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useTable, usePagination } from 'react-table';
-import { Link } from 'react-router-dom';
+import { useTable } from 'react-table';
 
 const SelectAssetTable = ({
   columns,

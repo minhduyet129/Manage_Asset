@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { Link, useHistory, useParams } from 'react-router-dom';

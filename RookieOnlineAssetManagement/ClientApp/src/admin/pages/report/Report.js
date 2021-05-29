@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { getApiReport } from './reportApi';
 import ReportTable from './ReportTable';

@@ -1,18 +1,17 @@
 import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import ReactDatePicker from 'react-datepicker';
 import { useHistory, useParams } from 'react-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 import * as Yup from 'yup';
-
+import { yupResolver } from '@hookform/resolvers/yup';
 import SelectUser from './SelectUser/SelectUser';
 import SelectAsset from './SelectAsset/SelectAsset';
-import './Assignment.css';
 import axios from 'axios';
+import './Assignment.css';
 
 const customStyles = {
   content: {
@@ -195,7 +194,7 @@ function CreateAssignment() {
             <input className='input' {...register('assignToId')} hidden />
             <input className='input' value={fullName} disabled required />
             <div className='search-btn' onClick={openUserModal}>
-              <i class='fas fa-search'></i>
+              <i className='fas fa-search'></i>
             </div>
           </div>
           <div className='invalid-feedback'>
@@ -212,7 +211,7 @@ function CreateAssignment() {
               disabled
             />
             <div className='search-btn' onClick={openAssetModal}>
-              <i class='fas fa-search'></i>
+              <i className='fas fa-search'></i>
             </div>
           </div>
           <div className='invalid-feedback'>

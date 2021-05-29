@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Waypoint } from 'react-waypoint';
 import useDebounce from '../../../../useDebounce';
 import SelectAssetTable from './SelectAssetTable';
@@ -39,11 +39,11 @@ function SelectAsset({ onSelectAsset, onSaveAssetModal, onCancelAssetModal }) {
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
       if (sort.asc) {
-        return <i class='fas fa-caret-down'></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i class='fas fa-caret-up'></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i class='fas fa-caret-down'></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSortBy = (sortBy) => {
@@ -89,7 +89,7 @@ function SelectAsset({ onSelectAsset, onSaveAssetModal, onCancelAssetModal }) {
     [searchText, sort, pageNumber]
   );
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: ' ',

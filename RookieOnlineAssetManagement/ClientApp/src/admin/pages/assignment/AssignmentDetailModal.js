@@ -2,7 +2,7 @@ function AssignmentDetailModal({ closeModal, assignment }) {
   return (
     <div className='modal-wrapper'>
       <div className='modal-close-btn' onClick={closeModal}>
-        <i class='fas fa-times'></i>
+        <i className='fas fa-times'></i>
       </div>
       <div className='modal-header'>
         <span>Assignment Details</span>

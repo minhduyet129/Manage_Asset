@@ -1,5 +1,5 @@
 import LayoutAdmin from '../layout/LayoutAdmin';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { getApiAssets } from './assetsApi';
 import AssetsTable from './AssetsTable';
@@ -85,7 +85,7 @@ function Asset() {
         Cell: (props) => {
           const rowIdx = props.row.id;
           return (
-            <div>
+            <>
               <span className='font' onClick={() => getAssetId(rowIdx)}>
                 <i className='bx bx-edit'></i>
               </span>
@@ -93,7 +93,7 @@ function Asset() {
               <span className='font' onClick={() => DeleteAsset(rowIdx)}>
                 <i className='fas fa-times'></i>
               </span>
-            </div>
+            </>
           );
         },
       },

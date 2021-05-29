@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTable } from 'react-table';
 
@@ -37,23 +36,23 @@ function AssetsTable({ columns, data, loading }) {
           </Link>
         </div>
         <div>
-          <table {...getTableProps()}>
-            <thead>
-              {headerGroups.map((headerGroup) => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column) => (
-                    <th {...column.getHeaderProps()}>
-                      {column.render('Header')}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            {loading ? (
-              <div className='spinner'>
-                <i class='fas fa-spinner fa-spin'></i>
-              </div>
-            ) : (
+          {loading ? (
+            <span className='spinner'>
+              <i className='fas fa-spinner fa-spin'></i>
+            </span>
+          ) : (
+            <table {...getTableProps()}>
+              <thead>
+                {headerGroups.map((headerGroup) => (
+                  <tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column) => (
+                      <th {...column.getHeaderProps()}>
+                        {column.render('Header')}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
               <tbody {...getTableBodyProps()}>
                 {rows.map((row) => {
                   prepareRow(row);
@@ -70,8 +69,9 @@ function AssetsTable({ columns, data, loading }) {
                   );
                 })}
               </tbody>
-            )}
-          </table>
+              )
+            </table>
+          )}
         </div>
       </div>
     </div>

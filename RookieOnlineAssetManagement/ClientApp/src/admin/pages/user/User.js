@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import UsersTable from './UsersTable';
 import { useHistory } from 'react-router-dom';
@@ -75,7 +75,7 @@ const User = () => {
 
   // const data = React.useMemo(() => users, [users]);
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: 'StaffCode',

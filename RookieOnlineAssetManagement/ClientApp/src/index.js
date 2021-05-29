@@ -12,11 +12,8 @@ const queryClient = new QueryClient();
 const userLocalStorage = localStorage.getItem('userInfo');
 const userInfoObject = JSON.parse(userLocalStorage);
 
-// axios.defaults.baseURL = 'http://rookies-001-site1.itempurl.com';
-
 axios.defaults.baseURL = 'https://localhost:5001';
 
-// axios.defaults.headers.common['Authorization'] = `Bearer ${window.localStorage.getItem('token')}`;
 if (userLocalStorage) {
   axios.defaults.headers.common[
     'Authorization'

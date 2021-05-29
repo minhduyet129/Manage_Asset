@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTable } from 'react-table';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
@@ -41,7 +40,7 @@ function ReportTable({ columns, data, loading, fileName }) {
             </thead>
             {loading ? (
               <div className='spinner'>
-                <i class='fas fa-spinner fa-spin'></i>
+                <i className='fas fa-spinner fa-spin'></i>
               </div>
             ) : (
               <tbody {...getTableBodyProps()}>
