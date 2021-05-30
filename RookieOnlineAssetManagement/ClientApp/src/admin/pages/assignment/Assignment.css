@@ -308,3 +308,20 @@
 .confirm-btn:hover {
   cursor: pointer;
 }
+
+.select-state .css-yk16xz-control {
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  height: 20px;
+  font-size: 14px !important;
+}
+
+.select-state .css-g1d714-ValueContainer {
+  height: 20px;
+  padding-left: 35px;
+}
+
+.css-1uccc91-singleValue,
+.css-1wa3eu0-placeholder {
+  margin-top: 16px;
+}

@@ -74,7 +74,18 @@ function Assignment() {
   useEffect(() => {
     setLoading(true);
     callAssignmentsAPI();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNumber, sort, filterState, filterAssignedDate]);
+
+  useDebounce(
+    () => {
+      setTotalPages(0);
+      setPageNumber(1);
+      callAssignmentsAPI();
+    },
+    500,
+    [searchText, filterState, filterAssignedDate, sort]
+  );
 
   const getAssignmentId = (rowIndex) => {
     if (!assignmentsRef.current) return;
@@ -119,7 +130,7 @@ function Assignment() {
       return {
         ...prevSort,
         sortBy: sortBy,
-        asc: true,
+        asc: false,
       };
     });
   };
@@ -128,15 +139,7 @@ function Assignment() {
     setSearchText(value);
   };
 
-  useDebounce(
-    () => {
-      setTotalPages(0);
-      setPageNumber(1);
-      callAssignmentsAPI();
-    },
-    500,
-    [searchText, filterState, filterAssignedDate]
-  );
+  
 
   const handleFilterState = (value) => {
     setTotalPages(0);
@@ -170,6 +173,10 @@ function Assignment() {
     setAssignment(value);
     openModal();
   };
+
+  const handleSelectState = (value) => {
+    setFilterState(value)
+  }
 
   const handleDeleteAssignment = () => {
     axios
@@ -316,6 +323,7 @@ function Assignment() {
         onFilterState={handleFilterState}
         onClickAssignment={handleOnClickAssignment}
         onFilterAssignedDate={handleFilterAssignedDate}
+        onSelectStateOption={handleSelectState}
       />
       <div className="paging-box">
         {totalPages && (

@@ -5,6 +5,16 @@ import { Link } from "react-router-dom";
 import "./Assignment.css";
 import { Controller } from "react-hook-form";
 import ReactDatePicker from "react-datepicker";
+import Select from 'react-select';
+
+const options = [
+  { value: -1, label: "Options" },
+  { value: 0, label: "Waiting" },
+  { value: 1, label: "Accepted" },
+  { value: 2, label: "Declined" },
+  { value: 3, label: "WaitingForReturning" },
+  { value: 4, label: "Returned" },
+];
 
 const AssignmentsTable = ({
   columns,
@@ -15,6 +25,7 @@ const AssignmentsTable = ({
   onFilterState = () => {},
   onClickAssignment = () => {},
   onFilterAssignedDate = () => {},
+  onSelectStateOption = () => {},
 }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data }, usePagination);
@@ -26,35 +37,9 @@ const AssignmentsTable = ({
         <div className="table__view--search">
           <div className="search">
             <div className="filter-state">
-              <input
-                type="text"
-                placeholder="State"
-                onChange={(e) => onFilterState(e.target.value)}
-              />
+              <Select className="select-state" onChange={e => onSelectStateOption(e.value)} options={options} />
               <i className="bx bx-filter-alt" />
             </div>
-            {/* <div className="state-options">
-              <label htmlFor="accepted" className="state-input">
-                <input id="accepted" type="radio" name="filterState" />
-                <div id="accepted">Accepted</div>
-              </label>
-              <label htmlFor="accepted" className="state-input">
-                <input id="accepted" type="radio" name="filterState" />
-                <div id="accepted">Accepted</div>
-              </label>
-              <label htmlFor="accepted" className="state-input">
-                <input id="accepted" type="radio" name="filterState" />
-                <div id="accepted">Accepted</div>
-              </label>
-              <label htmlFor="accepted" className="state-input">
-                <input id="accepted" type="radio" name="filterState" />
-                <div id="accepted">Accepted</div>
-              </label>
-              <label htmlFor="accepted" className="state-input">
-                <input id="accepted" type="radio" name="filterState" />
-                <div id="accepted">Accepted</div>
-              </label>
-            </div> */}
           </div>
           <div className="search">
             <div className="filter-state">
