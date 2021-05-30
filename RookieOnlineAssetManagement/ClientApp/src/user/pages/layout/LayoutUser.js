@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SidebarData } from './SidebarDataAdmin';
+import { SidebarData } from './SidebarUser';
 import './Navbar.css';
 
-function LayoutAdmin({ children }) {
+function LayoutUser({ children }) {
   const [sidebar, setSidebar] = useState(false);
 
   const showSidebar = () => setSidebar(!sidebar);
@@ -54,4 +54,4 @@ function LayoutAdmin({ children }) {
   );
 }
 
-export default LayoutAdmin;
+export default LayoutUser;

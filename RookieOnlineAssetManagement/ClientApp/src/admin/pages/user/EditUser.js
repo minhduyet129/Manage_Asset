@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
@@ -7,7 +7,8 @@ import ReactDatePicker from 'react-datepicker';
 import { Link, useHistory } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+
 const schema = Yup.object().shape({
   doB: Yup.date()
     .required('Enter New Date of Birth!')
@@ -27,8 +28,6 @@ const schema = Yup.object().shape({
 });
 
 const EditUser = () => {
-
-
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState();
   const [users, setUsers] = useState([]);
@@ -45,7 +44,7 @@ const EditUser = () => {
       .getbyid(id)
       .then((res) => {
         setUsers(res.data.data);
-        console.log(res.data.data)
+        console.log(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
@@ -96,7 +95,6 @@ const EditUser = () => {
 
     let newDate = date.split('-').join(',');
     return new Date(newDate);
-    
   };
 
   const getGenderEnum = (gender) => {

@@ -1,28 +1,30 @@
-import axios from "axios";
-import React from "react";
-import { format } from "date-fns";
-import Modal from "react-modal";
-import { useHistory } from "react-router";
-import ReactPaginate from "react-paginate";
-import { useEffect, useRef, useState } from "react";
-
-import useDebounce from "../../../useDebounce";
-import AssignmentTable from "./AssignmentTable";
-import LayoutAdmin from "../layout/LayoutAdmin";
-import "./Assignment.css";
+import axios from 'axios';
+import Modal from 'react-modal';
+import { format } from 'date-fns';
+import { toast } from 'react-toastify';
+import { useHistory } from 'react-router';
+import ReactPaginate from 'react-paginate';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import useDebounce from '../../../useDebounce';
+import AssignmentTable from './AssignmentTable';
+import LayoutAdmin from '../layout/LayoutAdmin';
+import DeleteModal from './DeleteModal';
+import HandleAPIUrl from './HandleAPIUrl';
+import AssignmentDetailModal from './AssignmentDetailModal';
+import './Assignment.css';
 
 const customStyles = {
   content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
   },
 };
 
-Modal.setAppElement("#root");
+Modal.setAppElement('#root');
 
 function Assignment() {
   const [assignments, setAssignments] = useState([]);
@@ -30,12 +32,14 @@ function Assignment() {
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState();
   const [pageNumber, setPageNumber] = useState(1);
-  const [searchText, setSearchText] = useState();
-  const [filterState, setFilterState] = useState();
+  const [searchText, setSearchText] = useState('');
+  const [filterState, setFilterState] = useState(-1);
   const [modalIsOpen, setIsOpen] = useState(false);
-
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteId, setDeleteId] = useState();
+  const [filterAssignedDate, setFilterAssignedDate] = useState();
   const [sort, setSort] = useState({
-    sortBy: "assetCode",
+    sortBy: 'assetCode',
     asc: true,
   });
 
@@ -43,17 +47,17 @@ function Assignment() {
 
   const assignmentsRef = useRef([]);
 
-  const callAssignmentsAPI = () => {
-    let url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
-    if (searchText) {
-      url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-    }
-    if (filterState) {
-      url = `api/Assignments?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&filterState=${filterState}`;
-    }
-
+  const callAssignmentsAPI = async () => {
     axios
-      .get(url)
+      .get(
+        HandleAPIUrl(
+          pageNumber,
+          sort,
+          filterState,
+          filterAssignedDate,
+          searchText
+        )
+      )
       .then((res) => {
         assignmentsRef.current = res.data.data;
         setAssignments(res.data.data);
@@ -68,17 +72,24 @@ function Assignment() {
   useEffect(() => {
     setLoading(true);
     callAssignmentsAPI();
-  }, [pageNumber, sort]);
+  }, [pageNumber, sort, filterState, filterAssignedDate]);
 
   const getAssignmentId = (rowIndex) => {
     if (!assignmentsRef.current) return;
     const id = assignmentsRef.current[rowIndex].id;
-    // if (id) {
-    //   history.push(`/admin/users/edit/${id}`);
-    // }
+    if (id) {
+      history.push(`/admin/assignments/${id}/edit`);
+    }
   };
 
-  const DisableAssignments = () => {};
+  const HandleClickDeleteBtn = (rowIndex) => {
+    if (!assignmentsRef.current) return;
+    const id = assignmentsRef.current[rowIndex].id;
+    if (id) {
+      setDeleteId(id);
+    }
+    setDeleteModal(true);
+  };
 
   const handlePageClick = (data) => {
     const currentPage = data.selected;
@@ -88,11 +99,11 @@ function Assignment() {
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
       if (sort.asc) {
-        return <i class="fas fa-caret-down"></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i class="fas fa-caret-up"></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i class="fas fa-caret-down"></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSortBy = (sortBy) => {
@@ -117,26 +128,40 @@ function Assignment() {
 
   useDebounce(
     () => {
+      setTotalPages(0);
+      setPageNumber(1);
       callAssignmentsAPI();
     },
     500,
-    [searchText, filterState]
+    [searchText, filterState, filterAssignedDate]
   );
 
   const handleFilterState = (value) => {
-    setFilterState(Number(value));
+    setTotalPages(0);
+    setPageNumber(1);
+    if (value === '') {
+      setFilterState(-1);
+    } else {
+      setFilterState(Number(value));
+    }
+  };
+
+  const handleFilterAssignedDate = (value) => {
+    setTotalPages(0);
+    setPageNumber(1);
+    setFilterAssignedDate(value);
   };
 
   const openModal = () => {
     setIsOpen(true);
   };
 
-  const afterOpenModal = () => {
-    // references are now sync'd and can be accessed.
-  };
-
   const closeModal = () => {
     setIsOpen(false);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal(false);
   };
 
   const handleOnClickAssignment = (value) => {
@@ -144,114 +169,131 @@ function Assignment() {
     openModal();
   };
 
-  const columns = React.useMemo(
+  const handleDeleteAssignment = () => {
+    axios
+      .delete(`/api/Assignments/${deleteId}`)
+      .then((res) => {
+        callAssignmentsAPI();
+        setDeleteModal(false);
+        toast.success('Delete Successfully');
+      })
+      .catch((err) => {
+        toast.success('Delete Failed');
+        console.log(err);
+      });
+  };
+
+  const columns = useMemo(
     () => [
       {
-        Header: "No.",
-        accessor: "id",
+        Header: 'Id',
+        accessor: 'id',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetCode")}
+              className='table-header'
+              onClick={() => handleSortBy('assetCode')}
             >
               <span>Asset Code</span>
-              {handleSortIcon("assetCode")}
+              {handleSortIcon('assetCode')}
             </div>
           );
         },
-        accessor: "assetCode",
+        accessor: 'assetCode',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetName")}
+              className='table-header'
+              onClick={() => handleSortBy('assetName')}
             >
               <span>Asset Name</span>
-              {handleSortIcon("assetName")}
+              {handleSortIcon('assetName')}
             </div>
           );
         },
-        accessor: "assetName",
+        accessor: 'assetName',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assignTo")}
+              className='table-header'
+              onClick={() => handleSortBy('assignTo')}
             >
               <span>Assigned to</span>
-              {handleSortIcon("assignTo")}
+              {handleSortIcon('assignTo')}
             </div>
           );
         },
-        accessor: "assignTo",
+        accessor: 'assignTo',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assignBy")}
+              className='table-header'
+              onClick={() => handleSortBy('assignBy')}
             >
               <span>Assigned by</span>
-              {handleSortIcon("assignBy")}
+              {handleSortIcon('assignBy')}
             </div>
           );
         },
-        accessor: "assignBy",
+        accessor: 'assignBy',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assignDate")}
+              className='table-header'
+              onClick={() => handleSortBy('assignDate')}
             >
               <span>Assigned Date</span>
-              {handleSortIcon("assignDate")}
+              {handleSortIcon('assignDate')}
             </div>
           );
         },
-        accessor: "assignDate",
+        accessor: 'assignDate',
         Cell: ({ value }) => {
-          return format(new Date(value), "dd/MM/yyyy");
+          return format(new Date(value), 'dd/MM/yyyy');
         },
       },
       {
         Header: () => {
           return (
-            <div className="table-header" onClick={() => handleSortBy("state")}>
+            <div className='table-header' onClick={() => handleSortBy('state')}>
               <span>State</span>
-              {handleSortIcon("state")}
+              {handleSortIcon('state')}
             </div>
           );
         },
-        accessor: "state",
+        accessor: 'state',
       },
       {
-        Header: "Actions",
-        accessor: "actions",
+        Header: 'Actions',
+        accessor: 'actions',
         Cell: (props) => {
           const rowIdx = props.row.id;
 
           return (
-            <div id="actions" style={{ display: "flex" }}>
-              <span className="font" onClick={() => getAssignmentId(rowIdx)}>
-                <i className="bx bx-edit"></i>
+            <div id='actions' style={{ display: 'flex' }}>
+              <span className='font' onClick={() => getAssignmentId(rowIdx)}>
+                <i className='bx bx-edit'></i>
               </span>
               &emsp;
-              <span className="font" onClick={() => DisableAssignments(rowIdx)}>
-                <i className="fas fa-times "></i>
+              <span
+                className='font'
+                onClick={() => HandleClickDeleteBtn(rowIdx)}
+              >
+                <i className='fas fa-times '></i>
               </span>
               &emsp;
-              <span className="font undo-icon">
-                <i class="fas fa-undo"></i>
+              <span className='font undo-icon'>
+                <i className='fas fa-undo'></i>
               </span>
             </div>
           );
@@ -267,69 +309,46 @@ function Assignment() {
         columns={columns}
         data={assignments}
         loading={loading}
+        filterAssignedDate={filterAssignedDate}
         onSearch={handleSearchChange}
         onFilterState={handleFilterState}
         onClickAssignment={handleOnClickAssignment}
+        onFilterAssignedDate={handleFilterAssignedDate}
       />
-      <div className="paging-box">
-        <ReactPaginate
-          previousLabel={"Previous"}
-          nextLabel={"Next"}
-          breakLabel={"..."}
-          breakClassName={"break-me"}
-          pageCount={totalPages}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-        />
+      <div className='paging-box'>
+        {totalPages && (
+          <ReactPaginate
+            previousLabel={'Previous'}
+            nextLabel={'Next'}
+            breakLabel={'...'}
+            breakClassName={'break-me'}
+            pageCount={totalPages}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            containerClassName={'pagination'}
+            activeClassName={'active'}
+          />
+        )}
       </div>
       {assignment && (
         <Modal
           isOpen={modalIsOpen}
-          onAfterOpen={afterOpenModal}
           onRequestClose={closeModal}
           style={customStyles}
         >
-          <div className="modal-wrapper">
-            <div className="modal-close-btn" onClick={closeModal}>
-              <i class="fas fa-times"></i>
-            </div>
-            <div className="modal-header">
-              <h2>Assignment Details</h2>
-            </div>
-            <div className="modal-body">
-              <div className="body-row">
-                <div className="row-title">Asset Code</div>
-                <div className="row-value">{assignment.assetCode}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Asset Name</div>
-                <div className="row-value">{assignment.assetName}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Assigned to</div>
-                <div className="row-value">{assignment.assignTo}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Assigned by</div>
-                <div className="row-value">{assignment.assignBy}</div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">Assigned Date</div>
-                <div className="row-value">
-                  {assignment.assignDate.slice(0, 10)}
-                </div>
-              </div>
-              <div className="body-row">
-                <div className="row-title">State</div>
-                <div className="row-value">{assignment.state}</div>
-              </div>
-            </div>
-          </div>
+          <AssignmentDetailModal
+            closeModal={closeModal}
+            assignment={assignment}
+          />
         </Modal>
       )}
+      <Modal isOpen={deleteModal} style={customStyles}>
+        <DeleteModal
+          closeDeleteModal={closeDeleteModal}
+          onDeleteAssignment={handleDeleteAssignment}
+        />
+      </Modal>
     </LayoutAdmin>
   );
 }

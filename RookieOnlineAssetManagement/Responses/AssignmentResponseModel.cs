@@ -16,6 +16,7 @@ namespace RookieOnlineAssetManagement.Responses
         public int AssignById { get; set; }
         public string AssignBy { get; set; }
         public DateTime AssignDate { get; set; }
+        public string Note { get; set; }
         public string State { get; set; }
     }
 }
