@@ -22,8 +22,12 @@ function createAsset  (assets) {
 } 
 // Get categories for creating new assets
 function getCategories  () {
-  return api.get('categories')
+  return api.get('/Categories')
 
+}
+
+function createCategories (category) {
+  return api.post('/Categories', category)
 }
   
 
@@ -48,6 +52,7 @@ export const getApiAssets = {
   getAsset,
   createAsset,
   getCategories,
+  createCategories,
   updateAsset,
   deleteAsset
 };
