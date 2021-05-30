@@ -19,7 +19,7 @@ const schema = Yup.object().shape({
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
-  // categoryId: Yup.string().required('Select Category is required'),
+   categoryId: Yup.string().required('Select Category is required'),
   state: Yup.string().required('Select State is required'),
 });
 
@@ -146,12 +146,13 @@ const CreateAsset = (props) => {
                     onCreateCategory={onClick}
                     components={{ Control }}
                     placeholder='Select or Create New Category'
+                    error={errors.categoryId}
                   />
                 )}
               />
             </div>
           </div>
-          {/* <p className='invalid-feedback'>{errors.categoryId?.message}</p> */}
+          <p className='invalid-feedback'>{errors.categoryId?.message}</p>
 
           <div className='form__field'>
             <label>Specification</label>
