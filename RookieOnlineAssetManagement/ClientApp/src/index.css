@@ -180,12 +180,12 @@ body {
   border-radius: 3px;
 }
 
-.font{
+.font {
   font-size: 25px;
   cursor: pointer;
   outline: none;
 }
-.spinner{
+.spinner {
   font-size: 50px;
   position: absolute;
   top: 100px;
@@ -196,7 +196,6 @@ body {
   justify-content: center;
   align-items: center;
 }
-
 
 .form__field input:focus,
 .form__field textarea:focus,
@@ -257,7 +256,6 @@ body {
   cursor: pointer;
   border-radius: var(--border-radius-button);
   outline: none;
-;
 }
 
 .form__field .btn:hover {
@@ -297,6 +295,11 @@ body {
   .form__field label {
     margin-bottom: 5px;
   }
+}
+
+.form__validation {
+  color: red;
+  font-size: var(--small-font-size);
 }
 
 .react-datepicker__input-container input {
