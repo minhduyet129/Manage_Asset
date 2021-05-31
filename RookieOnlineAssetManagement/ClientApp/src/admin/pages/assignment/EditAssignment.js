@@ -44,7 +44,7 @@ function CreateAssignment() {
     assignToId: null,
     assetId: null,
     assignedDate: '',
-    assignById: userInfo,
+    assignById: userInfo.userId,
   });
 
   const history = useHistory();
