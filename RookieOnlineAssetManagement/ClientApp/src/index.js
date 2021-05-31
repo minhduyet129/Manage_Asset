@@ -1,18 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import axios from 'axios';
+import Modal from 'react-modal';
 import reportWebVitals from './reportWebVitals';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { BrowserRouter as Router } from 'react-router-dom';
+import './index.css';
 
 const queryClient = new QueryClient();
+
 const userLocalStorage = localStorage.getItem('userInfo');
 const userInfoObject = JSON.parse(userLocalStorage);
 
 axios.defaults.baseURL = 'http://rookies-001-site1.itempurl.com';
+
+Modal.setAppElement('#root');
 
 if (userLocalStorage) {
   axios.defaults.headers.common[

@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import moment from 'moment';
 const schema = Yup.object().shape({
   firstName: Yup.string()
     .required('First Name is required')
@@ -110,7 +110,7 @@ const CreateUser = () => {
                   id='doB'
                   selected={startDate}
                   onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() + 10));
+                     let d = new Date(e.setHours(e.getHours() + 10));
                     onChange(d);
                     setStartDate(d);
                   }}
