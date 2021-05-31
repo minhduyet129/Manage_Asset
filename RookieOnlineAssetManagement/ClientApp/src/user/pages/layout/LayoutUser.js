@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
+import { SidebarData } from './SidebarDataUser';
 
 function LayoutUser({ children }) {
   const [sidebar, setSidebar] = useState(false);
@@ -16,14 +17,18 @@ function LayoutUser({ children }) {
     <div className='container'>
       <nav className={sidebar ? 'nav active' : 'nav'}>
         <ul>
-          <li>
-            <Link className='link' to='/'>
-              <span className='icon'>
-                <i className=''></i>
-              </span>
-              <span className='title'></span>
-            </Link>
-          </li>
+          {SidebarData.map((item, index) => {
+            return (
+              <li key={index}>
+                <Link className='link' to={item.path}>
+                  <span className='icon'>
+                    <i className={item.icon}></i>
+                  </span>
+                  <span className='title'>{item.title}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
