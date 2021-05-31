@@ -1,31 +1,27 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Waypoint } from 'react-waypoint';
-import useDebounce from '../../../../useDebounce';
+import queryString from 'query-string'
+
 import SelectUserTable from './SelectUserTable';
 
 function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
   const [users, setUsers] = useState([]);
-  const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchText, setSearchText] = useState('');
-  const [sort, setSort] = useState({
-    sortBy: 'id',
+  const [filters, setFilters] = useState({
+    sortBy: null,
     asc: true,
-  });
+    PageNumber: 1,
+    PageSize: 10,
+    keyword: null,
+  })
+
+  const typingTimoutRef = useRef(null)
 
   useEffect(() => {
-    if (searchText !== '') {
-      setUsers([]);
-      setPageNumber(1);
-    }
-  }, [searchText]);
-
-  useEffect(() => {
-    if (searchText === '') {
-      let url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
+    const paramString = queryString.stringify(filters)
       axios
-        .get(url)
+        .get(`api/Users?${paramString}`)
         .then((res) => {
           setTotalPages(res.data.totalPages);
           setUsers((prevState) => {
@@ -35,12 +31,11 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
         .catch((err) => {
           console.log(err);
         });
-    }
-  }, [pageNumber, sort, searchText]);
+  }, [filters]);
 
   const handleSortIcon = (sortBy) => {
-    if (sort.sortBy === sortBy) {
-      if (sort.asc) {
+    if (filters.sortBy === sortBy) {
+      if (filters.asc) {
         return <i className='fas fa-caret-down'></i>;
       }
       return <i className='fas fa-caret-up'></i>;
@@ -49,50 +44,39 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
   };
 
   const handleSortBy = (sortBy) => {
-    setSort((prevSort) => {
-      setUsers([]);
-      setPageNumber(1);
-      if (prevSort.sortBy === sortBy) {
+    setUsers([]);
+    setFilters((prev) => {
+      if (prev.sortBy === sortBy) {
         return {
-          ...prevSort,
-          asc: !prevSort.asc,
+          ...prev,
+          asc: !prev.asc,
+          PageNumber: 1
         };
       } else {
         return {
-          ...prevSort,
+          ...prev,
           sortBy: sortBy,
           asc: true,
+          PageNumber: 1
         };
       }
     });
   };
 
   const handleSearchChange = (value) => {
-    setSearchText(value);
+    if (typingTimoutRef.current) {
+      clearTimeout(typingTimoutRef.current);
+    }
+
+    typingTimoutRef.current = setTimeout(() => {
+      setUsers([])
+      setFilters({
+        ...filters,
+        keyword: value,
+        pageNumber: 1,
+      });
+    }, 500);
   };
-
-  useDebounce(
-    () => {
-      if (searchText !== '') {
-        let url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-        axios
-          .get(url)
-          .then((res) => {
-            setTotalPages(res.data.totalPages);
-            setUsers((prevState) => {
-              return [...prevState, ...res.data.data];
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    },
-    500,
-    [searchText, sort, pageNumber]
-  );
-
-  // console.log(users)
 
   const columns = React.useMemo(
     () => [
@@ -102,11 +86,17 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
           <>
             <Waypoint
               onEnter={() => {
+                console.log(filters.PageNumber)
                 if (
                   users.length - 1 === Number(d.row.id) &&
-                  pageNumber < totalPages
+                  filters.PageNumber < totalPages
                 ) {
-                  setPageNumber((prev) => prev + 1);
+                  setFilters(prev => {
+                    return {
+                      ...prev,
+                      PageNumber: prev.PageNumber + 1
+                    }
+                  });
                 }
               }}
             />
@@ -155,6 +145,7 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
         accessor: 'roles',
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [users]
   );
   return (
