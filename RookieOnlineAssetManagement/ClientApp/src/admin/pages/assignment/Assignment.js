@@ -1,32 +1,30 @@
-import axios from "axios";
-import React from "react";
-import Modal from "react-modal";
-import { format } from "date-fns";
-import { toast } from "react-toastify";
-import { useHistory } from "react-router";
-import ReactPaginate from "react-paginate";
-import { useEffect, useRef, useState } from "react";
-
-import useDebounce from "../../../useDebounce";
-import AssignmentTable from "./AssignmentTable";
-import LayoutAdmin from "../layout/LayoutAdmin";
-import "./Assignment.css";
-import DeleteModal from "./DeleteModal";
-import HandleAPIUrl from "./HandleAPIUrl";
-import AssignmentDetailModal from "./AssignmentDetailModal";
+import axios from 'axios';
+import Modal from 'react-modal';
+import { format } from 'date-fns';
+import { toast } from 'react-toastify';
+import { useHistory } from 'react-router';
+import ReactPaginate from 'react-paginate';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import useDebounce from '../../../useDebounce';
+import AssignmentTable from './AssignmentTable';
+import LayoutAdmin from '../layout/LayoutAdmin';
+import DeleteModal from './DeleteModal';
+import HandleAPIUrl from './HandleAPIUrl';
+import AssignmentDetailModal from './AssignmentDetailModal';
+import './Assignment.css';
 
 const customStyles = {
   content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
   },
 };
 
-Modal.setAppElement("#root");
+Modal.setAppElement('#root');
 
 function Assignment() {
   const [assignments, setAssignments] = useState([]);
@@ -34,14 +32,14 @@ function Assignment() {
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState();
   const [pageNumber, setPageNumber] = useState(1);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [filterState, setFilterState] = useState(-1);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState();
   const [filterAssignedDate, setFilterAssignedDate] = useState();
   const [sort, setSort] = useState({
-    sortBy: "assetCode",
+    sortBy: 'assetCode',
     asc: true,
   });
 
@@ -74,7 +72,18 @@ function Assignment() {
   useEffect(() => {
     setLoading(true);
     callAssignmentsAPI();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNumber, sort, filterState, filterAssignedDate]);
+
+  useDebounce(
+    () => {
+      setTotalPages(0);
+      setPageNumber(1);
+      callAssignmentsAPI();
+    },
+    500,
+    [searchText, filterState, filterAssignedDate, sort]
+  );
 
   const getAssignmentId = (rowIndex) => {
     if (!assignmentsRef.current) return;
@@ -101,11 +110,11 @@ function Assignment() {
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
       if (sort.asc) {
-        return <i class="fas fa-caret-down"></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i class="fas fa-caret-up"></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i class="fas fa-caret-down"></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSortBy = (sortBy) => {
@@ -119,7 +128,7 @@ function Assignment() {
       return {
         ...prevSort,
         sortBy: sortBy,
-        asc: true,
+        asc: false,
       };
     });
   };
@@ -128,20 +137,12 @@ function Assignment() {
     setSearchText(value);
   };
 
-  useDebounce(
-    () => {
-      setTotalPages(0);
-      setPageNumber(1);
-      callAssignmentsAPI();
-    },
-    500,
-    [searchText, filterState, filterAssignedDate]
-  );
+  
 
   const handleFilterState = (value) => {
     setTotalPages(0);
     setPageNumber(1);
-    if (value === "") {
+    if (value === '') {
       setFilterState(-1);
     } else {
       setFilterState(Number(value));
@@ -171,131 +172,135 @@ function Assignment() {
     openModal();
   };
 
+  const handleSelectState = (value) => {
+    setFilterState(value)
+  }
+
   const handleDeleteAssignment = () => {
     axios
       .delete(`/api/Assignments/${deleteId}`)
       .then((res) => {
         callAssignmentsAPI();
         setDeleteModal(false);
-        toast.success("Delete Successfully");
+        toast.success('Delete Successfully');
       })
       .catch((err) => {
-        toast.success("Delete Failed");
+        toast.success('Delete Failed');
         console.log(err);
       });
   };
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
-        Header: "Id",
-        accessor: "id",
+        Header: 'Id',
+        accessor: 'id',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetCode")}
+              className='table-header'
+              onClick={() => handleSortBy('assetCode')}
             >
               <span>Asset Code</span>
-              {handleSortIcon("assetCode")}
+              {handleSortIcon('assetCode')}
             </div>
           );
         },
-        accessor: "assetCode",
+        accessor: 'assetCode',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetName")}
+              className='table-header'
+              onClick={() => handleSortBy('assetName')}
             >
               <span>Asset Name</span>
-              {handleSortIcon("assetName")}
+              {handleSortIcon('assetName')}
             </div>
           );
         },
-        accessor: "assetName",
+        accessor: 'assetName',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assignTo")}
+              className='table-header'
+              onClick={() => handleSortBy('assignTo')}
             >
               <span>Assigned to</span>
-              {handleSortIcon("assignTo")}
+              {handleSortIcon('assignTo')}
             </div>
           );
         },
-        accessor: "assignTo",
+        accessor: 'assignTo',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assignBy")}
+              className='table-header'
+              onClick={() => handleSortBy('assignBy')}
             >
               <span>Assigned by</span>
-              {handleSortIcon("assignBy")}
+              {handleSortIcon('assignBy')}
             </div>
           );
         },
-        accessor: "assignBy",
+        accessor: 'assignBy',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assignDate")}
+              className='table-header'
+              onClick={() => handleSortBy('assignDate')}
             >
               <span>Assigned Date</span>
-              {handleSortIcon("assignDate")}
+              {handleSortIcon('assignDate')}
             </div>
           );
         },
-        accessor: "assignDate",
+        accessor: 'assignDate',
         Cell: ({ value }) => {
-          return format(new Date(value), "dd/MM/yyyy");
+          return format(new Date(value), 'dd/MM/yyyy');
         },
       },
       {
         Header: () => {
           return (
-            <div className="table-header" onClick={() => handleSortBy("state")}>
+            <div className='table-header' onClick={() => handleSortBy('state')}>
               <span>State</span>
-              {handleSortIcon("state")}
+              {handleSortIcon('state')}
             </div>
           );
         },
-        accessor: "state",
+        accessor: 'state',
       },
       {
-        Header: "Actions",
-        accessor: "actions",
+        Header: 'Actions',
+        accessor: 'actions',
         Cell: (props) => {
           const rowIdx = props.row.id;
 
           return (
-            <div id="actions" style={{ display: "flex" }}>
-              <span className="font" onClick={() => getAssignmentId(rowIdx)}>
-                <i className="bx bx-edit"></i>
+            <div id='actions' style={{ display: 'flex' }}>
+              <span className='font' onClick={() => getAssignmentId(rowIdx)}>
+                <i className='bx bx-edit'></i>
               </span>
               &emsp;
               <span
-                className="font"
+                className='font'
                 onClick={() => HandleClickDeleteBtn(rowIdx)}
               >
-                <i className="fas fa-times "></i>
+                <i className='fas fa-times '></i>
               </span>
               &emsp;
-              <span className="font undo-icon">
-                <i class="fas fa-undo"></i>
+              <span className='font undo-icon'>
+                <i className='fas fa-undo'></i>
               </span>
             </div>
           );
@@ -316,20 +321,21 @@ function Assignment() {
         onFilterState={handleFilterState}
         onClickAssignment={handleOnClickAssignment}
         onFilterAssignedDate={handleFilterAssignedDate}
+        onSelectStateOption={handleSelectState}
       />
-      <div className="paging-box">
+      <div className='paging-box'>
         {totalPages && (
           <ReactPaginate
-            previousLabel={"Previous"}
-            nextLabel={"Next"}
-            breakLabel={"..."}
-            breakClassName={"break-me"}
+            previousLabel={'Previous'}
+            nextLabel={'Next'}
+            breakLabel={'...'}
+            breakClassName={'break-me'}
             pageCount={totalPages}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
+            containerClassName={'pagination'}
+            activeClassName={'active'}
           />
         )}
       </div>

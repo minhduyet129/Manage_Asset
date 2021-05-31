@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SidebarData } from './SidebarDataAdmin';
 import './Navbar.css';
 
-function LayoutAdmin({ children }) {
+function LayoutUser({ children }) {
   const [sidebar, setSidebar] = useState(false);
 
   const showSidebar = () => setSidebar(!sidebar);
@@ -15,25 +14,18 @@ function LayoutAdmin({ children }) {
 
   return (
     <div className='container'>
-      {/* Start Layout */}
       <nav className={sidebar ? 'nav active' : 'nav'}>
-        {/* Render each item of the side bar */}
         <ul>
-          {SidebarData.map((item, index) => {
-            return (
-              <li key={index}>
-                <Link className='link' to={item.path}>
-                  <span className='icon'>
-                    <i className={item.icon}></i>
-                  </span>
-                  <span className='title'>{item.title}</span>
-                </Link>
-              </li>
-            );
-          })}
+          <li>
+            <Link className='link' to='/'>
+              <span className='icon'>
+                <i className=''></i>
+              </span>
+              <span className='title'></span>
+            </Link>
+          </li>
         </ul>
       </nav>
-      {/* End Layout */}
 
       <main className={sidebar ? 'main active' : 'main'}>
         <div className='topbar'>
@@ -54,4 +46,4 @@ function LayoutAdmin({ children }) {
   );
 }
 
-export default LayoutAdmin;
+export default LayoutUser;

@@ -1,10 +1,11 @@
 import LayoutAdmin from '../layout/LayoutAdmin';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { getApiAssets } from './assetsApi';
-import '../TableView.css';
 import AssetsTable from './AssetsTable';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+import '../TableView.css';
+
 function Asset() {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,7 +14,6 @@ function Asset() {
   const history = useHistory();
 
   const getassets = () => {
-
     setLoading(true);
     getApiAssets
       .getAssets()
@@ -31,22 +31,21 @@ function Asset() {
   const DeleteAsset = async (index) => {
     if (!usersRef.current) return;
     const id = usersRef.current[index].id;
-    await getApiAssets.deleteAsset(id)
-    .then((res) => {
-      setChanges((prev) => {
-        const current = !prev;
-        return current;
+    await getApiAssets
+      .deleteAsset(id)
+      .then((res) => {
+        setChanges((prev) => {
+          const current = !prev;
+          return current;
+        });
+        if (res.status === 200) {
+          toast('Asset Deleted');
+        }
+      })
+      .catch(() => {
+        toast('Delete Failed');
       });
-      if (res.status === 200) {
-        toast('Asset Deleted');
-      }
-    })
-    .catch(() => {
-      toast(
-        'Delete Failed'
-      );
-    });
-  }
+  };
 
   const getAssetId = async (rowIndex) => {
     if (!usersRef.current) return;
@@ -54,13 +53,13 @@ function Asset() {
     if (id) {
       history.push(`/admin/assets/edit/${id}`);
     }
-  }
+  };
 
   const handleState = (value) => {
-    if(value === 0) return "Available"
-    if(value === 1) return "Not Available"
+    if (value === 0) return 'Available';
+    if (value === 1) return 'Not Available';
     return null;
-  }
+  };
 
   const columns = useMemo(
     () => [
@@ -86,7 +85,7 @@ function Asset() {
         Cell: (props) => {
           const rowIdx = props.row.id;
           return (
-            <div>
+            <>
               <span className='font' onClick={() => getAssetId(rowIdx)}>
                 <i className='bx bx-edit'></i>
               </span>
@@ -94,7 +93,7 @@ function Asset() {
               <span className='font' onClick={() => DeleteAsset(rowIdx)}>
                 <i className='fas fa-times'></i>
               </span>
-            </div>
+            </>
           );
         },
       },

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTable } from 'react-table';
 import { Link } from 'react-router-dom';
 
@@ -40,7 +39,7 @@ const UsersTable = ({ columns, data, loading }) => {
             </thead>
             {loading ? (
               <div className='spinner'>
-                <i class='fas fa-spinner fa-spin'></i>
+                <i className='fas fa-spinner fa-spin'></i>
               </div>
             ) : (
               <tbody {...getTableBodyProps()}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { Link, useHistory } from 'react-router-dom';
@@ -7,32 +7,55 @@ import { getApiAssets } from './assetsApi';
 import { toast } from 'react-toastify';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import Modal from 'react-modal';
+import ModalForm from './ModalForm';
+import Select, { components } from 'react-select';
+
+import './Asset.css'
 
 const schema = Yup.object().shape({
   assetName: Yup.string()
     .required('Asset Name is required')
     .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
-  specification: Yup.string()
-    .required('Specification is required')
-    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
-  categoryId: Yup.string().required('Select Category is required'),
+   categoryId: Yup.string().required('Select Category is required'),
   state: Yup.string().required('Select State is required'),
 });
 
-const CreateAsset = () => {
+const Control = ({ children, ...props }) => {
+  const { onCreateCategory } = props.selectProps;
+  const style = { cursor: 'pointer' };
+
+  return (
+    <components.Control {...props} className="select-category">
+      {children}
+      <span onMouseDown={onCreateCategory} style={style} title="Create Category">
+      <i class="fas fa-plus-circle"></i>
+      </span>
+    </components.Control>
+  );
+};
+
+const CreateAsset = (props) => {
   const [modalIsOpen, setModelIsOpen] = useState(false);
   const [installedDate, setInstalledDate] = useState();
   const [categories, setCategories] = useState([]);
+  const [changes, setChanges] = useState(false);
   const history = useHistory();
+  const [selectedOption, setSelectedOption] = useState(null);
 
+  const onClick = (e) => {
+    handleChange()
+    e.preventDefault();
+    e.stopPropagation();
+  };
   const {
     register,
     handleSubmit,
     control,
+    setValue,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -48,8 +71,8 @@ const CreateAsset = () => {
     return getApiAssets
       .createAsset(assets)
       .then((response) => {
-        if (response.status === 200) {
-          toast('Add asset sucessfully');
+        if (response.status) {
+          toast('Add Asset sucessfully');
           history.push('/admin/assets');
         }
       })
@@ -57,23 +80,28 @@ const CreateAsset = () => {
         toast('Add asset failed!');
       });
   }
-  useEffect(() => {
-    (async () => {
-      getApiAssets
-        .getCategories()
-        .then((res) => res.data)
-        .then((data) => {
-          setCategories(data);
-          console.log(data);
-        })
-        .catch((err) => err);
-    })();
-  }, []);
+
+  const getCategories = () => {
+    getApiAssets
+      .getCategories()
+      .then((res) => res.data)
+      .then((data) => {
+        setCategories(data);
+        console.log(data);
+      })
+      .catch((err) => err);
+  };
+  useEffect(getCategories, [changes]);
 
   const handleChange = () => {
-    setModelIsOpen(true)
-  }
+    setModelIsOpen(true);
+  };
 
+  const options =
+    categories &&
+    categories.map((category) => {
+      return { label: category.name, value: category.id };
+    });
   return (
     <LayoutAdmin>
       <div className='table__view'>
@@ -92,22 +120,36 @@ const CreateAsset = () => {
           <div className='form__field'>
             <label>Category</label>
             <div className='custom__select'>
-              
-              {categories && (
+              {/* {categories && (
                 <select
                   {...register('categoryId')}
                   className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
                 >
-                  
                   <option value=''>Select</option>
                   {categories.map((category) => (
                     <option value={category.id}>{category.name}</option>
                   ))}
-                  
                 </select>
-              )}
-              <button className='btn' onClick={handleChange}>Create Category</button>
-              
+              )} */}
+              <Controller
+                name='categoryId'
+                control={control}
+                defaultValue={options[1]}
+                render={({ onChange, value, name, ref }) => (
+                  <Select
+                    {...props}
+                    isSearchable
+                    options={options}
+                    onChange={(e) => reset({ categoryId: e.value })}
+                    value={options.find((c) => c.value === value)}
+                    // onClick={console.log(123)}
+                    onCreateCategory={onClick}
+                    components={{ Control }}
+                    placeholder='Select or Create New Category'
+                    error={errors.categoryId}
+                  />
+                )}
+              />
             </div>
           </div>
           <p className='invalid-feedback'>{errors.categoryId?.message}</p>
@@ -117,10 +159,9 @@ const CreateAsset = () => {
             <textarea
               defaultValue={''}
               {...register('specification')}
-              className={`input ${errors.specification ? 'is-invalid' : ''}`}
+              className='input'
             />
           </div>
-          <p className='invalid-feedback'>{errors.specification?.message}</p>
 
           <div className='form__field'>
             <label>Installed Date</label>
@@ -175,13 +216,14 @@ const CreateAsset = () => {
             <Link to='/admin/assets/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>
-            
           </div>
         </form>
+        <ModalForm
+          modalIsOpen={modalIsOpen}
+          setModelIsOpen={setModelIsOpen}
+          setChanges={setChanges}
+        />
       </div>
-      <Modal isOpen={modalIsOpen}>
-        <h2>test</h2>
-      </Modal>
     </LayoutAdmin>
   );
 };

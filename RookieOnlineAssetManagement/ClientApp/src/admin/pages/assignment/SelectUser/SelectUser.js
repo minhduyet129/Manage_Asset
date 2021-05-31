@@ -1,28 +1,28 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Waypoint } from "react-waypoint";
-import useDebounce from "../../../../useDebounce";
-import SelectUserTable from "./SelectUserTable";
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { Waypoint } from 'react-waypoint';
+import useDebounce from '../../../../useDebounce';
+import SelectUserTable from './SelectUserTable';
 
 function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
   const [users, setUsers] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
   const [sort, setSort] = useState({
-    sortBy: "id",
+    sortBy: 'id',
     asc: true,
   });
 
   useEffect(() => {
-    if (searchText !== "") {
+    if (searchText !== '') {
       setUsers([]);
       setPageNumber(1);
     }
   }, [searchText]);
 
   useEffect(() => {
-    if (searchText === "") {
+    if (searchText === '') {
       let url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
       axios
         .get(url)
@@ -41,11 +41,11 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
   const handleSortIcon = (sortBy) => {
     if (sort.sortBy === sortBy) {
       if (sort.asc) {
-        return <i class="fas fa-caret-down"></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i class="fas fa-caret-up"></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i class="fas fa-caret-down"></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSortBy = (sortBy) => {
@@ -73,7 +73,7 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
 
   useDebounce(
     () => {
-      if (searchText !== "") {
+      if (searchText !== '') {
         let url = `api/Users?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
         axios
           .get(url)
@@ -97,7 +97,7 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
   const columns = React.useMemo(
     () => [
       {
-        Header: " ",
+        Header: ' ',
         Cell: (d) => (
           <>
             <Waypoint
@@ -110,7 +110,7 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
                 }
               }}
             />
-            <input type="radio" name="selectUser" id={d.row.id} />
+            <input type='radio' name='selectUser' id={d.row.id} />
           </>
         ),
       },
@@ -118,41 +118,41 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("staffCode")}
+              className='table-header'
+              onClick={() => handleSortBy('staffCode')}
             >
               <span>Staff Code</span>
-              {handleSortIcon("staffCode")}
+              {handleSortIcon('staffCode')}
             </div>
           );
         },
-        accessor: "staffCode",
+        accessor: 'staffCode',
       },
       {
-        id: "firstName",
+        id: 'firstName',
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("firstName")}
+              className='table-header'
+              onClick={() => handleSortBy('firstName')}
             >
               <span>Full Name</span>
-              {handleSortIcon("firstName")}
+              {handleSortIcon('firstName')}
             </div>
           );
         },
-        accessor: (d) => <div>{d.firstName + " " + d.lastName}</div>,
+        accessor: (d) => <div>{d.firstName + ' ' + d.lastName}</div>,
       },
       {
         Header: () => {
           return (
-            <div className="table-header" onClick={() => handleSortBy("type")}>
+            <div className='table-header' onClick={() => handleSortBy('type')}>
               <span>Type</span>
-              {handleSortIcon("type")}
+              {handleSortIcon('type')}
             </div>
           );
         },
-        accessor: "roles",
+        accessor: 'roles',
       },
     ],
     [users]

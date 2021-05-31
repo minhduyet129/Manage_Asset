@@ -1,0 +1,46 @@
+.select-category {
+    position: relative;
+}
+
+.select-category span {
+    position: absolute;
+    top: 7px !important; 
+    right: 32px !important;
+}
+
+.select-category span svg {
+    font-size: 22px !important;
+    color: var(--secondary-color);
+}
+
+.control-btn {
+    justify-content: flex-end;
+}
+
+.control-btn .btn {
+    margin-left: 15px;
+}
+
+.cancel-btn {
+    background-color: #fff !important;
+    border: 1px solid var(--primary-color) !important;
+    color: var(--secondary-color) !important;
+}
+
+.table__view {
+    position: relative;
+    min-height: 200px;
+}
+
+.close-btn {
+    position: absolute;
+    top: -18px;
+    right: -18px;
+    font-size: 24px;
+    color: var(--primary-color);
+    padding: 10px 20px;
+}
+
+.close-btn:hover {
+    cursor: pointer;
+}

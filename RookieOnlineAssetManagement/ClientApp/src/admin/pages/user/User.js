@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import UsersTable from './UsersTable';
 import { useHistory } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useCreateUser } from './UserHooks';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+
 const User = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -74,7 +75,7 @@ const User = () => {
 
   // const data = React.useMemo(() => users, [users]);
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
         Header: 'StaffCode',
@@ -107,12 +108,12 @@ const User = () => {
 
           return (
             <div>
-              <span className='font'  onClick={() => getUserId(rowIdx)}>
-                <i className='bx bx-edit' ></i>
+              <span className='font' onClick={() => getUserId(rowIdx)}>
+                <i className='bx bx-edit'></i>
               </span>
               &emsp;
-              <span className='font'  onClick={() => DisableUsers(rowIdx)}>
-                <i className='fas fa-times' ></i>
+              <span className='font' onClick={() => DisableUsers(rowIdx)}>
+                <i className='fas fa-times'></i>
               </span>
             </div>
           );

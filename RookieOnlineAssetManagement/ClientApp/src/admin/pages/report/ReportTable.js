@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTable } from 'react-table';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
@@ -10,18 +9,21 @@ function ReportTable({ columns, data, loading, fileName }) {
 
   const exportToCSV = (data, fileName) => {
     const ws = XLSX.utils.json_to_sheet(data);
-    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const datatype = new Blob([excelBuffer], { type: fileType });
     FileSaver.saveAs(datatype, fileName + fileExtension);
   };
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
+
   return (
     <div>
       <div className='table__view'>
         <h2>Report</h2>
-        <button onClick={(e) => exportToCSV(data, fileName)} className='btn'>Export</button>
+        <button onClick={(e) => exportToCSV(data, fileName)} className='btn'>
+          Export
+        </button>
         <div className='table__view--search'></div>
         <div>
           <table id='table' {...getTableProps()}>
@@ -38,7 +40,7 @@ function ReportTable({ columns, data, loading, fileName }) {
             </thead>
             {loading ? (
               <div className='spinner'>
-                <i class='fas fa-spinner fa-spin'></i>
+                <i className='fas fa-spinner fa-spin'></i>
               </div>
             ) : (
               <tbody {...getTableBodyProps()}>

@@ -183,7 +183,7 @@
 }
 
 .table-wrapper {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .table-wrapper table {
@@ -192,15 +192,15 @@
 }
 
 .table__view table tr th:nth-child(3) {
-    width: 170px;
+  width: 170px;
 }
 
 .table__view table tr td:nth-child(2) {
-    width: 140px;
+  width: 140px;
 }
 
 .table__view table tr td:nth-child(3) {
-    width: 170px;
+  width: 170px;
 }
 
 .table__view table tr th:nth-child(2) {
@@ -212,36 +212,36 @@
 }
 
 .user-control {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
 }
 
 .user-btn {
-    padding: 5px 15px;
-    border-radius: 4px;
-    width: 90px;
-    text-align: center;
-    margin: 0 10px;
+  padding: 5px 15px;
+  border-radius: 4px;
+  width: 90px;
+  text-align: center;
+  margin: 0 10px;
 }
 
 .user-btn:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .user-btn:active {
-    opacity: 0.9;
+  opacity: 0.9;
 }
 
 .user-btn.save {
-    background-color: var(--primary-color);
-    color: #fff;
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 .user-btn.cancel {
-    background-color: #fff;
-    color: var(--primary-color);
-    border: 1px solid rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  color: var(--primary-color);
+  border: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .invalid-feedback {
@@ -304,7 +304,24 @@
   color: #fff;
 }
 
-.confirm-close-btn, 
+.confirm-close-btn,
 .confirm-btn:hover {
   cursor: pointer;
+}
+
+.select-state .css-yk16xz-control {
+  border-radius: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  height: 20px;
+  font-size: 14px !important;
+}
+
+.select-state .css-g1d714-ValueContainer {
+  height: 20px;
+  padding-left: 35px;
+}
+
+.css-1uccc91-singleValue,
+.css-1wa3eu0-placeholder {
+  margin-top: 16px;
 }
