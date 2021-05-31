@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import * as moment from 'moment-timezone';
+
 const schema = Yup.object().shape({
   firstName: Yup.string()
     .required('First Name is required')

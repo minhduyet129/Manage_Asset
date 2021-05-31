@@ -5,8 +5,8 @@ function getbyid(id) {
 }
 
 // Get users
-function getall(pageNumber) {
-  return axios.get(`api/Users?PageNumber=${pageNumber}`);
+function getall(paramString) {
+  return axios.get(`api/Users?${paramString}`);
 }
 
 // Create a new user
