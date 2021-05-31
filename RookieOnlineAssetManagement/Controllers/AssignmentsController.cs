@@ -40,8 +40,16 @@ namespace RookieOnlineAssetManagement.Controllers
             else if (state == AssignmentState.Accepted)
             {
                 return "Accepted";
-            }    
-            else
+            } 
+            else if (state == AssignmentState.WaitingForReturning)
+            {
+                return "Waiting for returning";
+            }
+            else if (state == AssignmentState.Returned)
+            {
+                return "Returned";
+            }
+            else 
             {
                 return "Declined";
             }
@@ -303,6 +311,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 assetOld.State = AssetState.Available;
 
                 assignment.AssignToId = model.AssignToId;
+                assignment.AssignById = model.AssignById;
                 assignment.AssetId = model.AssetId;
                 assignment.AssignedDate = model.AssignedDate;
                 assignment.Note = model.Note;
@@ -368,7 +377,7 @@ namespace RookieOnlineAssetManagement.Controllers
                              AssetName=b.AssetName,
                              AssignedBy=c.UserName,
                              AssignedDate=a.AssignedDate,
-                             State =a.State
+                             State =GetAssignmentState(a.State)
 
                          };
             if (!string.IsNullOrEmpty(sortBy))
