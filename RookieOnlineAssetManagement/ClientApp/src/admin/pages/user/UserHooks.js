@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 // Get an user
 function getbyid(id) {
