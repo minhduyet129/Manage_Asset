@@ -1,14 +1,9 @@
-import { api } from '../api';
+import { api } from '../../../api';
 
+function getReports() {
+  return api.get('/Reports');
+}
 
-function getReports  () {
-    return api.get('/Reports')
-     
-  }
-
-
-
-  export const getApiReport = {
-    getReports,
-
-  };
+export const getApiReport = {
+  getReports,
+};

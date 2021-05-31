@@ -1,24 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { Link, useHistory } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
 import { getApiAssets } from './assetsApi';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import Modal from 'react-modal';
 
 const schema = Yup.object().shape({
-  assetName: Yup.string().required('Asset Name is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
-  specification: Yup.string().required('Specification is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
+  assetName: Yup.string()
+    .required('Asset Name is required')
+    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
+  specification: Yup.string()
+    .required('Specification is required')
+    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
-  categoryId:Yup.string().required('Select Category is required'),
-  state:Yup.string().required('Select State is required')
+  categoryId: Yup.string().required('Select Category is required'),
+  state: Yup.string().required('Select State is required'),
 });
 
 const CreateAsset = () => {
+  const [modalIsOpen, setModelIsOpen] = useState(false);
   const [installedDate, setInstalledDate] = useState();
   const [categories, setCategories] = useState([]);
   const history = useHistory();
@@ -38,9 +44,7 @@ const CreateAsset = () => {
   };
 
   function handleAsset(assets) {
-    
-
-    console.log(assets)
+    console.log(assets);
     return getApiAssets
       .createAsset(assets)
       .then((response) => {
@@ -55,15 +59,20 @@ const CreateAsset = () => {
   }
   useEffect(() => {
     (async () => {
-      getApiAssets.getCategories()
+      getApiAssets
+        .getCategories()
         .then((res) => res.data)
         .then((data) => {
           setCategories(data);
-          console.log(data)
+          console.log(data);
         })
-        .catch((err) =>(err));
+        .catch((err) => err);
     })();
   }, []);
+
+  const handleChange = () => {
+    setModelIsOpen(true);
+  };
 
   return (
     <LayoutAdmin>
@@ -73,9 +82,9 @@ const CreateAsset = () => {
 
           <div className='form__field'>
             <label>Name</label>
-            <input {...register('assetName')} 
-            className={`input ${errors.assetName ? 'is-invalid' : ''}`}
-
+            <input
+              {...register('assetName')}
+              className={`input ${errors.assetName ? 'is-invalid' : ''}`}
             />
           </div>
           <p className='invalid-feedback'>{errors.assetName?.message}</p>
@@ -84,15 +93,19 @@ const CreateAsset = () => {
             <label>Category</label>
             <div className='custom__select'>
               {categories && (
-                <select {...register('categoryId')}
-                className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
+                <select
+                  {...register('categoryId')}
+                  className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
                 >
                   <option value=''>Select</option>
                   {categories.map((category) => (
-                    <option value={(category.id)}>{category.name}</option>
+                    <option value={category.id}>{category.name}</option>
                   ))}
                 </select>
               )}
+              <button className='btn' onClick={handleChange}>
+                Create Category
+              </button>
             </div>
           </div>
           <p className='invalid-feedback'>{errors.categoryId?.message}</p>
@@ -143,16 +156,13 @@ const CreateAsset = () => {
           <div className='form__field'>
             <label>State</label>
             <div className='custom__select'>
-              <select {...register('state')}
-              className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
+              <select
+                {...register('state')}
+                className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
               >
                 <option value=''>Select</option>
                 <option value={0}>Available</option>
-                <option value={1}>Waiting For Approval</option>
-                <option value={2}>Not Available</option>
-                <option value={3}>Assigned</option>
-                <option value={4}>Waiting For Recycling</option>
-                <option value={5}>Recycled</option>
+                <option value={1}>Not Available</option>
               </select>
             </div>
           </div>
@@ -166,6 +176,9 @@ const CreateAsset = () => {
           </div>
         </form>
       </div>
+      <Modal isOpen={modalIsOpen}>
+        <h2>test</h2>
+      </Modal>
     </LayoutAdmin>
   );
 };

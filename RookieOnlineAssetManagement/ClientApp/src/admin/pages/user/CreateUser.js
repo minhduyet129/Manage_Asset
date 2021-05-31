@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
@@ -7,11 +7,15 @@ import { useHistory } from 'react-router';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 const schema = Yup.object().shape({
-  firstName: Yup.string().required('First Name is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
-  lastName: Yup.string().required('Last name is required').matches(/^[aA-zZ\s]+$/, "Only alphabets are allowed for this field "),
+  firstName: Yup.string()
+    .required('First Name is required')
+    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
+  lastName: Yup.string()
+    .required('Last name is required')
+    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
   doB: Yup.date()
     .required('Date of birth is required')
     .typeError('Date of birth is required')
@@ -30,8 +34,6 @@ const schema = Yup.object().shape({
 });
 
 const CreateUser = () => {
-
-
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState();
   const history = useHistory();
@@ -40,7 +42,7 @@ const CreateUser = () => {
     return day !== 0 && day !== 6;
   };
 
-  function handlerUser(users) {
+  const handlerUser = (users) => {
     users.gender = users.gender === 0 ? 0 : 1;
     return useCreateUser
       .create(users)
@@ -54,7 +56,7 @@ const CreateUser = () => {
       .catch((error) => {
         toast.error('Add user failed!');
       });
-  }
+  };
 
   const { register, handleSubmit, control, formState } = useForm({
     resolver: yupResolver(schema),
@@ -108,7 +110,7 @@ const CreateUser = () => {
                   id='doB'
                   selected={startDate}
                   onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() +10));
+                    let d = new Date(e.setHours(e.getHours() + 10));
                     onChange(d);
                     setStartDate(d);
                   }}
@@ -141,9 +143,9 @@ const CreateUser = () => {
                   id='joinedDate'
                   selected={joinedDate}
                   onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() +10));
+                    let d = new Date(e.setHours(e.getHours() + 10));
                     onChange(d);
-                    console.log(d)
+                    console.log(d);
                     setJoinedDate(d);
                   }}
                   filterDate={isWeekday}

@@ -32,7 +32,7 @@ const AssignmentsTable = ({
 
   return (
     <div>
-      <div className="table__view">
+      <div className='table__view'>
         <h2>Manage Assignment</h2>
         <div className="table__view--search">
           <div className="search">
@@ -41,37 +41,37 @@ const AssignmentsTable = ({
               <i className="bx bx-filter-alt" />
             </div>
           </div>
-          <div className="search">
-            <div className="filter-state">
+          <div className='search'>
+            <div className='filter-state'>
               <ReactDatePicker
                 selected={filterAssignedDate}
                 onChange={(e) => onFilterAssignedDate(e)}
-                placeholderText="Assigned Date"
+                placeholderText='Assigned Date'
                 isClearable
                 withPortal
                 showYearDropdown
                 showMonthDropdown
-                dateFormat="dd/MM/yyyy"
+                dateFormat='dd/MM/yyyy'
                 yearDropdownItemNumber={100}
                 scrollableYearDropdown
-                dropdownMode="select"
-                className="input"
+                dropdownMode='select'
+                className='input'
               />
-              <i className="bx bx-filter-alt" />
+              <i className='bx bx-filter-alt' />
             </div>
           </div>
-          <div className="search">
+          <div className='search'>
             <label />
             <input
-              type="text"
-              placeholder="Name"
-              id="search"
+              type='text'
+              placeholder='Name'
+              id='search'
               onChange={(e) => onSearch(e.target.value)}
             />
-            <i className="bx bx-search" />
+            <i className='bx bx-search' />
           </div>
-          <Link to="/admin/assignments/create">
-            <button className="btn">Create New Assignment</button>
+          <Link to='/admin/assignments/create'>
+            <button className='btn'>Create New Assignment</button>
           </Link>
         </div>
         <div>
@@ -81,15 +81,15 @@ const AssignmentsTable = ({
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
                     <th {...column.getHeaderProps()}>
-                      {column.render("Header")}
+                      {column.render('Header')}
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
             {loading ? (
-              <div className="spinner">
-                <i className="fas fa-spinner fa-spin"></i>
+              <div className='spinner'>
+                <i className='fas fa-spinner fa-spin'></i>
               </div>
             ) : (
               <tbody {...getTableBodyProps()}>
@@ -97,10 +97,10 @@ const AssignmentsTable = ({
                   prepareRow(row);
                   return (
                     <tr
-                      id="tr-hover"
+                      id='tr-hover'
                       {...row.getRowProps()}
                       onClick={(e) => {
-                        if (!e.target.closest("#Actions")) {
+                        if (!e.target.closest('#Actions')) {
                           onClickAssignment(row.original);
                         }
                       }}
@@ -108,7 +108,7 @@ const AssignmentsTable = ({
                       {row.cells.map((cell) => {
                         return (
                           <td id={cell.column.Header} {...cell.getCellProps()}>
-                            {cell.render("Cell")}
+                            {cell.render('Cell')}
                           </td>
                         );
                       })}

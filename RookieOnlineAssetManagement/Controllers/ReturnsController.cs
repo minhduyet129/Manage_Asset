@@ -23,7 +23,7 @@ namespace RookieOnlineAssetManagement.Controllers
             _context = context;
         }
         [HttpGet]
-        public IActionResult GetListReturnRequest(int state, DateTime returnedDate, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
+        public IActionResult GetListReturnRequest(int? state, string returnedDate, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
             var queryable = from a in _context.Assets
                             join b in _context.Assignments
@@ -47,13 +47,17 @@ namespace RookieOnlineAssetManagement.Controllers
                                 State=c.State
                                 
                             };
-            if (!string.IsNullOrEmpty(state.ToString()))
+            if (state !=null &&!string.IsNullOrEmpty(state.ToString()))
             {
                 queryable = queryable.Where(x => x.State == (ReturnRequestState)state);
             }
-            if(!string.IsNullOrEmpty(returnedDate.ToString()))
+            if(!string.IsNullOrEmpty(returnedDate))
             {
-                queryable = queryable.Where(y => y.ReturnedDate == returnedDate);
+                DateTime date;
+                if(DateTime.TryParseExact(returnedDate,"dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
+                {
+                    queryable = queryable.Where(a => a.ReturnedDate == date.Date);
+                }
             }
 
             if (!string.IsNullOrEmpty(sortBy))
