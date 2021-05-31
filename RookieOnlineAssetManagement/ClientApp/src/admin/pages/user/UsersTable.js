@@ -1,27 +1,54 @@
-import { useTable } from 'react-table';
-import { Link } from 'react-router-dom';
+import { useTable } from "react-table";
+import { Link } from "react-router-dom";
+import Select from "react-select";
 
-const UsersTable = ({ columns, data, loading }) => {
+import { customStyles } from "../CustomSelectStyle"
+
+const options = [
+  { value: 0, label: "Admin" },
+  { value: 1, label: "User" },
+];
+
+const UsersTable = ({
+  columns,
+  data,
+  loading,
+  onSearchChange = () => {},
+  onSelectType = () => {},
+  onShowUserDetail = () => {},
+}) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
 
   return (
     <div>
-      <div className='table__view'>
+      <div className="table__view">
         <h2>Manage User</h2>
-        <div className='table__view--search'>
-          <form className='search'>
+        <div className="table__view--search">
+          <form className="search">
             <label />
-            <input type='text' placeholder='State' />
-            <i className='bx bx-filter-alt' />
+            <Select
+                placeholder="State"
+                isSearchable={false}
+                isClearable={true}
+                styles={customStyles}
+                className="State"
+                onChange={(e) => onSelectType(e)}
+                options={options}
+              />
+            <i className="bx bx-filter-alt" />
           </form>
-          <form className='search'>
+          <form className="search">
             <label />
-            <input type='text' placeholder='Name' />
-            <i className='bx bx-search' />
+            <input
+              type="text"
+              placeholder="Name"
+              onChange={(e) => onSearchChange(e.target.value)}
+            />
+            <i className="bx bx-search" />
           </form>
-          <Link to='/admin/users/create'>
-            <button className='btn'>Create New User</button>
+          <Link to="/admin/users/create">
+            <button className="btn">Create New User</button>
           </Link>
         </div>
         <div>
@@ -31,26 +58,34 @@ const UsersTable = ({ columns, data, loading }) => {
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
                     <th {...column.getHeaderProps()}>
-                      {column.render('Header')}
+                      {column.render("Header")}
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
             {loading ? (
-              <div className='spinner'>
-                <i className='fas fa-spinner fa-spin'></i>
+              <div className="spinner">
+                <i className="fas fa-spinner fa-spin"></i>
               </div>
             ) : (
               <tbody {...getTableBodyProps()}>
                 {rows.map((row) => {
                   prepareRow(row);
                   return (
-                    <tr {...row.getRowProps()}>
+                    <tr
+                    id="tr-hover"
+                    {...row.getRowProps()}
+                    onClick={(e) => {
+                      if (!e.target.closest("#actions")) {
+                        onShowUserDetail(row.original);
+                      }
+                    }}
+                    >
                       {row.cells.map((cell) => {
                         return (
                           <td {...cell.getCellProps()}>
-                            {cell.render('Cell')}
+                            {cell.render("Cell")}
                           </td>
                         );
                       })}

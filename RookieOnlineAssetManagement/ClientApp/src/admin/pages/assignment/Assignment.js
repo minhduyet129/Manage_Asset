@@ -7,24 +7,14 @@ import ReactPaginate from "react-paginate";
 import { useEffect, useRef, useState, useMemo } from "react";
 import queryString from "query-string";
 
-import useDebounce from "../../../useDebounce";
 import AssignmentTable from "./AssignmentTable";
 import LayoutAdmin from "../layout/LayoutAdmin";
 import DeleteModal from "./DeleteModal";
-import HandleAPIUrl from "./HandleAPIUrl";
 import AssignmentDetailModal from "./AssignmentDetailModal";
+import { modalCustomStyle } from "../ModalCustomStyles"
 import "./Assignment.css";
 
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
-};
+
 
 Modal.setAppElement("#root");
 
@@ -87,7 +77,7 @@ function Assignment() {
     }
   };
 
-  const HandleClickDeleteBtn = (rowIndex) => {
+  const handleClickDeleteBtn = (rowIndex) => {
     if (!assignmentsRef.current) return;
     const id = assignmentsRef.current[rowIndex].id;
     if (id) {
@@ -142,6 +132,10 @@ function Assignment() {
     }
 
     typingTimoutRef.current = setTimeout(() => {
+      setPaginaion({
+        pageNumber: 1,
+        totalPages: 0
+      })
       setFilters({
         ...filters,
         keyword: value,
@@ -309,7 +303,7 @@ function Assignment() {
               &emsp;
               <span
                 className="font"
-                onClick={() => HandleClickDeleteBtn(rowIdx)}
+                onClick={() => handleClickDeleteBtn(rowIdx)}
               >
                 <i className="fas fa-times "></i>
               </span>
@@ -345,7 +339,7 @@ function Assignment() {
             nextLabel={"Next"}
             breakLabel={"..."}
             breakClassName={"break-me"}
-            pageCount={pagination.totalPages || 1}
+            pageCount={pagination.totalPages}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={handlePageClick}
@@ -358,7 +352,7 @@ function Assignment() {
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
-          style={customStyles}
+          style={modalCustomStyle}
         >
           <AssignmentDetailModal
             closeModal={closeModal}
@@ -366,7 +360,7 @@ function Assignment() {
           />
         </Modal>
       )}
-      <Modal isOpen={deleteModal} style={customStyles}>
+      <Modal isOpen={deleteModal} style={modalCustomStyle}>
         <DeleteModal
           closeDeleteModal={closeDeleteModal}
           onDeleteAssignment={handleDeleteAssignment}
