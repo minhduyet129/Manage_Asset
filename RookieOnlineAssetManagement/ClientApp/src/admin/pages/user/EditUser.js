@@ -8,6 +8,8 @@ import { Link, useHistory } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
+import moment from 'moment';
+
 
 const schema = Yup.object().shape({
   doB: Yup.date()
@@ -188,7 +190,7 @@ const EditUser = () => {
                   selected={joinedDate}
                   onChange={(d) => {
                     onChange(d);
-                    setJoinedDate(d);
+                    moment.utc(setJoinedDate(d)).format();
                     console.log(d);
                   }}
                   filterDate={isWeekday}
