@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace RookieOnlineAssetManagement.Controllers
 {
+    [Authorize(Roles =RoleName.Admin)]
     [ApiController]
     [Route("api/[Controller]")]
     public class AssetsController : ControllerBase
