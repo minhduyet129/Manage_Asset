@@ -31,7 +31,7 @@ const schema = Yup.object().shape({
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
-    .min(new Date(), 'Assigned Date must be later than today.'),
+    .min(new Date(new Date().setHours(new Date().getHours() - 24)), 'Assigned Date must be current or future.'),
 });
 
 const userInfoJSON = window.localStorage.getItem('userInfo')
@@ -43,9 +43,9 @@ function CreateAssignment() {
   const [fullName, setFullName] = useState();
   const [assetName, setAssetName] = useState();
   const [submitData, setSubmitData] = useState({
-    assignToId: '',
-    assetId: '',
-    assignedDate: '',
+    assignToId: null,
+    assetId: null,
+    assignedDate: null,
     assignById: userInfo.userId,
   });
 
@@ -89,16 +89,16 @@ function CreateAssignment() {
 
   const handleCancelUserModal = () => {
     setUserModal(false);
-    setFullName('');
+    setFullName(null);
     setSubmitData((prev) => {
       return {
         ...submitData,
-        assignToId: '',
+        assignToId: null,
       };
     });
     reset({
       ...submitData,
-      assignToId: '',
+      assignToId: null,
     });
   };
 
@@ -112,16 +112,16 @@ function CreateAssignment() {
 
   const handleCancelAssetModal = () => {
     setAssetModal(false);
-    setAssetName('');
+    setAssetName(null);
     setSubmitData((prev) => {
       return {
         ...submitData,
-        assetId: '',
+        assetId: null,
       };
     });
     reset({
       ...submitData,
-      assetId: '',
+      assetId: null,
     });
   };
 
@@ -146,11 +146,11 @@ function CreateAssignment() {
   };
 
   const handleSetAssignedDate = (e, onChange) => {
-    let utcDate = new Date(e.setHours(e.getHours() + 10));
+    let utcDate = new Date(e.setHours(e.getHours() + 7));
     onChange(utcDate);
     setSubmitData((prev) => {
       return {
-        ...submitData,
+        ...prev,
         assignedDate: utcDate,
       };
     });
@@ -212,7 +212,7 @@ function CreateAssignment() {
                   scrollableYearDropdown
                   dropdownMode='select'
                   className='input'
-                  error={errors.assignedDate}
+                  // error={errors.assignedDate}
                 />
               )}
               rules={{
