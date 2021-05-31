@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RookieOnlineAssetManagement.Data;
+using RookieOnlineAssetManagement.Entities;
 using RookieOnlineAssetManagement.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace RookieOnlineAssetManagement.Controllers
 {
+    [Authorize(Roles=RoleName.Admin)]
     [ApiController]
     [Route("api/[Controller]")]
     public class ReportsController : ControllerBase

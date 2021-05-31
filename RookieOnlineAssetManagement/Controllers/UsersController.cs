@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -167,7 +168,7 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             return "Male";
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -191,7 +192,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
             return Ok(new Response<UserResponseModel>(result));
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
@@ -259,13 +260,13 @@ namespace RookieOnlineAssetManagement.Controllers
             var response = PaginationHelper.CreatePagedResponse(result, filter.PageNumber, filter.PageSize, count);
             return Ok(response);
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpGet("roles")]
         public IActionResult GetRoleList()
         {
             return Ok(_roleManager.Roles);
         }
-
+        [Authorize(Roles=RoleName.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserModel model)
         {
@@ -323,7 +324,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(int id, UpdateUserModel model)
         {
@@ -375,7 +376,7 @@ namespace RookieOnlineAssetManagement.Controllers
             }
 
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpPut("disable/{id}")]
         public async Task<IActionResult> DisableUser(int id)
         {
@@ -447,7 +448,7 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             return Unauthorized("Username or password is incorrect. Please try again");
         }
-
+        [Authorize]
         [HttpPost("ChangPasswordFirstLogin")]
         public async Task<IActionResult> ChangePasswordFirstLogin(int userId,string newPassword)
         {
@@ -465,6 +466,7 @@ namespace RookieOnlineAssetManagement.Controllers
             
             return Ok("Your password has been changed successfully");
         }
+        [Authorize]
         [HttpPost("ChangPassword")]
         public async Task<IActionResult> ChangPassword(string userId,string oldPassword,string newPassword)
         {

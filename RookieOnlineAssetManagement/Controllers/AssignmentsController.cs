@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RookieOnlineAssetManagement.Data;
@@ -122,7 +123,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
             return response;
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpGet("{id}")]
         public async Task<IActionResult> UpdateAssignment(int id)
         {
@@ -147,7 +148,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 Note = assignment.Note,
             });
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetAllAssignment(string assignedDate, [FromQuery] PaginationFilter filter, string keyword, int? filterState, string sortBy, bool asc = true)
         {
@@ -244,9 +245,9 @@ namespace RookieOnlineAssetManagement.Controllers
             var response = PaginationHelper.CreatePagedResponse(result, filter.PageNumber, filter.PageSize, count);
             return Ok(response);
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpPost]
-        public async Task<IActionResult> CreateUser(AssignmentModel model)
+        public async Task<IActionResult> CreateAssignment(AssignmentModel model)
         {
             try
             {
@@ -287,7 +288,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAssignment(int id, AssignmentModel model)
         {
@@ -322,7 +323,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 AssignToId = assignment.AssignToId
             });
         }
-
+        [Authorize(Roles =RoleName.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAssignment(int id)
         {
