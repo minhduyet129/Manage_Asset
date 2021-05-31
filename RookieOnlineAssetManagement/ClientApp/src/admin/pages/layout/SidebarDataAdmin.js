@@ -34,9 +34,4 @@ export const SidebarData = [
     path: '/admin/reports',
     icon: 'bx bxs-minus-circle',
   },
-  {
-    title: 'Logout',
-    path: '/admin/login',
-    icon: 'bx bxs-exit',
-  },
 ];
