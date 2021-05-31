@@ -125,7 +125,7 @@ namespace RookieOnlineAssetManagement.Controllers
         }
         [Authorize(Roles =RoleName.Admin)]
         [HttpGet("{id}")]
-        public async Task<IActionResult> UpdateAssignment(int id)
+        public async Task<IActionResult> GetAssignmentById(int id)
         {
             var assignment = await _dbContext.Assignments
                 .Include(a => a.Asset)
@@ -292,36 +292,42 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAssignment(int id, AssignmentModel model)
         {
-            var assignment = await _dbContext.Assignments.SingleOrDefaultAsync(a => a.Id == id);
-
-            var stateMessage = "Cannot edit because the assignment has been responded by assignee";
-            var validateState = ValidateAssignmentState(assignment.State, stateMessage);
-            if (validateState.Errors.Count > 0) return BadRequest(validateState.Errors);
-
-            var validate = ValidateAssignment(model);
-            if (validate.Errors.Count > 0) return BadRequest(validate.Errors);
-
-            assignment.AssignToId = model.AssignToId;
-            assignment.AssignById = model.AssignById;
-            assignment.AssetId = model.AssetId;
-            assignment.AssignedDate = model.AssignedDate;
-            assignment.Note = model.Note;
-
-            await _dbContext.SaveChangesAsync();
-
-            return Ok(new AssignmentResponseModel
+            try
             {
-                Id = assignment.Id,
-                AssetCode = assignment.Asset.AssetCode,
-                AssetName = assignment.Asset.AssetName,
-                AssignTo = assignment.AssignTo.UserName,
-                AssignBy = assignment.AssignBy.UserName,
-                AssignDate = assignment.AssignedDate,
-                State = GetAssignmentState(assignment.State),
-                AssetId = assignment.AssetId,
-                AssignById = assignment.AssignById,
-                AssignToId = assignment.AssignToId
-            });
+                var assignment = await _dbContext.Assignments.SingleOrDefaultAsync(a => a.Id == id);
+
+                if (assignment == null) return NotFound("Not found assignment");
+                if (assignment.State != AssignmentState.Waiting) return BadRequest("Assignment must have state Waiting for acceptance ");
+                var assetOld = await _dbContext.Assets.SingleOrDefaultAsync(x => x.Id == assignment.AssetId);
+                if (assetOld == null) return NotFound("Not found old asset of assignment ");
+                assetOld.State = AssetState.Available;
+
+                assignment.AssignToId = model.AssignToId;
+                assignment.AssetId = model.AssetId;
+                assignment.AssignedDate = model.AssignedDate;
+                assignment.Note = model.Note;
+
+                await _dbContext.SaveChangesAsync();
+
+                return Ok(new AssignmentResponseModel
+                {
+                    Id = assignment.Id,
+                    AssetCode = assignment.Asset.AssetCode,
+                    AssetName = assignment.Asset.AssetName,
+                    AssignTo = assignment.AssignTo.UserName,
+                    AssignBy = assignment.AssignBy.UserName,
+                    AssignDate = assignment.AssignedDate,
+                    State = GetAssignmentState(assignment.State),
+                    AssetId = assignment.AssetId,
+                    AssignById = assignment.AssignById,
+                    AssignToId = assignment.AssignToId
+                });
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
         }
         [Authorize(Roles =RoleName.Admin)]
         [HttpDelete("{id}")]
@@ -342,7 +348,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok();
         }
 
-        //[Authorize(Roles =RoleName.User)]
+        [Authorize(Roles = RoleName.User)]
         [HttpGet("ForUser/{id}")]
         public async Task<IActionResult> GetAssignmentForUser(int id, [FromQuery] PaginationFilter filter, string sortBy, bool asc = true)
         {
@@ -406,6 +412,56 @@ namespace RookieOnlineAssetManagement.Controllers
                 .ToListAsync();
             var response = PaginationHelper.CreatePagedResponse(data, filter.PageNumber, filter.PageSize, count);
             return Ok(response);
+        }
+        [Authorize(Roles =RoleName.User)]
+        [HttpPut("{id}/UserAcceptAssignment")]
+        public async Task<IActionResult> AcceptAssignment(int id)
+        {
+            try
+            {
+                var assign = await _dbContext.Assignments.FindAsync(id);
+                if (assign == null)
+                {
+                    return NotFound("Not found!");
+                }
+                if (assign.State != AssignmentState.Waiting) return BadRequest("Request must have state Waiting for acceptance!");
+                assign.State = AssignmentState.Accepted;
+                var asset = await _dbContext.Assets.SingleOrDefaultAsync(x => x.Id == assign.AssetId);
+                if (asset == null) return NotFound("Not find asset of Assignment");
+                asset.State = AssetState.Assigned;
+                await _dbContext.SaveChangesAsync();
+                return Ok(assign);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
+        }
+        [Authorize(Roles = RoleName.User)]
+        [HttpPut("{id}/UserDeclineAssignment")]
+        public async Task<IActionResult> DeclineAssignment(int id)
+        {
+            try
+            {
+                var assign = await _dbContext.Assignments.FindAsync(id);
+                if (assign == null)
+                {
+                    return NotFound("Not found!");
+                }
+                if (assign.State != AssignmentState.Waiting) return BadRequest("Request must have state Waiting for acceptance!");
+                assign.State = AssignmentState.Declined;
+                var asset = await _dbContext.Assets.SingleOrDefaultAsync(x => x.Id == assign.AssetId);
+                if (asset == null) return NotFound("Not find asset of Assignment");
+                asset.State = AssetState.Available;
+                await _dbContext.SaveChangesAsync();
+                return Ok(assign);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
+            }
         }
     }
 }
