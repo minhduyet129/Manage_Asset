@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 
 function useDebounce(cb, delay, depens) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const _cb = useCallback(cb, depens);
   useEffect(() => {
     const timer = setTimeout(_cb, delay);
