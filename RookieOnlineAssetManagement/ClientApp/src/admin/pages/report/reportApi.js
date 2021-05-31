@@ -1,7 +1,7 @@
-import { api } from '../../../api';
 
+import axios from 'axios';
 function getReports() {
-  return api.get('/Reports');
+  return axios.get('api/Reports');
 }
 
 export const getApiReport = {

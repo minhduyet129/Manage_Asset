@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { api } from '../api';
+import axios from 'axios'
 
 function Login() {
   const history = useHistory();
@@ -16,7 +16,7 @@ function Login() {
 
   const onLogin = async (data) => {
     setIsLoading(true);
-    const response = await api.post('/users/login', {
+    const response = await axios.post('api/users/login', {
       username: data.username,
       password: data.password,
     });
