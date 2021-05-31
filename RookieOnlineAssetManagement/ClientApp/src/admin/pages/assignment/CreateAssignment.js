@@ -26,8 +26,8 @@ const customStyles = {
 };
 
 const schema = Yup.object().shape({
-  assignToId: Yup.number().required('User is required'),
-  assetId: Yup.number().required('Asset is required'),
+  assignToId: Yup.string().required('User is required'),
+  assetId: Yup.string().required('Asset is required'),
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
@@ -165,7 +165,7 @@ function CreateAssignment() {
           <div className='form__field'>
             <label>User</label>
             <input className='input' {...register('assignToId')} hidden />
-            <input className='input' value={fullName} disabled required />
+            <input className='input' value={fullName} disabled required error={errors.assignToId}/>
             <div className='search-btn' onClick={openUserModal}>
               <i className='fas fa-search'></i>
             </div>
@@ -182,6 +182,7 @@ function CreateAssignment() {
               value={assetName}
               name='assetName'
               disabled
+              error={errors.assetId}
             />
             <div className='search-btn' onClick={openAssetModal}>
               <i className='fas fa-search'></i>
