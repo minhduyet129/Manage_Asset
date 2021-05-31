@@ -14,6 +14,7 @@ import RequestForReturning from './admin/pages/request/RequestForReturning';
 import Report from './admin/pages/report/Report';
 import Login from './login/Login';
 import { ToastContainer } from 'react-toastify';
+import UserHome from './user/pages/home/UserHome';
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
@@ -75,7 +76,7 @@ function App() {
       <ToastContainer position='top-center' hideProgressBar />
       {/* Add Pages for normal users later */}
       <Switch>
-        <Route path='/login' exact component={Login} />
+        <Route path='/' exact component={UserHome} />
       </Switch>
     </>
   ) : (

@@ -43,7 +43,6 @@ const CreateAsset = (props) => {
   const [categories, setCategories] = useState([]);
   const [changes, setChanges] = useState(false);
   const history = useHistory();
-  const [selectedOption, setSelectedOption] = useState(null);
 
   const onClick = (e) => {
     handleChange()
@@ -54,7 +53,6 @@ const CreateAsset = (props) => {
     register,
     handleSubmit,
     control,
-    setValue,
     reset,
     formState: { errors },
   } = useForm({
@@ -173,13 +171,12 @@ const CreateAsset = (props) => {
                   id='installedDate'
                   selected={installedDate}
                   onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() + 10));
+                    let d = new Date(e.setHours(e.getHours() + 7));
                     onChange(d);
                     setInstalledDate(d);
                     console.log(d);
                   }}
                   placeholderText='MM/DD/YY'
-                  isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown

@@ -1,24 +1,23 @@
-import { api } from '../../../api';
-
+import axios from 'axios';
 // Get an user
 function getbyid(id) {
-  return api.get(`/Users/${id}`);
+  return axios.get(`api/Users/${id}`);
 }
 
 // Get users
 function getall(pageNumber) {
-  return api.get(`/Users?PageNumber=${pageNumber}`);
+  return axios.get(`api/Users?PageNumber=${pageNumber}`);
 }
 
 // Create a new user
 function create(users) {
-  return api.post('/Users', users);
+  return axios.post('api/Users', users);
 }
 
 //Edit an user
 
 function edit(users, id) {
-  return api.put(`/Users/${id}`, {
+  return axios.put(`api/Users/${id}`, {
     doB: users.doB,
     joinedDate: users.joinedDate,
     gender: users.gender,
@@ -27,7 +26,7 @@ function edit(users, id) {
 }
 
 function disable(id) {
-  return api.put(`/Users/disable/${id}`);
+  return axios.put(`api/Users/disable/${id}`);
 }
 
 export const useCreateUser = {

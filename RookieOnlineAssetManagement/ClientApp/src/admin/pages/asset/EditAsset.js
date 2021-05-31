@@ -40,7 +40,7 @@ const EditAsset = (props) => {
           assetCode: res.data[0].assetCode,
           assetName: res.data[0].assetName,
           specification: res.data[0].specification,
-          installedDate: res.data[0].installedDate,
+          installedDate: setDateTime(res.data[0].installedDate),
           categoryName: res.data[0].categoryName,
           state: res.data[0].assetState,
         });
@@ -51,11 +51,11 @@ const EditAsset = (props) => {
       });
   };
 
-  const setDateTime = (date) => {
-    date = date.slice(0, 10);
-
-    let newDate = date.split('-').join(',');
-    return new Date(newDate);
+  const setDateTime = (data) => {
+    let d = new Date(data.slice(0, 10))
+    let date = new Date(d.setHours(d.getHours() + 7))
+    
+    return date;
   };
 
   function updateAssets(assets) {
@@ -130,13 +130,11 @@ const EditAsset = (props) => {
                   id='doB'
                   selected={installedDate}
                   onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() + 10));
-                    onChange(d);
-                    setInstalledDate(d);
-                    console.log(d);
+                    onChange(e);
+                    setInstalledDate(e);
+                    console.log(e);
                   }}
                   placeholderText='MM/DD/YY'
-                  isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown

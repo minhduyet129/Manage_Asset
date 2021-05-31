@@ -9,7 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import moment from 'moment';
-
+import { addHours } from 'date-fns';
 
 const schema = Yup.object().shape({
   doB: Yup.date()
@@ -46,16 +46,16 @@ const EditUser = () => {
       .getbyid(id)
       .then((res) => {
         setUsers(res.data.data);
-        console.log(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
+        console.log(setDateTime(res.data.data.doB))
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
           id: res.data.data.id,
           staffCode: res.data.data.staffCode,
           firstName: res.data.data.firstName,
           lastName: res.data.data.lastName,
-          doB: res.data.data.doB,
-          joinedDate: res.data.data.joinedDate,
+          joinedDate: setDateTime(res.data.data.joinedDate),
+          doB: setDateTime(res.data.data.doB),
           gender: getGenderEnum(res.data.data.gender),
           location: res.data.data.location,
           userName: res.data.data.userName,
@@ -92,11 +92,11 @@ const EditUser = () => {
   });
   const { errors } = formState;
 
-  const setDateTime = (date) => {
-    date = date.slice(0, 10);
-
-    let newDate = date.split('-').join(',');
-    return new Date(newDate);
+  const setDateTime = (data) => {
+    let d = new Date(data.slice(0, 10))
+    let date = new Date(d.setHours(d.getHours() + 7))
+    
+    return date;
   };
 
   const getGenderEnum = (gender) => {
@@ -162,7 +162,6 @@ const EditUser = () => {
                     console.log(d);
                   }}
                   placeholderText='MM/DD/YY'
-                  isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown
@@ -190,12 +189,11 @@ const EditUser = () => {
                   selected={joinedDate}
                   onChange={(d) => {
                     onChange(d);
-                    moment.utc(setJoinedDate(d)).format();
+                    setJoinedDate(d)
                     console.log(d);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
-                  isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown
