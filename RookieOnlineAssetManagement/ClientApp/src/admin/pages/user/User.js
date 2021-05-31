@@ -112,6 +112,7 @@ const User = () => {
   };
 
   const handleSelectType = (event) => {
+    setTotalPages(0);
     if (!event) {
       event = {
         target: "",
@@ -316,8 +317,6 @@ const User = () => {
           title="Do you want to disable this user?"
         />
       </Modal>
-
-      {/* {"Are you want to disable this user?"} */}
     </>
   );
 };

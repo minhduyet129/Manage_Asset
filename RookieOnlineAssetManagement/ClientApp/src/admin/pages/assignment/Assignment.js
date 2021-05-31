@@ -11,10 +11,8 @@ import AssignmentTable from "./AssignmentTable";
 import LayoutAdmin from "../layout/LayoutAdmin";
 import DeleteModal from "./DeleteModal";
 import AssignmentDetailModal from "./AssignmentDetailModal";
-import { modalCustomStyle } from "../ModalCustomStyles"
+import { modalCustomStyle } from "../ModalCustomStyles";
 import "./Assignment.css";
-
-
 
 Modal.setAppElement("#root");
 
@@ -22,14 +20,14 @@ function Assignment() {
   const [assignments, setAssignments] = useState([]);
   const [assignment, setAssignment] = useState();
   const [loading, setLoading] = useState(false);
-  const [pagination, setPaginaion] = useState({
-    totalPages: 0,
-    pageNumber: 1,
-  });
   const [modalIsOpen, setIsOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState();
   const [assignedDate, setAssignedDate] = useState();
+  const [pagination, setPaginaion] = useState({
+    totalPages: 0,
+    pageNumber: 1,
+  });
   const [filters, setFilters] = useState({
     PageNumber: 1,
     assignedDate: null,
@@ -134,8 +132,8 @@ function Assignment() {
     typingTimoutRef.current = setTimeout(() => {
       setPaginaion({
         pageNumber: 1,
-        totalPages: 0
-      })
+        totalPages: 0,
+      });
       setFilters({
         ...filters,
         keyword: value,
@@ -145,13 +143,26 @@ function Assignment() {
   };
 
   const handleFilterAssignedDate = (value) => {
-    const date = format(new Date(value), "dd/MM/yyyy");
-    setAssignedDate(value);
-    setFilters({
-      ...filters,
-      PageNumber: 1,
-      assignedDate: date,
+    setPaginaion({
+      totalPages: 0,
     });
+
+    if (!value) {
+      setAssignedDate(null)
+      setFilters({
+        ...filters,
+        PageNumber: 1,
+        assignedDate: null,
+      });
+    } else {
+      const date = format(new Date(value), "dd/MM/yyyy");
+      setAssignedDate(value);
+      setFilters({
+        ...filters,
+        PageNumber: 1,
+        assignedDate: date,
+      });
+    }
   };
 
   const openModal = () => {
@@ -172,6 +183,9 @@ function Assignment() {
   };
 
   const handleSelectState = (event) => {
+    setPaginaion({
+      totalPages: 0,
+    });
     if (!event) {
       event = {
         target: "",

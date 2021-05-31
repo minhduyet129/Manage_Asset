@@ -8,8 +8,6 @@ import { Link, useHistory } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import moment from 'moment';
-import { addHours } from 'date-fns';
 
 const schema = Yup.object().shape({
   doB: Yup.date()
