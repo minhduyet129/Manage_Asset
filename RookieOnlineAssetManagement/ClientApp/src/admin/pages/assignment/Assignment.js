@@ -1,67 +1,71 @@
-import axios from 'axios';
-import Modal from 'react-modal';
-import { format } from 'date-fns';
-import { toast } from 'react-toastify';
-import { useHistory } from 'react-router';
-import ReactPaginate from 'react-paginate';
-import { useEffect, useRef, useState, useMemo } from 'react';
-import useDebounce from '../../../useDebounce';
-import AssignmentTable from './AssignmentTable';
-import LayoutAdmin from '../layout/LayoutAdmin';
-import DeleteModal from './DeleteModal';
-import HandleAPIUrl from './HandleAPIUrl';
-import AssignmentDetailModal from './AssignmentDetailModal';
-import './Assignment.css';
+import axios from "axios";
+import Modal from "react-modal";
+import { format } from "date-fns";
+import { toast } from "react-toastify";
+import { useHistory } from "react-router";
+import ReactPaginate from "react-paginate";
+import { useEffect, useRef, useState, useMemo } from "react";
+import queryString from "query-string";
+
+import useDebounce from "../../../useDebounce";
+import AssignmentTable from "./AssignmentTable";
+import LayoutAdmin from "../layout/LayoutAdmin";
+import DeleteModal from "./DeleteModal";
+import HandleAPIUrl from "./HandleAPIUrl";
+import AssignmentDetailModal from "./AssignmentDetailModal";
+import "./Assignment.css";
 
 const customStyles = {
   content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
   },
 };
 
-Modal.setAppElement('#root');
+Modal.setAppElement("#root");
 
 function Assignment() {
   const [assignments, setAssignments] = useState([]);
   const [assignment, setAssignment] = useState();
   const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState();
-  const [pageNumber, setPageNumber] = useState(1);
-  const [searchText, setSearchText] = useState('');
-  const [filterState, setFilterState] = useState(-1);
+  const [pagination, setPaginaion] = useState({
+    totalPages: 0,
+    pageNumber: 1,
+  });
   const [modalIsOpen, setIsOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState();
-  const [filterAssignedDate, setFilterAssignedDate] = useState();
-  const [sort, setSort] = useState({
-    sortBy: 'assetCode',
+  const [assignedDate, setAssignedDate] = useState();
+  const [filters, setFilters] = useState({
+    PageNumber: 1,
+    assignedDate: null,
+    filterState: null,
+    PageSize: 10,
+    keyword: null,
+    sortBy: null,
     asc: true,
   });
 
   const history = useHistory();
 
   const assignmentsRef = useRef([]);
+  const typingTimoutRef = useRef(null);
 
   const callAssignmentsAPI = async () => {
+    const paramString = queryString.stringify(filters);
     axios
-      .get(
-        HandleAPIUrl(
-          pageNumber,
-          sort,
-          filterState,
-          filterAssignedDate,
-          searchText
-        )
-      )
+      .get(`api/Assignments?${paramString}`)
       .then((res) => {
         assignmentsRef.current = res.data.data;
         setAssignments(res.data.data);
-        setTotalPages(res.data.totalPages);
+        setPaginaion({
+          totalPages: res.data.totalPages,
+          pageNumber: res.data.pageNumber,
+        });
         setLoading(false);
       })
       .catch((err) => {
@@ -72,18 +76,8 @@ function Assignment() {
   useEffect(() => {
     setLoading(true);
     callAssignmentsAPI();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageNumber, sort, filterState, filterAssignedDate]);
-
-  useDebounce(
-    () => {
-      setTotalPages(0);
-      setPageNumber(1);
-      callAssignmentsAPI();
-    },
-    500,
-    [searchText, filterState, filterAssignedDate, sort]
-  );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const getAssignmentId = (rowIndex) => {
     if (!assignmentsRef.current) return;
@@ -104,55 +98,66 @@ function Assignment() {
 
   const handlePageClick = (data) => {
     const currentPage = data.selected;
-    setPageNumber(currentPage + 1);
+    setFilters({
+      ...filters,
+      PageNumber: currentPage + 1,
+    });
   };
 
   const handleSortIcon = (sortBy) => {
-    if (sort.sortBy === sortBy) {
-      if (sort.asc) {
-        return <i className='fas fa-caret-down'></i>;
+    if (filters.sortBy === sortBy) {
+      if (filters.asc) {
+        return <i className="fas fa-caret-down"></i>;
       }
-      return <i className='fas fa-caret-up'></i>;
+      return <i className="fas fa-caret-up"></i>;
     }
-    return <i className='fas fa-caret-down'></i>;
+    return <i className="fas fa-caret-down"></i>;
   };
 
   const handleSortBy = (sortBy) => {
-    setSort((prevSort) => {
-      if (prevSort.sortBy === sortBy) {
+    setPaginaion({
+      totalPages: 0,
+      pageNumber: 1,
+    });
+    setFilters((prev) => {
+      if (prev.sortBy === sortBy) {
         return {
-          ...prevSort,
-          asc: !prevSort.asc,
+          ...prev,
+          asc: !prev.asc,
+          PageNumber: 1,
         };
       }
       return {
-        ...prevSort,
+        ...prev,
         sortBy: sortBy,
-        asc: false,
+        asc: true,
+        PageNumber: 1,
       };
     });
   };
 
   const handleSearchChange = (value) => {
-    setSearchText(value);
-  };
-
-  
-
-  const handleFilterState = (value) => {
-    setTotalPages(0);
-    setPageNumber(1);
-    if (value === '') {
-      setFilterState(-1);
-    } else {
-      setFilterState(Number(value));
+    if (typingTimoutRef.current) {
+      clearTimeout(typingTimoutRef.current);
     }
+
+    typingTimoutRef.current = setTimeout(() => {
+      setFilters({
+        ...filters,
+        keyword: value,
+        PageNumber: 1,
+      });
+    }, 500);
   };
 
   const handleFilterAssignedDate = (value) => {
-    setTotalPages(0);
-    setPageNumber(1);
-    setFilterAssignedDate(value);
+    const date = format(new Date(value), "dd/MM/yyyy");
+    setAssignedDate(value);
+    setFilters({
+      ...filters,
+      PageNumber: 1,
+      assignedDate: date,
+    });
   };
 
   const openModal = () => {
@@ -172,9 +177,19 @@ function Assignment() {
     openModal();
   };
 
-  const handleSelectState = (value) => {
-    setFilterState(value)
-  }
+  const handleSelectState = (event) => {
+    if (!event) {
+      event = {
+        target: "",
+        value: null,
+      };
+    }
+    setFilters({
+      ...filters,
+      filterState: event.value,
+      PageNumber: 1,
+    });
+  };
 
   const handleDeleteAssignment = () => {
     axios
@@ -182,10 +197,10 @@ function Assignment() {
       .then((res) => {
         callAssignmentsAPI();
         setDeleteModal(false);
-        toast.success('Delete Successfully');
+        toast.success("Delete Successfully");
       })
       .catch((err) => {
-        toast.success('Delete Failed');
+        toast.success("Delete Failed");
         console.log(err);
       });
   };
@@ -193,121 +208,122 @@ function Assignment() {
   const columns = useMemo(
     () => [
       {
-        Header: 'Id',
-        accessor: 'id',
+        Header: "Id",
+        accessor: "id",
       },
       {
         Header: () => {
           return (
             <div
-              className='table-header'
-              onClick={() => handleSortBy('assetCode')}
+              className="table-header"
+              onClick={() => handleSortBy("assetCode")}
             >
               <span>Asset Code</span>
-              {handleSortIcon('assetCode')}
+              {handleSortIcon("assetCode")}
             </div>
           );
         },
-        accessor: 'assetCode',
+        accessor: "assetCode",
       },
       {
         Header: () => {
           return (
             <div
-              className='table-header'
-              onClick={() => handleSortBy('assetName')}
+              className="table-header"
+              onClick={() => handleSortBy("assetName")}
             >
               <span>Asset Name</span>
-              {handleSortIcon('assetName')}
+              {handleSortIcon("assetName")}
             </div>
           );
         },
-        accessor: 'assetName',
+        accessor: "assetName",
       },
       {
         Header: () => {
           return (
             <div
-              className='table-header'
-              onClick={() => handleSortBy('assignTo')}
+              className="table-header"
+              onClick={() => handleSortBy("assignTo")}
             >
               <span>Assigned to</span>
-              {handleSortIcon('assignTo')}
+              {handleSortIcon("assignTo")}
             </div>
           );
         },
-        accessor: 'assignTo',
+        accessor: "assignTo",
       },
       {
         Header: () => {
           return (
             <div
-              className='table-header'
-              onClick={() => handleSortBy('assignBy')}
+              className="table-header"
+              onClick={() => handleSortBy("assignBy")}
             >
               <span>Assigned by</span>
-              {handleSortIcon('assignBy')}
+              {handleSortIcon("assignBy")}
             </div>
           );
         },
-        accessor: 'assignBy',
+        accessor: "assignBy",
       },
       {
         Header: () => {
           return (
             <div
-              className='table-header'
-              onClick={() => handleSortBy('assignDate')}
+              className="table-header"
+              onClick={() => handleSortBy("assignDate")}
             >
               <span>Assigned Date</span>
-              {handleSortIcon('assignDate')}
+              {handleSortIcon("assignDate")}
             </div>
           );
         },
-        accessor: 'assignDate',
+        accessor: "assignDate",
         Cell: ({ value }) => {
-          return format(new Date(value), 'dd/MM/yyyy');
+          return format(new Date(value), "dd/MM/yyyy");
         },
       },
       {
         Header: () => {
           return (
-            <div className='table-header' onClick={() => handleSortBy('state')}>
+            <div className="table-header" onClick={() => handleSortBy("state")}>
               <span>State</span>
-              {handleSortIcon('state')}
+              {handleSortIcon("state")}
             </div>
           );
         },
-        accessor: 'state',
+        accessor: "state",
       },
       {
-        Header: 'Actions',
-        accessor: 'actions',
+        Header: "Actions",
+        accessor: "actions",
         Cell: (props) => {
           const rowIdx = props.row.id;
 
           return (
-            <div id='actions' style={{ display: 'flex' }}>
-              <span className='font' onClick={() => getAssignmentId(rowIdx)}>
-                <i className='bx bx-edit'></i>
+            <div id="actions" style={{ display: "flex" }}>
+              <span className="font" onClick={() => getAssignmentId(rowIdx)}>
+                <i className="bx bx-edit"></i>
               </span>
               &emsp;
               <span
-                className='font'
+                className="font"
                 onClick={() => HandleClickDeleteBtn(rowIdx)}
               >
-                <i className='fas fa-times '></i>
+                <i className="fas fa-times "></i>
               </span>
               &emsp;
-              <span className='font undo-icon'>
-                <i className='fas fa-undo'></i>
+              <span className="font undo-icon">
+                <i className="fas fa-undo"></i>
               </span>
             </div>
           );
         },
       },
     ],
-    [sort]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filters.sortBy]
   );
 
   return (
@@ -316,26 +332,25 @@ function Assignment() {
         columns={columns}
         data={assignments}
         loading={loading}
-        filterAssignedDate={filterAssignedDate}
+        filterAssignedDate={assignedDate}
         onSearch={handleSearchChange}
-        onFilterState={handleFilterState}
         onClickAssignment={handleOnClickAssignment}
         onFilterAssignedDate={handleFilterAssignedDate}
         onSelectStateOption={handleSelectState}
       />
-      <div className='paging-box'>
-        {totalPages && (
+      <div className="paging-box">
+        {pagination.totalPages > 0 && (
           <ReactPaginate
-            previousLabel={'Previous'}
-            nextLabel={'Next'}
-            breakLabel={'...'}
-            breakClassName={'break-me'}
-            pageCount={totalPages}
+            previousLabel={"Previous"}
+            nextLabel={"Next"}
+            breakLabel={"..."}
+            breakClassName={"break-me"}
+            pageCount={pagination.totalPages || 1}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={handlePageClick}
-            containerClassName={'pagination'}
-            activeClassName={'active'}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
           />
         )}
       </div>

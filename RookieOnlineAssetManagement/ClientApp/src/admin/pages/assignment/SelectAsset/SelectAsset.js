@@ -1,44 +1,40 @@
-import axios from 'axios';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { Waypoint } from 'react-waypoint';
-import useDebounce from '../../../../useDebounce';
+import queryString from 'query-string'
+import axios from 'axios';
+
 import SelectAssetTable from './SelectAssetTable';
 
 function SelectAsset({ onSelectAsset, onSaveAssetModal, onCancelAssetModal }) {
   const [assets, setAssets] = useState([]);
-  const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchText, setSearchText] = useState('');
-  const [sort, setSort] = useState({
-    sortBy: 'id',
+  const [filters, setFilters] = useState({
+    sortBy: null,
     asc: true,
-  });
+    PageNumber: 1,
+    PageSize: 10,
+    keyword: null,
+  })
+
+  const typingTimoutRef = useRef(null)
 
   useEffect(() => {
-    if (searchText === '') {
-      let url = `api/Assets/GetAssetAvailable?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}`;
+    const paramString = queryString.stringify(filters)
+      let url = `api/Assets/GetAssetAvailable?${paramString}`;
       axios
         .get(url)
         .then((res) => {
-          setTotalPages(res.data.totalPages);
+          setTotalPages(res.data.totalPages)
           setAssets((prevState) => [...prevState, ...res.data.data]);
         })
         .catch((err) => {
           console.log(err);
         });
-    }
-  }, [pageNumber, sort, searchText]);
-
-  useEffect(() => {
-    if (searchText !== '') {
-      setAssets([]);
-      setPageNumber(1);
-    }
-  }, [searchText]);
+  }, [filters]);
 
   const handleSortIcon = (sortBy) => {
-    if (sort.sortBy === sortBy) {
-      if (sort.asc) {
+    if (filters.sortBy === sortBy) {
+      if (filters.asc) {
         return <i className='fas fa-caret-down'></i>;
       }
       return <i className='fas fa-caret-up'></i>;
@@ -47,47 +43,38 @@ function SelectAsset({ onSelectAsset, onSaveAssetModal, onCancelAssetModal }) {
   };
 
   const handleSortBy = (sortBy) => {
-    setSort((prevSort) => {
-      setAssets([]);
-      setPageNumber(1);
-      if (prevSort.sortBy === sortBy) {
+    setAssets([]);
+    setFilters((prev) => {
+      if (prev.sortBy === sortBy) {
         return {
-          ...prevSort,
-          asc: !prevSort.asc,
+          ...prev,
+          asc: !prev.asc,
+          PageNumber: 1
         };
       }
       return {
-        ...prevSort,
+        ...prev,
         sortBy: sortBy,
         asc: true,
+        PageNumber: 1
       };
     });
   };
 
   const handleSearchChange = (value) => {
-    setSearchText(value);
-  };
+    if (typingTimoutRef.current) {
+      clearTimeout(typingTimoutRef.current);
+    }
 
-  useDebounce(
-    () => {
-      if (searchText !== '') {
-        let url = `api/Assets/GetAssetAvailable?PageNumber=${pageNumber}&PageSize=10&sortBy=${sort.sortBy}&asc=${sort.asc}&keyword=${searchText}`;
-        axios
-          .get(url)
-          .then((res) => {
-            setTotalPages(res.data.totalPages);
-            setAssets((prevState) => {
-              return [...prevState, ...res.data.data];
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    },
-    500,
-    [searchText, sort, pageNumber]
-  );
+    typingTimoutRef.current = setTimeout(() => {
+      setAssets([])
+      setFilters({
+        ...filters,
+        keyword: value,
+        pageNumber: 1,
+      });
+    }, 500);
+  };
 
   const columns = useMemo(
     () => [
@@ -99,9 +86,14 @@ function SelectAsset({ onSelectAsset, onSaveAssetModal, onCancelAssetModal }) {
               onEnter={() => {
                 if (
                   assets.length - 1 === Number(d.row.id) &&
-                  Number(d.row.id) < totalPages - 1
+                  filters.PageNumber < totalPages - 1
                 ) {
-                  setPageNumber((prev) => prev + 1);
+                  setFilters(prev => {
+                    return {
+                      ...prev,
+                      PageNumber: prev.PageNumber + 1
+                    }
+                  });
                 }
               }}
             />
@@ -152,6 +144,7 @@ function SelectAsset({ onSelectAsset, onSaveAssetModal, onCancelAssetModal }) {
         accessor: 'categoryName',
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [assets]
   );
   return (
