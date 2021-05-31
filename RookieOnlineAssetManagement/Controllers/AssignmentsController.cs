@@ -341,5 +341,71 @@ namespace RookieOnlineAssetManagement.Controllers
 
             return Ok();
         }
+
+        //[Authorize(Roles =RoleName.User)]
+        [HttpGet("ForUser/{id}")]
+        public async Task<IActionResult> GetAssignmentForUser(int id, [FromQuery] PaginationFilter filter, string sortBy, bool asc = true)
+        {
+            var queryable = from a in _dbContext.Assignments
+                         join b in _dbContext.Assets
+                         on a.AssetId equals b.Id
+                         join c in _dbContext.Users
+                         on a.AssignById equals c.Id into f
+                         from c in f.DefaultIfEmpty()
+
+                         where a.AssignToId == id
+                         where a.AssignedDate <= DateTime.Now
+                         select new
+                         {
+                             AssignmentId=a.Id,
+                             AssetCode=b.AssetCode,
+                             AssetName=b.AssetName,
+                             AssignedBy=c.UserName,
+                             AssignedDate=a.AssignedDate,
+                             State =a.State
+
+                         };
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    
+
+                    case "assetCode":
+                        queryable = asc ? queryable.OrderBy(u => u.AssetCode) : queryable.OrderByDescending(u => u.AssetCode);
+                        break;
+
+                    case "assetName":
+                        queryable = asc ? queryable.OrderBy(u => u.AssetName) : queryable.OrderByDescending(u => u.AssetName);
+                        break;
+
+                    
+
+                    case "assignBy":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignedBy) : queryable.OrderByDescending(u => u.AssignedBy);
+                        break;
+
+                    case "assignDate":
+                        queryable = asc ? queryable.OrderBy(u => u.AssignedDate) : queryable.OrderByDescending(u => u.AssignedDate);
+                        break;
+
+                    case "state":
+                        queryable = asc ? queryable.OrderBy(u => u.State) : queryable.OrderByDescending(u => u.State);
+                        break;
+
+                    default:
+                        queryable = asc ? queryable.OrderBy(u => u.AssignmentId) : queryable.OrderByDescending(u => u.AssignmentId);
+                        break;
+                }
+            }
+
+            var count = await queryable.CountAsync();
+            var data = await queryable
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+            var response = PaginationHelper.CreatePagedResponse(data, filter.PageNumber, filter.PageSize, count);
+            return Ok(response);
+        }
     }
 }

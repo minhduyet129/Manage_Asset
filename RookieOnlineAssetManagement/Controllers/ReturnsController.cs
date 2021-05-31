@@ -154,6 +154,12 @@ namespace RookieOnlineAssetManagement.Controllers
                     return NotFound("Not found assignment with assignmentId in return asset! ");
                 }
                 assignment.State = AssignmentState.Returned;
+                var asset = _context.Assets.SingleOrDefault(x => x.Id == assignment.AssetId);
+                if (asset == null)
+                {
+                    return NotFound("Not found asset with assignment in return asset!");
+                }
+                asset.State = AssetState.Available;
                 await _context.SaveChangesAsync();
                 return Ok(request);
             }
