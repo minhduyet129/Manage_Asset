@@ -25,13 +25,16 @@ const customStyles = {
 };
 
 const schema = Yup.object().shape({
-  assignToId: Yup.number().required('User is required'),
-  assetId: Yup.number().required('Asset is required'),
+  assignToId: Yup.string().required('User is required'),
+  assetId: Yup.string().required('Asset is required'),
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
     .min(new Date(), 'Assigned Date must be later than today.'),
 });
+
+const userInfoJSON = window.localStorage.getItem('userInfo')
+const userInfo = window.JSON.parse(userInfoJSON)
 
 function CreateAssignment() {
   const [userModal, setUserModal] = useState(false);
@@ -42,7 +45,7 @@ function CreateAssignment() {
     assignToId: null,
     assetId: null,
     assignedDate: '',
-    assignById: 2,
+    assignById: userInfo,
   });
 
   const history = useHistory();
