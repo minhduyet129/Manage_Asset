@@ -32,8 +32,8 @@ const schema = Yup.object().shape({
     .typeError('Assigned Date is required')
 });
 
-const userInforJSON = window.localStorage.getItem('userInfo')
-const userInfor = window.JSON.parse(userInforJSON)
+const userInfoJSON = window.localStorage.getItem('userInfo')
+const userInfo = window.JSON.parse(userInfoJSON)
 
 function CreateAssignment() {
   const [userModal, setUserModal] = useState(false);
@@ -44,7 +44,7 @@ function CreateAssignment() {
     assignToId: null,
     assetId: null,
     assignedDate: '',
-    assignById: userInfor.userId,
+    assignById: userInfo.userId,
   });
 
   const history = useHistory();
