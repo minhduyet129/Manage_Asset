@@ -69,7 +69,6 @@ function AssetsTable({ columns, data, loading }) {
                   );
                 })}
               </tbody>
-              )
             </table>
           )}
         </div>

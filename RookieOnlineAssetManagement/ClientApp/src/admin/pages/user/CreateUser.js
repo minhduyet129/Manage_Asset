@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import moment from 'moment';
 const schema = Yup.object().shape({
   firstName: Yup.string()
     .required('First Name is required')
@@ -109,10 +109,10 @@ const CreateUser = () => {
                 <DatePicker
                   id='doB'
                   selected={startDate}
-                  onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() + 10));
+                  onChange={(d) => {
+                    // let d = new Date(e.setHours(e.getHours() + 10));
                     onChange(d);
-                    setStartDate(d);
+                    moment.utc(setStartDate(d)).format();
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -142,11 +142,11 @@ const CreateUser = () => {
                 <DatePicker
                   id='joinedDate'
                   selected={joinedDate}
-                  onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() + 10));
+                  onChange={(d) => {
+                    // let d = new Date(e.setHours(e.getHours() + 10));
                     onChange(d);
                     console.log(d);
-                    setJoinedDate(d);
+                    moment.utc(setJoinedDate(d)).format();
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
