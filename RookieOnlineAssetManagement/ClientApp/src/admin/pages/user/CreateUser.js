@@ -8,7 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import moment from 'moment';
+import * as moment from 'moment-timezone';
 const schema = Yup.object().shape({
   firstName: Yup.string()
     .required('First Name is required')
@@ -41,7 +41,6 @@ const CreateUser = () => {
     const day = date.getDay();
     return day !== 0 && day !== 6;
   };
-
   const handlerUser = (users) => {
     users.gender = users.gender === 0 ? 0 : 1;
     return useCreateUser
@@ -109,13 +108,13 @@ const CreateUser = () => {
                 <DatePicker
                   id='doB'
                   selected={startDate}
+                  format='YYYY-MM-D HH:m:s'
                   onChange={(e) => {
-                     let d = new Date(e.setHours(e.getHours() + 10));
+                    let d = new Date(e.setHours(e.getHours() + 7));
                     onChange(d);
                     setStartDate(d);
                   }}
                   placeholderText='MM/DD/YY'
-                  isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown
@@ -142,15 +141,14 @@ const CreateUser = () => {
                 <DatePicker
                   id='joinedDate'
                   selected={joinedDate}
+                  format='YYYY-MM-D HH:m:s'
                   onChange={(e) => {
-                    let d = new Date(e.setHours(e.getHours() + 10));
+                    let d = new Date(e.setHours(e.getHours() + 7));
                     onChange(d);
-                    console.log(d);
                     setJoinedDate(d);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'
-                  isClearable
                   withPortal
                   showYearDropdown
                   showMonthDropdown
