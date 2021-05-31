@@ -9,10 +9,10 @@ import Select from 'react-select';
 
 const options = [
   { value: -1, label: "Options" },
-  { value: 0, label: "Waiting" },
+  { value: 0, label: "Waiting For Acceptance" },
   { value: 1, label: "Accepted" },
   { value: 2, label: "Declined" },
-  { value: 3, label: "WaitingForReturning" },
+  { value: 3, label: "Waiting For Returning" },
   { value: 4, label: "Returned" },
 ];
 
