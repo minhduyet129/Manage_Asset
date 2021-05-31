@@ -26,13 +26,16 @@ const customStyles = {
 };
 
 const schema = Yup.object().shape({
-  assignToId: Yup.number().required('User is required').typeError('User is required'),
-  assetId: Yup.number().required('Asset is required').typeError('Asset is required'),
+  assignToId: Yup.string().required('User is required'),
+  assetId: Yup.string().required('Asset is required'),
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
     .min(new Date(), 'Assigned Date must be later than today.'),
 });
+
+const userInfoJSON = window.localStorage.getItem('userInfo')
+const userInfo = window.JSON.parse(userInfoJSON)
 
 function CreateAssignment() {
   const [userModal, setUserModal] = useState(false);
@@ -43,7 +46,7 @@ function CreateAssignment() {
     assignToId: '',
     assetId: '',
     assignedDate: '',
-    assignById: 2,
+    assignById: userInfo.userId,
   });
 
   const history = useHistory();
@@ -162,7 +165,7 @@ function CreateAssignment() {
           <div className='form__field'>
             <label>User</label>
             <input className='input' {...register('assignToId')} hidden />
-            <input className='input' value={fullName} disabled required />
+            <input className='input' value={fullName} disabled required error={errors.assignToId}/>
             <div className='search-btn' onClick={openUserModal}>
               <i className='fas fa-search'></i>
             </div>
@@ -179,6 +182,7 @@ function CreateAssignment() {
               value={assetName}
               name='assetName'
               disabled
+              error={errors.assetId}
             />
             <div className='search-btn' onClick={openAssetModal}>
               <i className='fas fa-search'></i>
