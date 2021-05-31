@@ -5,7 +5,7 @@ function AssetsTable({ columns, data, loading }) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
   return (
-    <div>
+    <div >
       <div className='table__view'>
         <h2>Manage Asset</h2>
         <div className='table__view--search'>

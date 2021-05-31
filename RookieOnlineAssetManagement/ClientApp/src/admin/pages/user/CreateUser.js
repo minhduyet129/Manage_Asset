@@ -109,10 +109,10 @@ const CreateUser = () => {
                 <DatePicker
                   id='doB'
                   selected={startDate}
-                  onChange={(d) => {
-                    // let d = new Date(e.setHours(e.getHours() + 10));
+                  onChange={(e) => {
+                     let d = new Date(e.setHours(e.getHours() + 10));
                     onChange(d);
-                    moment.utc(setStartDate(d)).format();
+                    setStartDate(d);
                   }}
                   placeholderText='MM/DD/YY'
                   isClearable
@@ -142,11 +142,11 @@ const CreateUser = () => {
                 <DatePicker
                   id='joinedDate'
                   selected={joinedDate}
-                  onChange={(d) => {
-                    // let d = new Date(e.setHours(e.getHours() + 10));
+                  onChange={(e) => {
+                    let d = new Date(e.setHours(e.getHours() + 10));
                     onChange(d);
                     console.log(d);
-                    moment.utc(setJoinedDate(d)).format();
+                    setJoinedDate(d);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'

@@ -26,8 +26,8 @@ const customStyles = {
 };
 
 const schema = Yup.object().shape({
-  assignToId: Yup.number().required('User is required'),
-  assetId: Yup.number().required('Asset is required'),
+  assignToId: Yup.number().required('User is required').typeError('User is required'),
+  assetId: Yup.number().required('Asset is required').typeError('Asset is required'),
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
