@@ -30,7 +30,6 @@ const schema = Yup.object().shape({
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
-    .min(new Date(), 'Assigned Date must be later than today.'),
 });
 
 const userInfoJSON = window.localStorage.getItem('userInfo')
