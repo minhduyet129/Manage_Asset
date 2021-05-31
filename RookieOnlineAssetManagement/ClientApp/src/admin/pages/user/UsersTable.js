@@ -28,7 +28,7 @@ const UsersTable = ({
           <form className="search">
             <label />
             <Select
-                placeholder="State"
+                placeholder="Type"
                 isSearchable={false}
                 isClearable={true}
                 styles={customStyles}

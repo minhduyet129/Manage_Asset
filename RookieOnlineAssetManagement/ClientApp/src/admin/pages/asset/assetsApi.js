@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-function getAssets() {
-  return axios.get('api/Assets', {});
+function getAssets(paramString) {
+  return axios.get(`api/Assets?${paramString}`);
 }
 
 function getAsset(id) {

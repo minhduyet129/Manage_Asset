@@ -202,7 +202,7 @@ const CreateAsset = (props) => {
               >
                 <option value=''>Select</option>
                 <option value={0}>Available</option>
-                <option value={1}>Not Available</option>
+                <option value={2}>Not Available</option>
               </select>
             </div>
           </div>
