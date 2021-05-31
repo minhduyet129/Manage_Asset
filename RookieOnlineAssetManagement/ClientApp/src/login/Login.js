@@ -4,11 +4,10 @@ import { useHistory } from 'react-router-dom';
 import { api } from '../api';
 
 function Login() {
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const history = useHistory();
-  const userInfoObject = JSON.parse(localStorage.getItem('userInfo'));
+  const [isLoading, setIsLoading] = useState(false);
+  const userLocalStorage = localStorage.getItem('userInfo');
+  const userInfoObject = JSON.parse(userLocalStorage);
   const {
     register,
     handleSubmit,
@@ -16,23 +15,23 @@ function Login() {
   } = useForm();
 
   const onLogin = async (data) => {
+    setIsLoading(true);
     const response = await api.post('/users/login', {
       username: data.username,
       password: data.password,
     });
     const result = await response.data;
+    setIsLoading(false);
     localStorage.setItem('userInfo', JSON.stringify(result));
   };
 
   // Redirect users to different URL according to their roles
   useEffect(() => {
-    if (localStorage.getItem('userInfo')) {
+    if (userLocalStorage) {
       if (userInfoObject.role === 'Admin') {
-        setIsAdminLoggedIn(true);
         history.push('/admin');
         window.location.reload();
       } else if (userInfoObject.role === 'User') {
-        setIsUserLoggedIn(true);
         history.push('/');
         window.location.reload();
       } else {
@@ -40,40 +39,47 @@ function Login() {
         window.location.reload();
       }
     }
-  }, [history, userInfoObject]);
+  }, [history, userInfoObject, userLocalStorage]);
 
   return (
-    <div className='wrapper-form'>
-      <form className='form__login' onSubmit={handleSubmit(onLogin)}>
-        <h2 className='form__title'>Login</h2>
+    <>
+      <div className='wrapper-form'>
+        <form className='form__login' onSubmit={handleSubmit(onLogin)}>
+          <h2 className='form__title'>Login</h2>
 
-        <div className='form__field'>
-          <label className='form__label' htmlFor='username'>
-            Username
-          </label>
-          <input className='input' {...register('username')} />
-        </div>
-        {errors.username && (
-          <span className='form__validation'>This field is required</span>
-        )}
+          <div className='form__field'>
+            <label htmlFor='username'>Username</label>
+            <input className='input' {...register('username')} />
+          </div>
+          {errors.username && (
+            <span className='form__validation'>This field is required</span>
+          )}
 
-        <div className='form__field'>
-          <label className='form__label' htmlFor='password'>
-            Password
-          </label>
-          <input
-            className='input'
-            {...register('password', { required: true })}
-            type='password'
-          />
-        </div>
-        {errors.password && (
-          <span className='form__validation'>This field is required</span>
-        )}
+          <div className='form__field'>
+            <label htmlFor='password'>Password</label>
+            <input
+              className='input'
+              {...register('password', { required: true })}
+              type='password'
+            />
+          </div>
+          {errors.password && (
+            <span className='form__validation'>This field is required</span>
+          )}
 
-        <input className='btn' type='submit' value='Login' />
-      </form>
-    </div>
+          <input className='btn' type='submit' value='Login' />
+        </form>
+      </div>
+
+      {isLoading && (
+        <span
+          className='spinner'
+          style={{ position: 'absolute', top: '500px' }}
+        >
+          <i className='fas fa-spinner fa-spin'></i>
+        </span>
+      )}
+    </>
   );
 }
 
