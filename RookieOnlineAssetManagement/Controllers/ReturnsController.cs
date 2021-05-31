@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
 using RookieOnlineAssetManagement.Enums;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace RookieOnlineAssetManagement.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[Controller]")]
     public class ReturnsController : ControllerBase
@@ -22,6 +24,7 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             _context = context;
         }
+        [Authorize(Roles =RoleName.Admin)]
         [HttpGet]
         public IActionResult GetListReturnRequest(int? state, string returnedDate, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
@@ -132,6 +135,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
         }
+       [Authorize(Roles =RoleName.Admin)]
        [HttpPut("{id}/Completed")]
        public async Task<IActionResult> CompletedReturnRequest(int id,int acceptedByUserId)
         {
@@ -158,6 +162,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
         }
+        [Authorize(Roles=RoleName.Admin)]
         [HttpPut("{id}/Declined")]
         public async Task<IActionResult> DeclinedReturnRequest(int id, int acceptedByUserId)
         {
