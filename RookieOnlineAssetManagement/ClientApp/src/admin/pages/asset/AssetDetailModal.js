@@ -8,7 +8,7 @@ function AssetDetailModal({ closeModal, asset }) {
     if (value === 5) return "Recycled";
     return null;
   };
-
+console.log(asset)
   return (
     <div className='modal-wrapper'>
       <div className='modal-close-btn' onClick={closeModal}>
@@ -33,6 +33,10 @@ function AssetDetailModal({ closeModal, asset }) {
         <div className='body-row'>
           <div className='row-title'>State</div>
           <div className='row-value'>{handleState(asset.state)}</div>
+        </div>
+        <div className='body-row'>
+          <div className='row-title'>History of Assignment</div>
+          <div className='row-value'>{asset.assignments}</div>
         </div>
         {/* <div className='body-row'>
           <div className='row-title'>Location</div>

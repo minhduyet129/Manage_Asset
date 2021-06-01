@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import LayoutUser from '../layout/LayoutUser';
 // import UserHomeTable from './UserHomeTable';
 import CreateReturningRequestModal from './CreateReturningRequestModal';
+import UserHomeTable from './UserHomeTable';
 
 const customStyles = {
   content: {
@@ -16,7 +17,7 @@ const customStyles = {
 };
 
 const UserHome = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const onCloseModal = () => {
     setIsModalOpen(false);
@@ -28,13 +29,14 @@ const UserHome = () => {
     <LayoutUser>
       <div className='table__view'>
         {/* <UserHomeTable /> */}
-        <Modal isOpen={isModalOpen} style={customStyles}>
+        {/* <Modal isOpen={isModalOpen} style={customStyles}>
           <CreateReturningRequestModal
             onCloseModal={onCloseModal}
             onCreateRequestForReturning={onCreateRequestForReturning}
           />
-        </Modal>
+        </Modal> */}
         <h2>Hello User</h2>
+        <UserHomeTable/>
       </div>
     </LayoutUser>
   );

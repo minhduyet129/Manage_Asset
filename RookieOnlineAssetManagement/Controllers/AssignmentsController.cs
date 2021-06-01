@@ -114,13 +114,13 @@ namespace RookieOnlineAssetManagement.Controllers
             return response;
         }
 
-        private Response<AssignmentResponseModel> ValidateAssignmentState(AssignmentState state, string message)
+        private Response<AssignmentResponseModel> ValidateAssignmentState(AssignmentState state)
         {
             var error = new List<object> { };
 
-            if (state != AssignmentState.Waiting)
+            if (state != AssignmentState.Waiting && state != AssignmentState.Declined)
             {
-                error.Add(new { assignTo = message });
+                error.Add(new { assignTo = "Cannot delete because the assignment has been responded by assignee" });
             }
 
             var response = new Response<AssignmentResponseModel>
@@ -344,8 +344,7 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             var assignment = await _dbContext.Assignments.SingleOrDefaultAsync(a => a.Id == id);
 
-            var stateMessage = "Cannot delete because the assignment has been responded by assignee";
-            var validateState = ValidateAssignmentState(assignment.State, stateMessage);
+            var validateState = ValidateAssignmentState(assignment.State);
             if (validateState.Errors.Count > 0) return BadRequest(validateState.Errors);
 
             var asset = await _dbContext.Assets.SingleOrDefaultAsync(a => a.Id == assignment.AssetId);

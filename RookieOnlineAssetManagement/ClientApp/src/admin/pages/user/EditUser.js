@@ -71,7 +71,7 @@ const EditUser = () => {
       .edit(users, id)
       .then((response) => {
         if (response.status === 200) {
-          toast('Update user sucessfully');
+          toast.success('Update user sucessfully');
           history.push('/admin/users');
         }
       })

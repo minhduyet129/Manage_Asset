@@ -9,6 +9,15 @@ function ReportTable({ columns, data, loading, fileName }) {
 
   const exportToCSV = (data, fileName) => {
     const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = [{ width: 20 }, { width: 20 }, { width: 20 }, { width: 20 }, { width: 20 }, { width: 20 }, { width: 20 } ];
+    ws.A1.v = "Category ";
+    ws.B1.v = "Total ";
+    ws.C1.v = "Assgined ";
+    ws.D1.v = "Available ";
+    ws.E1.v = "Not Available ";
+    ws.F1.v = "Waiting For Recycling";
+    ws.G1.v = "Waiting For Approval"
+    ws.H1.v = "Recycle"
     const wb = { Sheets: { data: ws }, SheetNames: ['data'] };
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const datatype = new Blob([excelBuffer], { type: fileType });
