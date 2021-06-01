@@ -53,7 +53,11 @@ const CreateUser = () => {
         console.log(users);
       })
       .catch((error) => {
-        toast.error('Add user failed!');
+        if (error.response) {
+          toast.error('Add user failed!');
+
+        }
+        
       });
   };
 
@@ -67,7 +71,6 @@ const CreateUser = () => {
     console.log(data);
   };
 
-  console.log(errors);
 
   return (
     <LayoutAdmin>
