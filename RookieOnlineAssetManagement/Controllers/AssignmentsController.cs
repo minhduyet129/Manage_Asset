@@ -357,7 +357,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = RoleName.User)]
+        [Authorize]
         [HttpGet("ForUser/{id}")]
         public async Task<IActionResult> GetAssignmentForUser(int id, [FromQuery] PaginationFilter filter, string sortBy, bool asc = true)
         {
@@ -422,7 +422,7 @@ namespace RookieOnlineAssetManagement.Controllers
             var response = PaginationHelper.CreatePagedResponse(data, filter.PageNumber, filter.PageSize, count);
             return Ok(response);
         }
-        [Authorize(Roles =RoleName.User)]
+        [Authorize]
         [HttpPut("{id}/UserAcceptAssignment")]
         public async Task<IActionResult> AcceptAssignment(int id)
         {
@@ -447,7 +447,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
         }
-        [Authorize(Roles = RoleName.User)]
+        [Authorize]
         [HttpPut("{id}/UserDeclineAssignment")]
         public async Task<IActionResult> DeclineAssignment(int id)
         {
