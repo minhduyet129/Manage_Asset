@@ -16,7 +16,7 @@ const customStyles = {
 };
 
 const UserHome = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const onCloseModal = () => {
     setIsModalOpen(false);
@@ -27,13 +27,13 @@ const UserHome = () => {
   return (
     <LayoutUser>
       <div className='table__view'>
-        {/* <UserHomeTable /> */}
-        <Modal isOpen={isModalOpen} style={customStyles}>
+        <UserHomeTable />
+        {/* <Modal isOpen={isModalOpen} style={customStyles}>
           <CreateReturningRequestModal
             onCloseModal={onCloseModal}
             onCreateRequestForReturning={onCreateRequestForReturning}
           />
-        </Modal>
+        </Modal> */}
         <h2>Hello User</h2>
       </div>
     </LayoutUser>

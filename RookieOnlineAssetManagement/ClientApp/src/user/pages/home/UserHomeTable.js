@@ -1,17 +1,45 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useTable } from 'react-table';
-import { useQuery } from 'react-query';
-import { api } from '../../../api';
+// import { useQuery } from 'react-query';
+import axios from 'axios';
 
 const UserHomeTable = () => {
-  const assignmentInfo = useQuery('assignments', async () => {
-    const response = await api.get('/assignments');
-    if (response.isError) {
-      throw new Error('Network response was error.');
-    }
-    const result = await response.data;
-    return result;
-  });
+  const userLocalStorage = localStorage.getItem('userInfo');
+  const userInfoObject = JSON.parse(userLocalStorage);
+  const [assignmentData, setAssignmentData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // const assignmentInfo = useQuery('assignments', async () => {
+  //   const response = await axios.get(
+  //     `api/assignments/foruser/${userInfoObject.userId}`
+  //   );
+
+  //   const result = await response.data;
+
+  //   return result;
+
+  //   return axios
+  //     .get(`/api/assignments/foruser/${userInfoObject.userId}`)
+  //     .then((response) => response.data);
+  // });
+
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      try {
+        setIsLoading(true);
+        const result = await axios.get(
+          `/api/assignments/foruser/${userInfoObject.userId}`
+        );
+        console.log(result);
+        setAssignmentData(result.data.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchAssignments();
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -59,29 +87,30 @@ const UserHomeTable = () => {
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: columns, data: assignmentInfo.data });
+    useTable({ columns: columns, data: assignmentData });
 
   return (
     <div>
       <h2>User Home</h2>
       <div>
-        <table id='table' {...getTableProps()}>
-          <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()}>
-                    {column.render('Header')}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          {assignmentInfo.isLoading ? (
-            <div className='spinner'>
-              <i className='fas fa-spinner fa-spin'></i>
-            </div>
-          ) : (
+        {isLoading ? (
+          <div className='spinner'>
+            <i className='fas fa-spinner fa-spin'></i>
+          </div>
+        ) : (
+          <table id='table' {...getTableProps()}>
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th {...column.getHeaderProps()}>
+                      {column.render('Header')}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+
             <tbody {...getTableBodyProps()}>
               {rows.map((row) => {
                 prepareRow(row);
@@ -96,9 +125,48 @@ const UserHomeTable = () => {
                 );
               })}
             </tbody>
-          )}
-        </table>
+          </table>
+        )}
       </div>
+
+      {/* <div>
+        {assignmentInfo.isLoading ? (
+          <div className='spinner'>
+            <i className='fas fa-spinner fa-spin'></i>
+          </div>
+        ) : assignmentInfo.isError ? (
+          <div>{assignmentInfo.error.message}</div>
+        ) : (
+          <table id='table' {...getTableProps()}>
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th {...column.getHeaderProps()}>
+                      {column.render('Header')}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+
+            <tbody {...getTableBodyProps()}>
+              {rows.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell) => {
+                      return (
+                        <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div> */}
     </div>
   );
 };
