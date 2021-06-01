@@ -449,7 +449,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return Unauthorized("Username or password is incorrect. Please try again");
         }
         [Authorize]
-        [HttpPost("ChangPasswordFirstLogin")]
+        [HttpPut("ChangPasswordFirstLogin")]
         public async Task<IActionResult> ChangePasswordFirstLogin(int userId,string newPassword)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -467,7 +467,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok("Your password has been changed successfully");
         }
         [Authorize]
-        [HttpPost("ChangPassword")]
+        [HttpPut("ChangPassword")]
         public async Task<IActionResult> ChangPassword(string userId,string oldPassword,string newPassword)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
