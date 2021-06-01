@@ -1,17 +1,26 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTable } from 'react-table';
-import { useQuery } from 'react-query';
-import { api } from '../../../api';
+import axios from 'axios';
 
 const UserHomeTable = () => {
-  const assignmentInfo = useQuery('assignments', async () => {
-    const response = await api.get('/assignments');
-    if (response.isError) {
-      throw new Error('Network response was error.');
-    }
-    const result = await response.data;
-    return result;
-  });
+  const [assignments, setAssignments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const callAssignmentsAPI = async () => {
+    axios
+      .get('api/Assignments')
+      .then((res) => {
+        setAssignments(res.data.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    callAssignmentsAPI();
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -59,7 +68,7 @@ const UserHomeTable = () => {
   );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns: columns, data: assignmentInfo.data });
+    useTable({ columns: columns, data: assignments });
 
   return (
     <div>
@@ -77,7 +86,7 @@ const UserHomeTable = () => {
               </tr>
             ))}
           </thead>
-          {assignmentInfo.isLoading ? (
+          {loading ? (
             <div className='spinner'>
               <i className='fas fa-spinner fa-spin'></i>
             </div>
