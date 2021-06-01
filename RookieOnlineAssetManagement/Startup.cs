@@ -41,11 +41,11 @@ namespace RookieOnlineAssetManagement
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(options =>
                 {
                     options.SaveToken = true;
@@ -80,9 +80,8 @@ namespace RookieOnlineAssetManagement
                 options.AddPolicy("AllowAllOrigin", builder =>
                 {
                     builder.AllowAnyOrigin()
-                              .AllowAnyHeader()
-                              .AllowAnyMethod();
-
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                 });
             });
 
@@ -115,16 +114,13 @@ namespace RookieOnlineAssetManagement
                                 Id = "Bearer"
                             }
                         },
-                        new string[] {}
+                        new string[] { }
                     }
                 });
             });
 
             // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/build";
-            });
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -149,12 +145,8 @@ namespace RookieOnlineAssetManagement
             }
 
 
-
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"); });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -182,6 +174,7 @@ namespace RookieOnlineAssetManagement
                 }
             });
         }
+
         public void SeedData(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             IdentityResult result;
@@ -197,7 +190,18 @@ namespace RookieOnlineAssetManagement
 
             if (userManager.Users.Any()) return;
 
-            var user = new ApplicationUser { UserName = "admin", StaffCode="SD0001", FirstName="Hung",LastName="Bui",Location="Ha Noi",DoB= DateTime.Parse("2000-01-01"),JoinedDate= DateTime.Parse("2021-01-01") ,CountLogin=0,State=UserState.Enable};
+            var user = new ApplicationUser
+            {
+                UserName = "admin",
+                StaffCode = "SD0001",
+                FirstName = "Admin",
+                LastName = "Rookies",
+                Location = "Ha Noi",
+                DoB = DateTime.Parse("2000-01-01"),
+                JoinedDate = DateTime.Parse("2021-01-01"),
+                CountLogin = 0,
+                State = UserState.Enable
+            };
             result = userManager.CreateAsync(user, "147258aA@").Result;
 
             if (result.Succeeded) userManager.AddToRoleAsync(user, "Admin").Wait();
