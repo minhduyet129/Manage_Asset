@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -126,10 +125,8 @@ namespace RookieOnlineAssetManagement
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            SeedData(userManager, roleManager);
-
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
@@ -146,6 +143,8 @@ namespace RookieOnlineAssetManagement
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -178,27 +177,6 @@ namespace RookieOnlineAssetManagement
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
-        }
-
-        public void SeedData(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
-        {
-            IdentityResult result;
-
-            if (!roleManager.Roles.Any())
-            {
-                result = roleManager.CreateAsync(new ApplicationRole("Admin")).Result;
-                if (!result.Succeeded) return;
-
-                result = roleManager.CreateAsync(new ApplicationRole("User")).Result;
-                if (!result.Succeeded) return;
-            }
-
-            if (userManager.Users.Any()) return;
-
-            var user = new ApplicationUser { UserName = "admin" };
-            result = userManager.CreateAsync(user, "147258aA@").Result;
-
-            if (result.Succeeded) userManager.AddToRoleAsync(user, "Admin").Wait();
         }
     }
 }
