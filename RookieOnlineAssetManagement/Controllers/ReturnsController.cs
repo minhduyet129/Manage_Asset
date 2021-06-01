@@ -186,6 +186,7 @@ namespace RookieOnlineAssetManagement.Controllers
                     return NotFound("Not found assignment with assignmentId in return asset! ");
                 }
                 assignment.State = AssignmentState.Accepted;
+                _context.ReturnRequests.Remove(request);
                 await _context.SaveChangesAsync();
                 return Ok(request);
             }

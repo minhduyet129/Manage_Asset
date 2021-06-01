@@ -82,6 +82,9 @@ function Asset() {
     if (value === 0) return "Available";
     if (value === 1) return "Waiting For Approval";
     if (value === 2) return "Not Available";
+    if (value === 3) return "Assigned";
+    if (value === 4) return "Waiting For Recycling";
+    if (value === 5) return "Recycled";
     return null;
   };
 
@@ -263,7 +266,7 @@ function Asset() {
         Header: () => {
           return (
             <div className="table-header" onClick={() => handleSortBy("state")}>
-              <span>Asset Name</span>
+              <span>State</span>
               {handleSortIcon("state")}
             </div>
           );
@@ -290,7 +293,7 @@ function Asset() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters.sortBy]
+    [filters]
   );
   return (
     <>

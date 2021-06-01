@@ -266,7 +266,7 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             return Ok(_roleManager.Roles);
         }
-        [Authorize(Roles=RoleName.Admin)]
+        [Authorize(Roles = RoleName.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserModel model)
         {
@@ -428,7 +428,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 var token = new JwtSecurityToken(
                     issuer: _configuration["JWT:ValidIssuer"],
                     audience: _configuration["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddHours(3),
+                    expires: DateTime.Now.AddHours(20),
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                     );
@@ -449,7 +449,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return Unauthorized("Username or password is incorrect. Please try again");
         }
         [Authorize]
-        [HttpPost("ChangPasswordFirstLogin")]
+        [HttpPut("ChangPasswordFirstLogin")]
         public async Task<IActionResult> ChangePasswordFirstLogin(int userId,string newPassword)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -467,7 +467,7 @@ namespace RookieOnlineAssetManagement.Controllers
             return Ok("Your password has been changed successfully");
         }
         [Authorize]
-        [HttpPost("ChangPassword")]
+        [HttpPut("ChangPassword")]
         public async Task<IActionResult> ChangPassword(string userId,string oldPassword,string newPassword)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
