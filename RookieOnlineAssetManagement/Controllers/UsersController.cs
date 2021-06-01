@@ -192,7 +192,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
             return Ok(new Response<UserResponseModel>(result));
         }
-        [Authorize(Roles =RoleName.Admin)]
+        [Authorize(Roles = RoleName.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
@@ -415,6 +415,7 @@ namespace RookieOnlineAssetManagement.Controllers
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
             {
+                if (user.State == UserState.Disable) return BadRequest("User is disable!");
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
                 {
@@ -452,39 +453,55 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpPut("ChangPasswordFirstLogin")]
         public async Task<IActionResult> ChangePasswordFirstLogin(int userId,string newPassword)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
+            try
             {
-                return NotFound("Not Found User!");
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return NotFound("Not Found User!");
+                }
+                var tokenChangePassword = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetPassword = await _userManager.ResetPasswordAsync(user, tokenChangePassword, newPassword);
+                if (!resetPassword.Succeeded)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Password must have 8 characters and include 1 uppercase character, 1 special character and 1 number ");
+                }
+
+                return Ok("Your password has been changed successfully");
             }
-            var tokenChangePassword = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var resetPassword =await _userManager.ResetPasswordAsync(user, tokenChangePassword, newPassword);
-            if (!resetPassword.Succeeded)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Password must have 8 characters and include 1 uppercase character, 1 special character and 1 number ");
+
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
-            
-            return Ok("Your password has been changed successfully");
         }
         [Authorize]
         [HttpPut("ChangPassword")]
         public async Task<IActionResult> ChangPassword(string userId,string oldPassword,string newPassword)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
+            try
             {
-                return NotFound("Not Found User!");
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return NotFound("Not Found User!");
+                }
+                if (!await _userManager.CheckPasswordAsync(user, oldPassword))
+                {
+                    return BadRequest("Password is incorrect");
+                }
+                var changePassword = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+                if (!changePassword.Succeeded)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Password must have 8 characters and include 1 uppercase character, 1 special character and 1 number ");
+                }
+                return Ok("Your password has been changed successfully");
             }
-            if(!await _userManager.CheckPasswordAsync(user, oldPassword))
+            catch (Exception ex)
             {
-                return BadRequest("Password is incorrect");
+
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex);
             }
-            var changePassword = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
-            if (!changePassword.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Password must have 8 characters and include 1 uppercase character, 1 special character and 1 number ");
-            }
-            return Ok("Your password has been changed successfully");
         }
 
 
