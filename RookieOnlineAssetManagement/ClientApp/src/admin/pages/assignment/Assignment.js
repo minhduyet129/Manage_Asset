@@ -58,6 +58,7 @@ function Assignment() {
           totalPages: res.data.totalPages,
           pageNumber: res.data.pageNumber,
         });
+        console.log(res.data.data)
         setLoading(false);
       })
       .catch((err) => {

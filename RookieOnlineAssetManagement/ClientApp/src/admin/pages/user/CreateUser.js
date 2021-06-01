@@ -47,13 +47,17 @@ const CreateUser = () => {
       .create(users)
       .then((response) => {
         if (response.status === 200) {
-          toast('Add user sucessfully');
+          toast.success('Add user sucessfully');
           history.push('/admin/users');
         }
         console.log(users);
       })
       .catch((error) => {
-        toast.error('Add user failed!');
+        if (error.response) {
+          toast.error('Add user failed!');
+
+        }
+        
       });
   };
 
@@ -67,7 +71,6 @@ const CreateUser = () => {
     console.log(data);
   };
 
-  console.log(errors);
 
   return (
     <LayoutAdmin>

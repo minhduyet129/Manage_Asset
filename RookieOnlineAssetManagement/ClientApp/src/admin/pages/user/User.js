@@ -22,8 +22,8 @@ const User = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [filters, setFilters] = useState({
     PageNumber: 1,
-    filterRole: null,
     PageSize: 10,
+    filterRole: null,
     keyword: null,
     sortBy: null,
     asc: true,
@@ -45,6 +45,7 @@ const User = () => {
         setUsers(res.data.data);
         setTotalPages(res.data.totalPages);
         setLoading(false);
+        console.log()
       })
       .catch((err) => console.log(err));
   };

@@ -12,9 +12,6 @@ const schema = Yup.object().shape({
   assetName: Yup.string()
     .required('Asset Name is required')
     .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid keyword'),
-  specification: Yup.string()
-    .required('Specification is required')
-    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid keyword'),
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
@@ -112,12 +109,11 @@ const EditAsset = (props) => {
           <div className='form__field'>
             <label>Specification</label>
             <textarea
-              className={`input ${errors.specification ? 'is-invalid' : ''}`}
+              className='input'
               defaultValue={''}
               {...register('specification')}
             />
           </div>
-          <p className='invalid-feedback'>{errors.specification?.message}</p>
 
           <div className='form__field'>
             <label>Installed Date</label>
@@ -158,7 +154,11 @@ const EditAsset = (props) => {
                 className={`input ${errors.categoryId ? 'is-invalid' : ''}`}
               >
                 <option value={0}>Available</option>
-                <option value={1}>Not Available</option>
+                <option value={1}>Waiting For Approval</option>
+                <option value={2}>Not Available</option>
+                <option value={3}>Assigned</option>
+                <option value={4}>Waiting For Recycling</option>
+                <option value={5}>Recycled</option>
               </select>
             </div>
           </div>
