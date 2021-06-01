@@ -11,10 +11,10 @@ import * as Yup from 'yup';
 const schema = Yup.object().shape({
   assetName: Yup.string()
     .required('Asset Name is required')
-    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
+    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid keyword'),
   specification: Yup.string()
     .required('Specification is required')
-    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
+    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid keyword'),
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
@@ -52,9 +52,9 @@ const EditAsset = (props) => {
   };
 
   const setDateTime = (data) => {
-    let d = new Date(data.slice(0, 10))
-    let date = new Date(d.setHours(d.getHours() + 7))
-    
+    let d = new Date(data.slice(0, 10));
+    let date = new Date(d.setHours(d.getHours() + 7));
+
     return date;
   };
 

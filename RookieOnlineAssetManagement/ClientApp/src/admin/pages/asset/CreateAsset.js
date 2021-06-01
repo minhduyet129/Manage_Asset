@@ -15,7 +15,7 @@ import './Asset.css'
 const schema = Yup.object().shape({
   assetName: Yup.string()
     .required('Asset Name is required')
-    .matches(/^[aA-zZ\s 0-9]+$/, 'Only alphabets are allowed for this field '),
+    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid keyword'),
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
