@@ -1,11 +1,11 @@
-import React from "react";
 import { useTable, usePagination } from "react-table";
+import ReactDatePicker from "react-datepicker";
 import { Link } from "react-router-dom";
+import Select from "react-select";
+import React from "react";
 
 import "./Assignment.css";
-import { Controller } from "react-hook-form";
-import ReactDatePicker from "react-datepicker";
-import Select from "react-select";
+import { customStyles } from "../CustomSelectStyle"
 
 const options = [
   { value: 0, label: "Waiting For Acceptance" },
@@ -14,25 +14,6 @@ const options = [
   { value: 3, label: "Waiting For Returning" },
   { value: 4, label: "Returned" },
 ];
-
-const customStyles = {
-  menu: (provided, state) => ({
-    ...provided,
-    width: 250,
-  }),
-
-  control: () => ({
-    height: 40,
-    width: 250,
-    display: "flex",
-    alignItems: "center",
-    border: "2px solid rgba(0, 0, 0, 0.3)",
-    borderRadius: 20,
-    paddingLeft: 26,
-    fontSize: 14,
-    fontWeight: 500,
-  }),
-};
 
 const AssignmentsTable = ({
   columns,
@@ -125,7 +106,7 @@ const AssignmentsTable = ({
                       id="tr-hover"
                       {...row.getRowProps()}
                       onClick={(e) => {
-                        if (!e.target.closest("#Actions")) {
+                        if (!e.target.closest("#actions")) {
                           onClickAssignment(row.original);
                         }
                       }}
