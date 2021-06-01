@@ -50,6 +50,10 @@ namespace RookieOnlineAssetManagement.Controllers
                                 State=c.State
                                 
                             };
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                queryable = queryable.Where(u => u.AssetName.Contains(keyword) || u.AssetCode.Contains(keyword)||u.RequestBy.Contains(keyword));
+            }
             if (state !=null &&!string.IsNullOrEmpty(state.ToString()))
             {
                 queryable = queryable.Where(x => x.State == (ReturnRequestState)state);
