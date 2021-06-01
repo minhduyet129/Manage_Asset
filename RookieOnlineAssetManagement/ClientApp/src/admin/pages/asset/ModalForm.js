@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { getApiAssets } from './assetsApi';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+
 const schema = Yup.object().shape({
   categoryCode: Yup.string()
     .required('Category Code is required')
@@ -14,7 +15,6 @@ const schema = Yup.object().shape({
     .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
 });
 const ModalForm = ({ modalIsOpen, setModelIsOpen, setChanges }) => {
-
   const customStyles = {
     content: {
       top: '50%',
@@ -84,10 +84,17 @@ const ModalForm = ({ modalIsOpen, setModelIsOpen, setChanges }) => {
           <p className='invalid-feedback'>{errors.name?.message}</p>
           <div className='form__field control-btn'>
             <input type='submit' className='btn' />
-            <button className='btn cancel-btn' onClick={() => setModelIsOpen(false)}>Cancel</button>
+            <button
+              className='btn cancel-btn'
+              onClick={() => setModelIsOpen(false)}
+            >
+              Cancel
+            </button>
           </div>
         </form>
-        <div className="close-btn" onClick={() => setModelIsOpen(false)}><i class="fas fa-times"></i></div>
+        <div className='close-btn' onClick={() => setModelIsOpen(false)}>
+          <i class='fas fa-times'></i>
+        </div>
       </div>
     </Modal>
   );

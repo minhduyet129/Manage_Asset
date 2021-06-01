@@ -1,8 +1,7 @@
-
 import axios from 'axios';
-function getAssets() {
-  return axios.get('api/Assets', {
-  });
+
+function getAssets(paramString) {
+  return axios.get(`api/Assets?${paramString}`);
 }
 
 function getAsset(id) {
@@ -14,15 +13,13 @@ function createAsset(assets) {
   return axios.post('api/Assets', assets);
 }
 // Get categories for creating new assets
-function getCategories  () {
-  return axios.get('api/Categories')
-
+function getCategories() {
+  return axios.get('api/Categories');
 }
 
-function createCategories (category) {
-  return axios.post('api/Categories', category)
+function createCategories(category) {
+  return axios.post('api/Categories', category);
 }
-  
 
 // UPDATE
 function updateAsset(assets, id) {
