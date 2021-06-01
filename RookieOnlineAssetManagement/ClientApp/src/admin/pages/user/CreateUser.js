@@ -12,10 +12,10 @@ import { toast } from 'react-toastify';
 const schema = Yup.object().shape({
   firstName: Yup.string()
     .required('First Name is required')
-    .matches(/^[aA-zZ\s 0-9]+$/, 'Only alphabets are allowed for this field '),
+    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid Input'),
   lastName: Yup.string()
     .required('Last name is required')
-    .matches(/^[aA-zZ\s 0-9]+$/, 'Only alphabets are allowed for this field '),
+    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid Input'),
   doB: Yup.date()
     .required('Date of birth is required')
     .typeError('Date of birth is required')
