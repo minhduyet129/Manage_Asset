@@ -266,7 +266,7 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             return Ok(_roleManager.Roles);
         }
-        //[Authorize(Roles=RoleName.Admin)]
+        [Authorize(Roles = RoleName.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateUser(UserModel model)
         {

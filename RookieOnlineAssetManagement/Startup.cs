@@ -11,6 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
+using RookieOnlineAssetManagement.Enums;
+using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -125,8 +128,9 @@ namespace RookieOnlineAssetManagement
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
+            SeedData(userManager, roleManager);
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
@@ -177,6 +181,26 @@ namespace RookieOnlineAssetManagement
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+        public void SeedData(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        {
+            IdentityResult result;
+
+            if (!roleManager.Roles.Any())
+            {
+                result = roleManager.CreateAsync(new ApplicationRole("Admin")).Result;
+                if (!result.Succeeded) return;
+
+                result = roleManager.CreateAsync(new ApplicationRole("User")).Result;
+                if (!result.Succeeded) return;
+            }
+
+            if (userManager.Users.Any()) return;
+
+            var user = new ApplicationUser { UserName = "admin", StaffCode="SD0001", FirstName="Hung",LastName="Bui",Location="Ha Noi",DoB= DateTime.Parse("2000-01-01"),JoinedDate= DateTime.Parse("2021-01-01") ,CountLogin=0,State=UserState.Enable};
+            result = userManager.CreateAsync(user, "147258aA@").Result;
+
+            if (result.Succeeded) userManager.AddToRoleAsync(user, "Admin").Wait();
         }
     }
 }
