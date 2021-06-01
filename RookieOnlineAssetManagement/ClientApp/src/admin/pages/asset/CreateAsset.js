@@ -15,11 +15,11 @@ import './Asset.css'
 const schema = Yup.object().shape({
   assetName: Yup.string()
     .required('Asset Name is required')
-    .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
+    .matches(/^[aA-zZ\s 0-9]+$/, 'Only alphabets are allowed for this field '),
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
-   categoryId: Yup.string().required('Select Category is required'),
+    categoryId: Yup.number().required('Select Category is required'),
   state: Yup.string().required('Select State is required'),
 });
 
@@ -53,7 +53,7 @@ const CreateAsset = (props) => {
     register,
     handleSubmit,
     control,
-    reset,
+    // reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -71,7 +71,7 @@ const CreateAsset = (props) => {
       .then((response) => {
         if (response.status) {
           toast('Add Asset sucessfully');
-          history.push('/admin/assets');
+           history.push('/admin/assets');
         }
       })
       .catch((error) => {
@@ -100,6 +100,7 @@ const CreateAsset = (props) => {
     categories.map((category) => {
       return { label: category.name, value: category.id };
     });
+
   return (
     <LayoutAdmin>
       <div className='table__view'>
@@ -132,25 +133,23 @@ const CreateAsset = (props) => {
               <Controller
                 name='categoryId'
                 control={control}
-                defaultValue={options[1]}
-                render={({ onChange, value, name, ref }) => (
+                render={({ field }) => (
                   <Select
                     {...props}
                     isSearchable
                     options={options}
-                    onChange={(e) => reset({ categoryId: e.value })}
-                    value={options.find((c) => c.value === value)}
-                    // onClick={console.log(123)}
+                    onChange={ e => field.onChange( e.value )}
+                    value={options.find((c) => c.value === field.value)}
                     onCreateCategory={onClick}
                     components={{ Control }}
                     placeholder='Select or Create New Category'
-                    error={errors.categoryId}
+                     error={errors.categoryId}
                   />
                 )}
               />
             </div>
           </div>
-          <p className='invalid-feedback'>{errors.categoryId?.message}</p>
+           <p className='invalid-feedback'>{errors.categoryId?.message}</p> 
 
           <div className='form__field'>
             <label>Specification</label>
