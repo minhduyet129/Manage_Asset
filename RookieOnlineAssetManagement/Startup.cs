@@ -13,7 +13,6 @@ using RookieOnlineAssetManagement.Data;
 using RookieOnlineAssetManagement.Entities;
 using RookieOnlineAssetManagement.Enums;
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -126,11 +125,8 @@ namespace RookieOnlineAssetManagement
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
-            SeedData(userManager, roleManager);
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
-            }
+            InitializeDatabase(app).Wait();
+            SeedData(userManager, roleManager).Wait();
 
             if (env.IsDevelopment())
             {
@@ -175,20 +171,29 @@ namespace RookieOnlineAssetManagement
             });
         }
 
-        public void SeedData(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        private static async Task InitializeDatabase(IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.GetService<IServiceScopeFactory>()?.CreateScope();
+            if (scope != null)
+            {
+                await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
+            }
+        }
+
+        public static async Task SeedData(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             IdentityResult result;
 
-            if (!roleManager.Roles.Any())
+            if (!await roleManager.Roles.AnyAsync())
             {
-                result = roleManager.CreateAsync(new ApplicationRole("Admin")).Result;
+                result = await roleManager.CreateAsync(new ApplicationRole("Admin"));
                 if (!result.Succeeded) return;
 
-                result = roleManager.CreateAsync(new ApplicationRole("User")).Result;
+                result = await roleManager.CreateAsync(new ApplicationRole("User"));
                 if (!result.Succeeded) return;
             }
 
-            if (userManager.Users.Any()) return;
+            if (await userManager.Users.AnyAsync()) return;
 
             var user = new ApplicationUser
             {
@@ -202,9 +207,12 @@ namespace RookieOnlineAssetManagement
                 CountLogin = 0,
                 State = UserState.Enable
             };
-            result = userManager.CreateAsync(user, "147258aA@").Result;
+            result = await userManager.CreateAsync(user, "147258aA@");
 
-            if (result.Succeeded) userManager.AddToRoleAsync(user, "Admin").Wait();
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "Admin");
+            }
         }
     }
 }
