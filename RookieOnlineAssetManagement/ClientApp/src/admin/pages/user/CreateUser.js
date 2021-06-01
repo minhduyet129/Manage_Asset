@@ -47,7 +47,7 @@ const CreateUser = () => {
       .create(users)
       .then((response) => {
         if (response.status === 200) {
-          toast('Add user sucessfully');
+          toast.success('Add user sucessfully');
           history.push('/admin/users');
         }
         console.log(users);

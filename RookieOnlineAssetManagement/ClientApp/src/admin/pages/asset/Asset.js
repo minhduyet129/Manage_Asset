@@ -1,16 +1,19 @@
-import LayoutAdmin from "../layout/LayoutAdmin";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { getApiAssets } from "./assetsApi";
-import AssetsTable from "./AssetsTable";
-import { toast } from "react-toastify";
-import queryString from "query-string";
-import "../TableView.css";
-import ReactPaginate from "react-paginate";
-import Modal from "react-modal";
-import AssetDetailModal from "./AssetDetailModal";
-import { modalCustomStyle } from "../ModalCustomStyles";
-import DeleteModal from "./DeleteModal";
+import LayoutAdmin from '../layout/LayoutAdmin';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, Redirect, useHistory } from 'react-router-dom';
+import { getApiAssets } from './assetsApi';
+import AssetsTable from './AssetsTable';
+import { toast } from 'react-toastify';
+import queryString from 'query-string';
+import '../TableView.css';
+import ReactPaginate from 'react-paginate';
+import Modal from 'react-modal';
+import AssetDetailModal from './AssetDetailModal';
+import { modalCustomStyle } from '../ModalCustomStyles';
+import DeleteModal from './DeleteModal';
+
+
+
 
 function Asset() {
   const [assets, setAssets] = useState([]);
@@ -19,6 +22,7 @@ function Asset() {
   const [changes, setChanges] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [authorities, setAuthorities] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [filters, setFilters] = useState({
     PageNumber: 1,
@@ -45,30 +49,15 @@ function Asset() {
         setAssets(res.data.data);
         setTotalPages(res.data.totalPages);
         setLoading(false);
+        console.log(res.data.data);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(getassets, [changes, filters]);
 
-  const DeleteAsset = async (index) => {
-    if (!usersRef.current) return;
-    const id = usersRef.current[index].id;
-    await getApiAssets
-      .deleteAsset(id)
-      .then((res) => {
-        setChanges((prev) => {
-          const current = !prev;
-          return current;
-        });
-        if (res.status === 200) {
-          toast("Asset Deleted");
-        }
-      })
-      .catch(() => {
-        toast("Delete Failed");
-      });
-  };
+
+  
 
   const getAssetId = async (rowIndex) => {
     if (!usersRef.current) return;
@@ -79,12 +68,12 @@ function Asset() {
   };
 
   const handleState = (value) => {
-    if (value === 0) return "Available";
-    if (value === 1) return "Waiting For Approval";
-    if (value === 2) return "Not Available";
-    if (value === 3) return "Assigned";
-    if (value === 4) return "Waiting For Recycling";
-    if (value === 5) return "Recycled";
+    if (value === 0) return 'Available';
+    if (value === 1) return 'Waiting For Approval';
+    if (value === 2) return 'Not Available';
+    if (value === 3) return 'Assigned';
+    if (value === 4) return 'Waiting For Recycling';
+    if (value === 5) return 'Recycled';
     return null;
   };
 
@@ -110,11 +99,11 @@ function Asset() {
   const handleSortIcon = (sortBy) => {
     if (filters.sortBy === sortBy) {
       if (filters.asc) {
-        return <i className="fas fa-caret-down"></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i className="fas fa-caret-up"></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i className="fas fa-caret-down"></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSearchChange = (value) => {
@@ -144,7 +133,7 @@ function Asset() {
     setTotalPages(0);
     if (!event) {
       event = {
-        target: "",
+        target: '',
         value: null,
       };
     }
@@ -159,7 +148,7 @@ function Asset() {
     setTotalPages(0);
     if (!event) {
       event = {
-        target: "",
+        target: '',
         value: null,
       };
     }
@@ -204,18 +193,18 @@ function Asset() {
           const current = !prev;
           return current;
         });
-        if (res.status === 200) {
+        if (res.status) {
           setDeleteModal(false);
-          toast.success("Asset Deleted");
+          toast.success('Asset Deleted');
         }
       })
       .catch((err) => {
         setDeleteModal(false);
-        if (err.response.status === 400) {
-          toast(err.response.data);
+        if (err.response.status) {
+          toast.error(err.response.data + "If the asset is not able to be used anymore, please update its state in edit asset");
         }
       });
-  }
+  };
 
   const columns = useMemo(
     () => [
@@ -223,69 +212,78 @@ function Asset() {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetCode")}
+              className='table-header'
+              onClick={() => handleSortBy('assetCode')}
             >
               <span>Asset Code</span>
-              {handleSortIcon("assetCode")}
+              {handleSortIcon('assetCode')}
             </div>
           );
         },
-        accessor: "assetCode",
+        accessor: 'assetCode',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetName")}
+              className='table-header'
+              onClick={() => handleSortBy('assetName')}
             >
               <span>Asset Name</span>
-              {handleSortIcon("assetName")}
+              {handleSortIcon('assetName')}
             </div>
           );
         },
-        accessor: "assetName",
+        accessor: 'assetName',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("categoryName")}
+              className='table-header'
+              onClick={() => handleSortBy('categoryName')}
             >
               <span>Category Name</span>
-              {handleSortIcon("categoryName")}
+              {handleSortIcon('categoryName')}
             </div>
           );
         },
-        accessor: "categoryName",
+        accessor: 'categoryName',
       },
       {
-        id: "state",
+        id: 'state',
         Header: () => {
           return (
-            <div className="table-header" onClick={() => handleSortBy("state")}>
+            <div className='table-header' onClick={() => handleSortBy('state')}>
               <span>State</span>
-              {handleSortIcon("state")}
+              {handleSortIcon('state')}
             </div>
           );
         },
         accessor: (d) => <div>{handleState(d.state)}</div>,
       },
       {
-        Header: "Actions",
-        accessor: "actions",
-        Cell: (props) => {
-          const rowIdx = props.row.id;
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: ({ row }) => {
+          const rowIdx = row.id;
           return (
-            <div id="actions" style={{ display: "flex" }}>
-              <span className="font" onClick={() => getAssetId(rowIdx)}>
-                <i className="bx bx-edit"></i>
-              </span>
+            <div id='actions' style={{ display: 'flex' }}>
+              {row.original.state === 3 ? (
+                <span className='font' style={{ color: 'rgba(0, 0, 0, 0.2)' }}>
+                  <i className='bx bx-edit'></i>
+                </span>
+              ) : (
+                <span className='font' onClick={() => getAssetId(rowIdx)}>
+                  <i className='bx bx-edit'></i>
+                </span>
+              )}
               &emsp;
-              <span className="font" onClick={() => handleClickDeleteBtn(rowIdx)}>
-                <i className="fas fa-times"></i>
+              <span
+                className='font'
+                onClick={() => handleClickDeleteBtn(rowIdx)}
+              >
+                <i className='fas fa-times'></i>
               </span>
             </div>
           );
@@ -307,19 +305,19 @@ function Asset() {
           onSelectCategory={handleSelectCategory}
           onShowAssetDetail={handleShowAssetDetail}
         />
-        <div className="paging-box">
+        <div className='paging-box'>
           {totalPages > 0 && (
             <ReactPaginate
-              previousLabel={"Previous"}
-              nextLabel={"Next"}
-              breakLabel={"..."}
-              breakClassName={"break-me"}
+              previousLabel={'Previous'}
+              nextLabel={'Next'}
+              breakLabel={'...'}
+              breakClassName={'break-me'}
               pageCount={totalPages || 1}
               marginPagesDisplayed={2}
               pageRangeDisplayed={5}
               onPageChange={handlePageClick}
-              containerClassName={"pagination"}
-              activeClassName={"active"}
+              containerClassName={'pagination'}
+              activeClassName={'active'}
             />
           )}
         </div>
@@ -336,7 +334,7 @@ function Asset() {
         <DeleteModal
           closeDeleteModal={closeDeleteModal}
           onDeleteAsset={handleDeleteAsset}
-          title="Do you want to disable this user?"
+          title='Do you want to disable this asset?'
         />
       </Modal>
     </>
