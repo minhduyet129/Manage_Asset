@@ -68,6 +68,7 @@ function LayoutUser({ children }) {
   //   setIsPasswordFirstTimeModalOpen(false);
   // };
 
+  // Open Change password for users when they first login
   useEffect(() => {
     if (userLocalStorage) {
       if (userInfoObject.countLogin <= 1) {

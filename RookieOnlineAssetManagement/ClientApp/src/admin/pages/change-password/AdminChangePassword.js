@@ -1,4 +1,5 @@
 import LayoutAdmin from '../layout/LayoutAdmin';
+import Spinner from '../../../components/Spinner';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -10,8 +11,8 @@ function AdminChangePassword() {
   const [isNewPasswordShowed, setNewPasswordShowed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  // const [oldPassword, setOldPassword] = useState('');
+  // const [newPassword, setNewPassword] = useState('');
   const userLocalStorage = localStorage.getItem('userInfo');
   const userInfoObject = JSON.parse(userLocalStorage);
   const {
@@ -28,36 +29,22 @@ function AdminChangePassword() {
     setNewPasswordShowed(!isNewPasswordShowed);
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data);
-  };
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
     setIsLoading(true);
     setIsError(false);
 
-    const passwordObject = {
+    const values = {
       userId: userInfoObject.userId,
-      oldPassword: oldPassword,
-      newPassword: newPassword,
+      oldPassword: data.oldPassword,
+      newPassword: data.newPassword,
     };
-
-    console.log(passwordObject);
+    console.log(values);
 
     try {
-      const response = await axios.post(
-        '/api/users/ChangePassword',
-        passwordObject,
-        {
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-          },
-        }
-      );
+      const response = await axios.put('/api/users/ChangePassword', values);
       setIsLoading(false);
       console.log(response);
-      // console.log(data);
     } catch (error) {
       setIsLoading(false);
       setIsError(true);
@@ -67,17 +54,15 @@ function AdminChangePassword() {
   return (
     <LayoutAdmin>
       <div className='table__view'>
-        <form className='form' onSubmit={handleChangePassword}>
+        <form className='form' onSubmit={handleSubmit(onSubmit)}>
           <div className='form__title'>Change password</div>
 
           <div className='form__field'>
             <label>Old Password</label>
             <input
-              // {...register('oldPassword', { required: true })}
+              {...register('oldPassword', { required: true })}
               type={isOldPasswordShowed ? 'text' : 'password'}
               className='input'
-              onChange={(e) => setOldPassword(e.target.value)}
-              value={oldPassword}
             />
             <div style={{ margin: '0 10px' }}>
               <i className='bx bx-show' onClick={showOldPassword}></i>
@@ -90,11 +75,9 @@ function AdminChangePassword() {
           <div className='form__field'>
             <label>New Password</label>
             <input
-              // {...register('newPassword', { required: true })}
+              {...register('newPassword', { required: true })}
               type={isNewPasswordShowed ? 'text' : 'password'}
               className='input'
-              onChange={(e) => setNewPassword(e.target.value)}
-              value={newPassword}
             ></input>
             <div style={{ margin: '0 10px' }}>
               <i className='bx bx-show' onClick={showNewPassword}></i>
@@ -110,6 +93,12 @@ function AdminChangePassword() {
               <button className='btn__cancel'>Cancel</button>
             </Link>
           </div>
+
+          {isLoading && (
+            <div>
+              <Spinner />
+            </div>
+          )}
         </form>
       </div>
     </LayoutAdmin>
