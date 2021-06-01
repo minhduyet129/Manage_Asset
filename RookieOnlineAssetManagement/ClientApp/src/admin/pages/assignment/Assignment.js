@@ -9,20 +9,23 @@ import queryString from "query-string";
 
 import AssignmentTable from "./AssignmentTable";
 import LayoutAdmin from "../layout/LayoutAdmin";
-import DeleteModal from "./DeleteModal";
+import ConfirmModal from "./ConfirmModal";
 import AssignmentDetailModal from "./AssignmentDetailModal";
 import { modalCustomStyle } from "../ModalCustomStyles";
 import "./Assignment.css";
 
 Modal.setAppElement("#root");
 
+const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfo = window.JSON.parse(userInfoJSON);
+
 function Assignment() {
   const [assignments, setAssignments] = useState([]);
   const [assignment, setAssignment] = useState();
   const [loading, setLoading] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [deleteId, setDeleteId] = useState();
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
+  const [confirmReturnModal, setConfirmReturnModal] = useState(false);
   const [assignedDate, setAssignedDate] = useState();
   const [pagination, setPaginaion] = useState({
     totalPages: 0,
@@ -42,6 +45,7 @@ function Assignment() {
 
   const assignmentsRef = useRef([]);
   const typingTimoutRef = useRef(null);
+  const assignmentIdRef = useRef(null);
 
   const callAssignmentsAPI = async () => {
     const paramString = queryString.stringify(filters);
@@ -68,20 +72,50 @@ function Assignment() {
   }, [filters]);
 
   const getAssignmentId = (rowIndex) => {
-    if (!assignmentsRef.current) return;
     const id = assignmentsRef.current[rowIndex].id;
+    return id;
+  };
+
+  const handleEditAssignment = (rowIndex) => {
+    const id = getAssignmentId(rowIndex);
     if (id) {
       history.push(`/admin/assignments/${id}/edit`);
     }
   };
 
-  const handleClickDeleteBtn = (rowIndex) => {
-    if (!assignmentsRef.current) return;
-    const id = assignmentsRef.current[rowIndex].id;
-    if (id) {
-      setDeleteId(id);
+  const handleCreateReturnRequest = () => {
+    axios
+      .post("api/Returns", {
+        requestedByUserId: userInfo.userId,
+        assignmentId: assignmentIdRef.current,
+      })
+      .then((res) => {
+        callAssignmentsAPI();
+        setConfirmReturnModal(false);
+        toast.success("Create Request for Returning Successfully");
+      })
+      .catch((err) => {
+        setConfirmReturnModal(false);
+        if (err.response.status === 400) {
+          toast.error("Create Fail");
+        }
+      });
+  }
+
+  const handleClickReturnRequest = (rowIndex) => {
+    const assignmentId = getAssignmentId(rowIndex);
+    if (assignmentId) {
+      assignmentIdRef.current = assignmentId
     }
-    setDeleteModal(true);
+    setConfirmReturnModal(true)
+  };
+
+  const handleClickDeleteBtn = (rowIndex) => {
+    const id = getAssignmentId(rowIndex);
+    if (id) {
+      assignmentIdRef.current = id
+    }
+    setConfirmDeleteModal(true);
   };
 
   const handlePageClick = (data) => {
@@ -148,7 +182,7 @@ function Assignment() {
     });
 
     if (!value) {
-      setAssignedDate(null)
+      setAssignedDate(null);
       setFilters({
         ...filters,
         PageNumber: 1,
@@ -171,10 +205,6 @@ function Assignment() {
 
   const closeModal = () => {
     setIsOpen(false);
-  };
-
-  const closeDeleteModal = () => {
-    setDeleteModal(false);
   };
 
   const handleOnClickAssignment = (value) => {
@@ -201,15 +231,17 @@ function Assignment() {
 
   const handleDeleteAssignment = () => {
     axios
-      .delete(`/api/Assignments/${deleteId}`)
+      .delete(`/api/Assignments/${assignmentIdRef.current}`)
       .then((res) => {
         callAssignmentsAPI();
-        setDeleteModal(false);
+        setConfirmDeleteModal(false);
         toast.success("Delete Successfully");
       })
       .catch((err) => {
-        toast.success("Delete Failed");
-        console.log(err);
+        setConfirmDeleteModal(false);
+        if (err.response.status === 400) {
+          toast.error(err.response.data[0].assignTo);
+        }
       });
   };
 
@@ -289,6 +321,7 @@ function Assignment() {
         },
         accessor: "assignDate",
         Cell: ({ value }) => {
+          if (!value) return null;
           return format(new Date(value), "dd/MM/yyyy");
         },
       },
@@ -306,25 +339,53 @@ function Assignment() {
       {
         Header: "Actions",
         accessor: "actions",
-        Cell: (props) => {
-          const rowIdx = props.row.id;
+        Cell: ({ row }) => {
+          const rowIdx = row.id;
 
           return (
             <div id="actions" style={{ display: "flex" }}>
-              <span className="font" onClick={() => getAssignmentId(rowIdx)}>
-                <i className="bx bx-edit"></i>
-              </span>
+              {row.original.state === "Waiting for acceptance" ? (
+                <span
+                  className="font"
+                  onClick={() => handleEditAssignment(rowIdx)}
+                >
+                  <i className="bx bx-edit"></i>
+                </span>
+              ) : (
+                <span className="font" style={{ color: "rgba(0, 0, 0, 0.2)" }}>
+                  <i className="bx bx-edit"></i>
+                </span>
+              )}
               &emsp;
-              <span
-                className="font"
-                onClick={() => handleClickDeleteBtn(rowIdx)}
-              >
-                <i className="fas fa-times "></i>
-              </span>
+              {row.original.state === "Waiting for acceptance" ||
+              row.original.state === "Declined" ? (
+                <span
+                  className="font"
+                  onClick={() => handleClickDeleteBtn(rowIdx)}
+                >
+                  <i className="fas fa-times "></i>
+                </span>
+              ) : (
+                <span className="font" style={{ color: "rgba(0, 0, 0, 0.2)" }}>
+                  <i className="fas fa-times "></i>
+                </span>
+              )}
               &emsp;
-              <span className="font undo-icon">
-                <i className="fas fa-undo"></i>
-              </span>
+              {row.original.state === "Accepted" ? (
+                <span
+                  className="font undo-icon"
+                  onClick={() => handleClickReturnRequest(rowIdx)}
+                >
+                  <i className="fas fa-undo"></i>
+                </span>
+              ) : (
+                <span
+                  className="font undo-icon"
+                  style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                >
+                  <i className="fas fa-undo"></i>
+                </span>
+              )}
             </div>
           );
         },
@@ -374,10 +435,23 @@ function Assignment() {
           />
         </Modal>
       )}
-      <Modal isOpen={deleteModal} style={modalCustomStyle}>
-        <DeleteModal
-          closeDeleteModal={closeDeleteModal}
+      <Modal isOpen={confirmDeleteModal} style={modalCustomStyle}>
+        <ConfirmModal
+          closeDeleteModal={() => setConfirmDeleteModal(false)}
           onDeleteAssignment={handleDeleteAssignment}
+          title="Are you sure delete this assignment?"
+          acceptBtn="Yes"
+          cancelBtn="No"
+        />
+      </Modal>
+
+      <Modal isOpen={confirmReturnModal} style={modalCustomStyle}>
+        <ConfirmModal
+          closeDeleteModal={() => setConfirmReturnModal(false)}
+          onDeleteAssignment={handleCreateReturnRequest}
+          title="Do you want to create a returning request for this asset?"
+          acceptBtn="Yes"
+          cancelBtn="No"
         />
       </Modal>
     </LayoutAdmin>

@@ -8,21 +8,19 @@ import React from "react";
 import { customStyles } from "../CustomSelectStyle"
 
 const options = [
-  { value: 0, label: "Waiting For Acceptance" },
-  { value: 1, label: "Accepted" },
+  { value: 0, label: "Waiting For Returning" },
+  { value: 1, label: "Completed" },
   { value: 2, label: "Declined" },
-  { value: 3, label: "Waiting For Returning" },
-  { value: 4, label: "Returned" },
 ];
 
 const AssignmentsTable = ({
   columns,
   data = [],
   loading,
-  filterAssignedDate,
+  filterReturnedDate = null,
   onSearch = () => {},
-  onClickAssignment = () => {},
-  onFilterAssignedDate = () => {},
+  onClickRequest = () => {},
+  onFilterReturnedDate = () => {},
   onSelectStateOption = () => {},
 }) => {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
@@ -31,7 +29,7 @@ const AssignmentsTable = ({
   return (
     <div>
       <div className="table__view">
-        <h2>Manage Assignment</h2>
+        <h2>Manage Request for Returning</h2>
         <div className="table__view--search">
           <div className="search">
             <div className="filter-state">
@@ -47,11 +45,11 @@ const AssignmentsTable = ({
               <i className="bx bx-filter-alt" />
             </div>
           </div>
-          <div className="search">
+          {/* <div className="search">
             <div className="filter-state">
               <ReactDatePicker
-                selected={filterAssignedDate}
-                onChange={(e) => onFilterAssignedDate(e)}
+                selected={filterReturnedDate}
+                onChange={(e) => onFilterReturnedDate(e)}
                 placeholderText="Assigned Date"
                 isClearable
                 withPortal
@@ -65,7 +63,7 @@ const AssignmentsTable = ({
               />
               <i className="bx bx-filter-alt" />
             </div>
-          </div>
+          </div> */}
           <div className="search">
             <label />
             <input
@@ -76,9 +74,6 @@ const AssignmentsTable = ({
             />
             <i className="bx bx-search" />
           </div>
-          <Link to="/admin/assignments/create">
-            <button className="btn">Create New Assignment</button>
-          </Link>
         </div>
         <div>
           <table {...getTableProps()}>
@@ -107,7 +102,7 @@ const AssignmentsTable = ({
                       {...row.getRowProps()}
                       onClick={(e) => {
                         if (!e.target.closest("#actions")) {
-                          onClickAssignment(row.original);
+                          onClickRequest(row.original);
                         }
                       }}
                     >

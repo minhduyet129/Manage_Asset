@@ -2,54 +2,54 @@ import axios from "axios";
 import Modal from "react-modal";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
-import { useHistory } from "react-router";
 import ReactPaginate from "react-paginate";
 import { useEffect, useRef, useState, useMemo } from "react";
 import queryString from "query-string";
 
-import AssignmentTable from "./AssignmentTable";
+import RequestTable from "./RequestTable";
 import LayoutAdmin from "../layout/LayoutAdmin";
-import DeleteModal from "./DeleteModal";
-import AssignmentDetailModal from "./AssignmentDetailModal";
+import ConfirmModal from "./ConfirmModal";
+import RequestDetailModal from "./RequestDetailModal";
 import { modalCustomStyle } from "../ModalCustomStyles";
-// import "./Assignment.css";
 
 Modal.setAppElement("#root");
 
+const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfo = window.JSON.parse(userInfoJSON);
+
 function Assignment() {
-  const [assignments, setAssignments] = useState([]);
-  const [assignment, setAssignment] = useState();
+  const [requests, setRequests] = useState([]);
+  const [request, setRequest] = useState();
   const [loading, setLoading] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [deleteId, setDeleteId] = useState();
-  const [assignedDate, setAssignedDate] = useState();
+  const [confirmCompleteModal, setConfirmCompleteModal] = useState(false);
+  const [confirmCancelModal, setConfirmCancelModal] = useState(false);
+  const [returnedDate, setReturnedDate] = useState();
   const [pagination, setPaginaion] = useState({
-    totalPages: 0,
+    totalPages: 1,
     pageNumber: 1,
   });
   const [filters, setFilters] = useState({
     PageNumber: 1,
-    assignedDate: null,
-    filterState: null,
+    returnedDate: null,
+    state: null,
     PageSize: 10,
     keyword: null,
     sortBy: null,
     asc: true,
   });
 
-  const history = useHistory();
-
-  const assignmentsRef = useRef([]);
+  const requestsRef = useRef([]);
+  const requestIdRef = useRef(null);
   const typingTimoutRef = useRef(null);
 
   const callAssignmentsAPI = async () => {
     const paramString = queryString.stringify(filters);
     axios
-      .get(`api/Assignments?${paramString}`)
+      .get(`api/Returns?${paramString}`)
       .then((res) => {
-        assignmentsRef.current = res.data.data;
-        setAssignments(res.data.data);
+        requestsRef.current = res.data.data;
+        setRequests(res.data.data);
         setPaginaion({
           totalPages: res.data.totalPages,
           pageNumber: res.data.pageNumber,
@@ -67,21 +67,25 @@ function Assignment() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
-  const getAssignmentId = (rowIndex) => {
-    if (!assignmentsRef.current) return;
-    const id = assignmentsRef.current[rowIndex].id;
-    if (id) {
-      history.push(`/admin/assignments/${id}/edit`);
-    }
+  const getCurrentId = (rowIndex) => {
+    const id = requestsRef.current[Number(rowIndex)].returnId;
+    return id;
   };
 
-  const handleClickDeleteBtn = (rowIndex) => {
-    if (!assignmentsRef.current) return;
-    const id = assignmentsRef.current[rowIndex].id;
+  const handleClickTickBtn = (rowIndex) => {
+    const id = getCurrentId(rowIndex);
     if (id) {
-      setDeleteId(id);
+      requestIdRef.current = id;
     }
-    setDeleteModal(true);
+    setConfirmCompleteModal(true);
+  };
+
+  const handleClickCancelBtn = (rowIndex) => {
+    const id = getCurrentId(rowIndex);
+    if (id) {
+      requestIdRef.current = id;
+    }
+    setConfirmCancelModal(true);
   };
 
   const handlePageClick = (data) => {
@@ -142,26 +146,27 @@ function Assignment() {
     }, 500);
   };
 
-  const handleFilterAssignedDate = (value) => {
+  const handleFilterReturnedDate = (value) => {
     setPaginaion({
       totalPages: 0,
     });
 
     if (!value) {
-      setAssignedDate(null)
+      setReturnedDate(null);
       setFilters({
         ...filters,
         PageNumber: 1,
-        assignedDate: null,
+        returnedDate: null,
       });
     } else {
-      const date = format(new Date(value), "dd/MM/yyyy");
-      setAssignedDate(value);
-      setFilters({
-        ...filters,
-        PageNumber: 1,
-        assignedDate: date,
-      });
+      // const date = format(new Date(value), "dd/MM/yyyy");
+      console.log(value.toUTCString());
+      setReturnedDate(value);
+      // setFilters({
+      //   ...filters,
+      //   PageNumber: 1,
+      //   returnedDate: date,
+      // });
     }
   };
 
@@ -173,12 +178,9 @@ function Assignment() {
     setIsOpen(false);
   };
 
-  const closeDeleteModal = () => {
-    setDeleteModal(false);
-  };
 
   const handleOnClickAssignment = (value) => {
-    setAssignment(value);
+    setRequest(value);
     openModal();
   };
 
@@ -194,30 +196,53 @@ function Assignment() {
     }
     setFilters({
       ...filters,
-      filterState: event.value,
+      state: event.value,
       PageNumber: 1,
     });
   };
 
-  const handleDeleteAssignment = () => {
+  const handleCompleteRequest = () => {
     axios
-      .delete(`/api/Assignments/${deleteId}`)
+      .put(`/api/Returns/${requestIdRef.current}/Completed?acceptedByUserId=${userInfo.userId}`)
       .then((res) => {
         callAssignmentsAPI();
-        setDeleteModal(false);
-        toast.success("Delete Successfully");
+        setConfirmCompleteModal(false)
+        toast.success("Completed Request for Returning Successfully");
       })
       .catch((err) => {
-        toast.success("Delete Failed");
+        setConfirmCompleteModal(false)
+        toast("Completed Request for Returning Failed");
         console.log(err);
       });
+  };
+
+  const handleCancelRequest = () => {
+    axios
+      .put(`/api/Returns/${requestIdRef.current}/Declined?acceptedByUserId=${userInfo.userId}`)
+      .then((res) => {
+        callAssignmentsAPI();
+        setConfirmCancelModal(false);
+        toast.success("Cancel Request for Returning Successfully");
+      })
+      .catch((err) => {
+        setConfirmCancelModal(false);
+        toast("Cancel Request for Returning Failed");
+        console.log(err);
+      });
+  };
+
+  const handleState = (value) => {
+    if (value === 0) return "WaitingForReturning";
+    if (value === 1) return "Completed";
+    if (value === 2) return "Declined";
+    return null;
   };
 
   const columns = useMemo(
     () => [
       {
         Header: "Id",
-        accessor: "id",
+        accessor: "returnId",
       },
       {
         Header: () => {
@@ -252,47 +277,67 @@ function Assignment() {
           return (
             <div
               className="table-header"
-              onClick={() => handleSortBy("assignTo")}
+              onClick={() => handleSortBy("requestedBy")}
             >
-              <span>Assigned to</span>
-              {handleSortIcon("assignTo")}
+              <span>Requested By</span>
+              {handleSortIcon("requestedBy")}
             </div>
           );
         },
-        accessor: "assignTo",
+        accessor: "requestBy",
       },
       {
         Header: () => {
           return (
             <div
               className="table-header"
-              onClick={() => handleSortBy("assignBy")}
-            >
-              <span>Assigned by</span>
-              {handleSortIcon("assignBy")}
-            </div>
-          );
-        },
-        accessor: "assignBy",
-      },
-      {
-        Header: () => {
-          return (
-            <div
-              className="table-header"
-              onClick={() => handleSortBy("assignDate")}
+              onClick={() => handleSortBy("assignedDate")}
             >
               <span>Assigned Date</span>
-              {handleSortIcon("assignDate")}
+              {handleSortIcon("assignedDate")}
             </div>
           );
         },
-        accessor: "assignDate",
+        accessor: "assignedDate",
         Cell: ({ value }) => {
+          if (!value) return null;
           return format(new Date(value), "dd/MM/yyyy");
         },
       },
       {
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("acceptedBy")}
+            >
+              <span>Accepted by</span>
+              {handleSortIcon("acceptedBy")}
+            </div>
+          );
+        },
+        accessor: "acceptedBy",
+      },
+      {
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("returnedDate")}
+            >
+              <span>Returned Date</span>
+              {handleSortIcon("returnedDate")}
+            </div>
+          );
+        },
+        accessor: "returnedDate",
+        Cell: ({ value }) => {
+          if (!value) return null;
+          return format(new Date(value), "dd/MM/yyyy");
+        },
+      },
+      {
+        id: "state",
         Header: () => {
           return (
             <div className="table-header" onClick={() => handleSortBy("state")}>
@@ -301,30 +346,49 @@ function Assignment() {
             </div>
           );
         },
-        accessor: "state",
+        accessor: (d) => <div>{handleState(d.state)}</div>,
       },
       {
         Header: "Actions",
         accessor: "actions",
-        Cell: (props) => {
-          const rowIdx = props.row.id;
+        Cell: ({ row }) => {
+          const rowIdx = row.id;
 
           return (
             <div id="actions" style={{ display: "flex" }}>
-              <span className="font" onClick={() => getAssignmentId(rowIdx)}>
-                <i className="bx bx-edit"></i>
-              </span>
-              &emsp;
-              <span
-                className="font"
-                onClick={() => handleClickDeleteBtn(rowIdx)}
-              >
-                <i className="fas fa-times "></i>
-              </span>
-              &emsp;
-              <span className="font undo-icon">
-                <i className="fas fa-undo"></i>
-              </span>
+              {row.original.state === 0 ? (
+                <>
+                  <span
+                    className="font"
+                    onClick={() => handleClickTickBtn(rowIdx)}
+                  >
+                    <i class="fas fa-check"></i>
+                  </span>
+                  &emsp;
+                  <span
+                    className="font"
+                    onClick={() => handleClickCancelBtn(rowIdx)}
+                  >
+                    <i className="fas fa-times "></i>
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span
+                    className="font"
+                    style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                  >
+                    <i class="fas fa-check"></i>
+                  </span>
+                  &emsp;
+                  <span
+                    className="font"
+                    style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                  >
+                    <i className="fas fa-times "></i>
+                  </span>
+                </>
+              )}
             </div>
           );
         },
@@ -336,14 +400,14 @@ function Assignment() {
 
   return (
     <LayoutAdmin>
-      <AssignmentTable
+      <RequestTable
         columns={columns}
-        data={assignments}
+        data={requests}
         loading={loading}
-        filterAssignedDate={assignedDate}
+        filterReturnedDate={returnedDate}
         onSearch={handleSearchChange}
-        onClickAssignment={handleOnClickAssignment}
-        onFilterAssignedDate={handleFilterAssignedDate}
+        onClickRequest={handleOnClickAssignment}
+        onFilterReturnedDate={handleFilterReturnedDate}
         onSelectStateOption={handleSelectState}
       />
       <div className="paging-box">
@@ -362,22 +426,28 @@ function Assignment() {
           />
         )}
       </div>
-      {assignment && (
+      {request && (
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
           style={modalCustomStyle}
         >
-          <AssignmentDetailModal
-            closeModal={closeModal}
-            assignment={assignment}
-          />
+          <RequestDetailModal closeModal={closeModal} assignment={request} />
         </Modal>
       )}
-      <Modal isOpen={deleteModal} style={modalCustomStyle}>
-        <DeleteModal
-          closeDeleteModal={closeDeleteModal}
-          onDeleteAssignment={handleDeleteAssignment}
+      <Modal isOpen={confirmCompleteModal} style={modalCustomStyle}>
+        <ConfirmModal
+          closeDeleteModal={() => setConfirmCompleteModal(false)}
+          onRequest={handleCompleteRequest}
+          title="Do you want to mark this returning request as 'Completed' "
+        />
+      </Modal>
+
+      <Modal isOpen={confirmCancelModal} style={modalCustomStyle}>
+        <ConfirmModal
+          closeDeleteModal={() => setConfirmCancelModal(false)}
+          onRequest={handleCancelRequest}
+          title="Do you want to cancel this returning request"
         />
       </Modal>
     </LayoutAdmin>
