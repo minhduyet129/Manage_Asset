@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import LayoutUser from '../layout/LayoutUser';
 // import UserHomeTable from './UserHomeTable';
 import CreateReturningRequestModal from './CreateReturningRequestModal';
+import UserHomeTable from './UserHomeTable';
 
 const customStyles = {
   content: {
@@ -35,6 +36,7 @@ const UserHome = () => {
           />
         </Modal>
         <h2>Hello User</h2>
+        <UserHomeTable/>
       </div>
     </LayoutUser>
   );
