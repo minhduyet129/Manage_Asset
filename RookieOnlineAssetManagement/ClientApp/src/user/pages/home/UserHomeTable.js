@@ -1,17 +1,16 @@
 import { useMemo } from 'react';
 import { useTable } from 'react-table';
-import { useQuery } from 'react-query';
-import { api } from '../../../api';
+import axios from 'axios'
 
 const UserHomeTable = () => {
-  const assignmentInfo = useQuery('assignments', async () => {
-    const response = await api.get('/assignments');
-    if (response.isError) {
-      throw new Error('Network response was error.');
-    }
-    const result = await response.data;
-    return result;
-  });
+  // const assignmentInfo = useQuery('assignments', async () => {
+  //   const response = await axios.get('api/assignments');
+  //   if (response.isError) {
+  //     throw new Error('Network response was error.');
+  //   }
+  //   const result = await response.data;
+  //   return result;
+  // });
 
   const columns = useMemo(
     () => [
