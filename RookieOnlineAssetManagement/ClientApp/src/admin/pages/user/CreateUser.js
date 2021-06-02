@@ -3,7 +3,7 @@ import LayoutAdmin from "../layout/LayoutAdmin";
 import { useForm, Controller } from "react-hook-form";
 import { useCreateUser } from "./UserHooks";
 import DatePicker from "react-datepicker";
-import { useHistory } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
@@ -80,13 +80,13 @@ const CreateUser = () => {
   const { errors } = formState;
 
   const onSubmit = async (data) => {
-    await handlerUser(data);
+    <Redirect push to='/admin/assets'/>
+    // await handlerUser(data);
   };
-
   return (
     <LayoutAdmin>
       <div className="table__view">
-        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+        <form className="form" onSubmit={ handleSubmit(onSubmit)}>
           <h2 className="form__title">Create User</h2>
           <div className="form__field">
             <label className="form__label" htmlFor="firstname">

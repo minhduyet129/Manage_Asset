@@ -17,9 +17,8 @@ const AssignmentsTable = ({
     if (value === 0) return 'Waiting For Acceptance';
     if (value === 1) return 'Accepted';
     if (value === 2) return 'Declined';
-    if (value === 3) return 'Assigned';
-    if (value === 4) return 'Waiting For Returning';
-    if (value === 5) return 'Returned';
+    if (value === 3) return 'Waiting For Returning';
+    if (value === 4) return 'Returned';
     return null;
   };
 
