@@ -159,14 +159,13 @@ function Assignment() {
         returnedDate: null,
       });
     } else {
-      // const date = format(new Date(value), "dd/MM/yyyy");
-      console.log(value.toUTCString());
+      const date = format(new Date(value), "dd/MM/yyyy");
       setReturnedDate(value);
-      // setFilters({
-      //   ...filters,
-      //   PageNumber: 1,
-      //   returnedDate: date,
-      // });
+      setFilters({
+        ...filters,
+        PageNumber: 1,
+        returnedDate: date,
+      });
     }
   };
 
