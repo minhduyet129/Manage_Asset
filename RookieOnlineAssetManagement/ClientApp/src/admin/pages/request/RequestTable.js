@@ -1,6 +1,5 @@
 import { useTable, usePagination } from "react-table";
 import ReactDatePicker from "react-datepicker";
-import { Link } from "react-router-dom";
 import Select from "react-select";
 import React from "react";
 
@@ -10,7 +9,6 @@ import { customStyles } from "../CustomSelectStyle"
 const options = [
   { value: 0, label: "Waiting For Returning" },
   { value: 1, label: "Completed" },
-  { value: 2, label: "Declined" },
 ];
 
 const AssignmentsTable = ({
@@ -45,12 +43,12 @@ const AssignmentsTable = ({
               <i className="bx bx-filter-alt" />
             </div>
           </div>
-          {/* <div className="search">
+          <div className="search">
             <div className="filter-state">
               <ReactDatePicker
                 selected={filterReturnedDate}
                 onChange={(e) => onFilterReturnedDate(e)}
-                placeholderText="Assigned Date"
+                placeholderText="Returned Date"
                 isClearable
                 withPortal
                 showYearDropdown
@@ -63,12 +61,12 @@ const AssignmentsTable = ({
               />
               <i className="bx bx-filter-alt" />
             </div>
-          </div> */}
+          </div>
           <div className="search">
             <label />
             <input
               type="text"
-              placeholder="Name"
+              placeholder="Search by asset code/ asset name/ request by"
               id="search"
               onChange={(e) => onSearch(e.target.value)}
             />
