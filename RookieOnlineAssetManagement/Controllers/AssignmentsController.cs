@@ -163,7 +163,9 @@ namespace RookieOnlineAssetManagement.Controllers
             IQueryable<Assignment> queryable = _dbContext.Assignments;
             queryable = queryable.Include(a => a.Asset)
                 .Include(a => a.AssignBy)
-                .Include(a => a.AssignTo);
+                .Include(a => a.AssignTo)
+                .Where(x => x.State != AssignmentState.Returned)
+                ;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -354,7 +356,7 @@ namespace RookieOnlineAssetManagement.Controllers
                          join c in _dbContext.Users
                          on a.AssignById equals c.Id into f
                          from c in f.DefaultIfEmpty()
-
+                         where a.State != AssignmentState.Returned
                          where a.AssignToId == id
                          where a.AssignedDate <= DateTime.Now
                             select new
