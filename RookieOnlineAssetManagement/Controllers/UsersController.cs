@@ -208,7 +208,7 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             if(!string.IsNullOrEmpty(filterUser))
             {
-                queryable = queryable.Where(x => x.UserRoles.FirstOrDefault().Role.Name!=null&& x.UserRoles.FirstOrDefault().Role.Name == filterUser);
+                queryable = queryable.Where(x => x.UserRoles.FirstOrDefault()!=null&& x.UserRoles.FirstOrDefault().Role.Name == filterUser);
             }
 
             if (!string.IsNullOrEmpty(sortBy))
