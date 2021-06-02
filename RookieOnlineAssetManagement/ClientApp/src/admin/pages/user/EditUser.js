@@ -45,7 +45,6 @@ const EditUser = () => {
       .then((res) => {
         setUsers(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
-        console.log(setDateTime(res.data.data.doB));
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
           id: res.data.data.id,
@@ -157,7 +156,6 @@ const EditUser = () => {
                   onChange={(d) => {
                     onChange(d);
                     setStartDate(d);
-                    console.log(d);
                   }}
                   placeholderText='MM/DD/YY'
                   withPortal
@@ -188,7 +186,6 @@ const EditUser = () => {
                   onChange={(d) => {
                     onChange(d);
                     setJoinedDate(d);
-                    console.log(d);
                   }}
                   filterDate={isWeekday}
                   placeholderText='MM/DD/YY'

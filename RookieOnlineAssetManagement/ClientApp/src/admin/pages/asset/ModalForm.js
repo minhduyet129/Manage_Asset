@@ -36,11 +36,9 @@ const ModalForm = ({ modalIsOpen, setModelIsOpen, setChanges }) => {
 
   const categorySubmit = (data) => {
     handleCategory(data);
-    console.log(data);
   };
 
   function handleCategory(category) {
-    console.log(category);
     return getApiAssets
       .createCategories(category)
       .then((response) => {

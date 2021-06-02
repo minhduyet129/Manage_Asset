@@ -68,7 +68,6 @@ function LayoutUser({ children }) {
     //   setIsLoading(false);
     //   setIsError(true);
     // }
-    console.log(data);
   };
 
   // const handleCreateRequestForReturning = () => {

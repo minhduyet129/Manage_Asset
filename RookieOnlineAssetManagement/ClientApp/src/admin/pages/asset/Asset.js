@@ -48,7 +48,6 @@ function Asset() {
         setAssets(res.data.data);
         setTotalPages(res.data.totalPages);
         setLoading(false);
-        console.log(res.data.data);
       })
       .catch((err) => console.log(err));
   };
@@ -173,11 +172,9 @@ function Asset() {
       .getAssetDetails(value.id)
       .then((res) => {
         setAssetHistories(res.data)
-        console.log(res.data)
       })
       .catch((err) => {
         setError(err);
-        console.log(err);
       });
     openModal();
   };

@@ -14,7 +14,6 @@ function Report() {
       .getReports()
       .then((res) => {
         setReports(res.data);
-        console.log(res.data);
         setLoading(false);
       })
       .catch((err) => console.log(err));
