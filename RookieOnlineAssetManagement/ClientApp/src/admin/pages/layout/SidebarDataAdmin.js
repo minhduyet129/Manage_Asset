@@ -34,9 +34,4 @@ export const SidebarData = [
     path: '/admin/reports',
     icon: 'bx bxs-minus-circle',
   },
-  {
-    title: 'Change Password',
-    path: '/admin/change-password',
-    icon: 'bx bxs-minus-circle',
-  },
 ];

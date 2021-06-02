@@ -21,8 +21,14 @@ const customStyles = {
 
 function LayoutAdmin({ children }) {
   const [sidebar, setSidebar] = useState(false);
+  const [dropDown, setDropdown] = useState(false);
 
   const showSidebar = () => setSidebar(!sidebar);
+  const showDropdown = () => setDropdown(!dropDown);
+  const autoHideDropdown = () =>
+    setTimeout(() => {
+      setDropdown(!dropDown);
+    }, 4000);
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
@@ -124,15 +130,31 @@ function LayoutAdmin({ children }) {
           <div className='toggle' onClick={showSidebar}>
             <i className='bx bx-menu'></i>
           </div>
-          <div style={{ marginLeft: '70%' }}>
-            <button className='btn' onClick={openChangePasswordModal}>
-              Change password
-            </button>
-          </div>
-          <div>
-            <Link to='/login' className='btn' onClick={handleLogout}>
-              Logout
-            </Link>
+
+          <div className='dropdown'>
+            <span className='dropdown-username'>{userInfoObject.userName}</span>
+            <span style={{ paddingRight: '10px' }}>
+              <i
+                className='bx bxs-chevron-down'
+                onClick={showDropdown}
+                onMouseLeave={autoHideDropdown}
+                style={{ fontSize: '23px' }}
+              ></i>
+            </span>
+            <div
+              className={
+                dropDown ? 'dropdown-content show' : 'dropdown-content'
+              }
+            >
+              <button className='dropbtn' onClick={openChangePasswordModal}>
+                <i className='bx bxs-lock-alt icon-dropdown'></i>
+                Change password
+              </button>
+              <Link to='/login' className='dropbtn' onClick={handleLogout}>
+                <i className='bx bx-log-out-circle icon-dropdown'></i>
+                Logout
+              </Link>
+            </div>
           </div>
         </div>
 
