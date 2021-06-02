@@ -134,15 +134,16 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
         accessor: (d) => <div>{d.firstName + ' ' + d.lastName}</div>,
       },
       {
+        id: 'roles',
         Header: () => {
           return (
-            <div className='table-header' onClick={() => handleSortBy('type')}>
+            <div className='table-header' onClick={() => handleSortBy('roles')}>
               <span>Type</span>
-              {handleSortIcon('type')}
+              {handleSortIcon('roles')}
             </div>
           );
         },
-        accessor: 'roles',
+        accessor: (d) => <div>{d.roles[0]}</div>,
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps

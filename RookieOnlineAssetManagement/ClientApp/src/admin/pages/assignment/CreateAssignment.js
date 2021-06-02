@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import ReactDatePicker from 'react-datepicker';
 import { useHistory } from 'react-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -26,8 +26,8 @@ const customStyles = {
 };
 
 const schema = Yup.object().shape({
-  assignToId: Yup.string().required('User is required'),
-  assetId: Yup.string().required('Asset is required'),
+  assignToId: Yup.number().required('User is required').typeError('User is required').nullable(true),
+  assetId: Yup.number().required('Asset is required').typeError('Asset is required').nullable(true),
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
