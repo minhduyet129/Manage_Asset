@@ -124,7 +124,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
         }
         [HttpGet("{id}/Detail")]
-        public async Task<IActionResult> GetAssetDetail(int id)
+        public IActionResult GetAssetDetail(int id)
         {
             var queryable =
                             from b in _context.Assignments

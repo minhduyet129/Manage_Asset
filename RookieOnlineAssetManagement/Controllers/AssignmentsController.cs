@@ -31,7 +31,7 @@ namespace RookieOnlineAssetManagement.Controllers
             _userManager = userManager;
         }
 
-        private string GetAssignmentState(AssignmentState state)
+        private static string GetAssignmentState(AssignmentState state)
         {
             if (state == AssignmentState.Waiting)
             {
@@ -302,7 +302,7 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             try
             {
-                var assignment = await _dbContext.Assignments.SingleOrDefaultAsync(a => a.Id == id);
+                var assignment = await _dbContext.Assignments.Include(x=>x.AssignBy).Include(y=>y.AssignTo).SingleOrDefaultAsync(a => a.Id == id);
 
                 if (assignment == null) return NotFound("Not found assignment");
                 if (assignment.State != AssignmentState.Waiting) return BadRequest("Assignment must have state Waiting for acceptance ");
@@ -315,22 +315,10 @@ namespace RookieOnlineAssetManagement.Controllers
                 assignment.AssetId = model.AssetId;
                 assignment.AssignedDate = model.AssignedDate;
                 assignment.Note = model.Note;
-
+                 _dbContext.Entry(assignment).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(new AssignmentResponseModel
-                {
-                    Id = assignment.Id,
-                    AssetCode = assignment.Asset.AssetCode,
-                    AssetName = assignment.Asset.AssetName,
-                    AssignTo = assignment.AssignTo.UserName,
-                    AssignBy = assignment.AssignBy.UserName,
-                    AssignDate = assignment.AssignedDate,
-                    State = GetAssignmentState(assignment.State),
-                    AssetId = assignment.AssetId,
-                    AssignById = assignment.AssignById,
-                    AssignToId = assignment.AssignToId
-                });
+                return Ok("Update succeed!");
             }
             catch (Exception ex)
             {
@@ -369,16 +357,16 @@ namespace RookieOnlineAssetManagement.Controllers
 
                          where a.AssignToId == id
                          where a.AssignedDate <= DateTime.Now
-                         select new
+                            select new
                          {
                              AssignmentId=a.Id,
                              AssetCode=b.AssetCode,
                              AssetName=b.AssetName,
                              AssignedBy=c.UserName,
                              AssignedDate=a.AssignedDate,
-                             State =GetAssignmentState(a.State)
+                             State = GetAssignmentState(a.State)
 
-                         };
+                            };
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy)
@@ -393,7 +381,6 @@ namespace RookieOnlineAssetManagement.Controllers
                         queryable = asc ? queryable.OrderBy(u => u.AssetName) : queryable.OrderByDescending(u => u.AssetName);
                         break;
 
-                    
 
                     case "assignBy":
                         queryable = asc ? queryable.OrderBy(u => u.AssignedBy) : queryable.OrderByDescending(u => u.AssignedBy);

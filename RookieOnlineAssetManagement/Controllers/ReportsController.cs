@@ -23,7 +23,7 @@ namespace RookieOnlineAssetManagement.Controllers
             _context = context;
         }
         [HttpGet]
-        public IActionResult ReportList()
+        public IActionResult ReportList(string sortBy, bool asc = true)
         {
             try
             {
@@ -39,7 +39,50 @@ namespace RookieOnlineAssetManagement.Controllers
                                 WaitingForApproval = c.Assets.Count(a => a.State == AssetState.WaitingForApproval),
                                 Recycled = c.Assets.Count(a => a.State == AssetState.Recycled),
                             };
+                if (!string.IsNullOrEmpty(sortBy))
+                {
+                    switch (sortBy)
+                    {
+                        
+                        case "category":
+                            query = asc ? query.OrderBy(u => u.CategoryName) : query.OrderByDescending(u => u.CategoryName);
 
+                            break;
+                        case "total":
+                            query = asc ? query.OrderBy(u => u.Total) : query.OrderByDescending(u => u.Total);
+
+                            break;
+                        case "assigned":
+                            query = asc ? query.OrderBy(u => u.Assgined) : query.OrderByDescending(u => u.Assgined);
+
+                            break;
+                        case "available":
+                            query = asc ? query.OrderBy(u => u.Available) : query.OrderByDescending(u => u.Available);
+
+                            break;
+                        case "notAvailable":
+                            query = asc ? query.OrderBy(u => u.NotAvailable) : query.OrderByDescending(u => u.NotAvailable);
+
+                            break;
+                        case "waitingForRecycling":
+                            query = asc ? query.OrderBy(u => u.WaitingForRecycling) : query.OrderByDescending(u => u.WaitingForRecycling);
+
+                            break;
+                        case "recycled":
+                            query = asc ? query.OrderBy(u => u.Recycled) : query.OrderByDescending(u => u.Recycled);
+
+                            break;
+                        case "waitingForApproval":
+                            query = asc ? query.OrderBy(u => u.WaitingForApproval) : query.OrderByDescending(u => u.WaitingForApproval);
+
+                            break;
+                        default:
+                            query = asc ? query.OrderBy(u => u.CategoryName) : query.OrderByDescending(u => u.CategoryName);
+
+                            break;
+
+                    }
+                }
                 return Ok(query);
             }
             catch (Exception ex)
