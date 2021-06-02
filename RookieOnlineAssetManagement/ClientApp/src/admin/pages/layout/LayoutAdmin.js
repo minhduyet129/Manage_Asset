@@ -63,11 +63,9 @@ function LayoutAdmin({ children }) {
       oldPassword: data.oldPassword,
       newPassword: data.newPassword,
     };
-    console.log(values);
 
     try {
       const response = await axios.post('/api/users/ChangePassword', values);
-      console.log(response);
       setIsLoading(false);
       setIsPasswordModalOpen(false);
       setIsPasswordChangeSuccessModalOpen(true);

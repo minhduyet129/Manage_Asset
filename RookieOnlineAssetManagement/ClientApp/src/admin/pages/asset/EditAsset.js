@@ -31,7 +31,6 @@ const EditAsset = (props) => {
       .then((res) => {
         setAssets(res.data);
         setInstalledDate(setDateTime(res.data[0].installedDate));
-        console.log(res.data);
         reset({
           id: res.data[0].id,
           assetCode: res.data[0].assetCode,
@@ -84,7 +83,6 @@ const EditAsset = (props) => {
     updateAssets(data);
     // alert('Edit successfully!');
     // history.push('/admin/assets');
-    console.log(data);
   };
 
   return (
@@ -128,7 +126,6 @@ const EditAsset = (props) => {
                   onChange={(e) => {
                     onChange(e);
                     setInstalledDate(e);
-                    console.log(e);
                   }}
                   placeholderText='MM/DD/YY'
                   withPortal

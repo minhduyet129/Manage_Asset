@@ -51,7 +51,6 @@ const CreateUser = () => {
           toast.success('Add user sucessfully');
           history.push('/admin/users');
         }
-        console.log(users);
       })
       .catch((error) => {
         if (error.response) {
@@ -69,7 +68,6 @@ const CreateUser = () => {
 
   const onSubmit = async (data) => {
     await handlerUser(data);
-    console.log(data);
   };
 
   return (
