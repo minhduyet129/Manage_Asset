@@ -257,7 +257,7 @@
 
 .dropdown-username {
   padding: 15px;
-  font-size: 17px;
+  font-size: var(--normal-font-size);
 }
 
 .dropdown-content a,
@@ -274,7 +274,7 @@ button {
   background-color: var(--secondary-color);
   color: var(--white);
   padding: 16px;
-  font-size: 16px;
+  font-size: var(--normal-font-size);
   font-family: 'Poppins';
   border: none;
   cursor: pointer;
@@ -294,5 +294,5 @@ button:hover {
   position: relative;
   top: 2px;
   padding-right: 10px;
-  font-size: 20px;
+  font-size: 1.1rem;
 }

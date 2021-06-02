@@ -165,7 +165,7 @@ const EditAsset = (props) => {
           <p className='invalid-feedback'>{errors.state?.message}</p>
 
           <div className='form__field'>
-            <input type='submit' className='btn' value='Submit' />
+            <input type='submit' className='btn' value='Save' />
             <Link to='/admin/assets/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>

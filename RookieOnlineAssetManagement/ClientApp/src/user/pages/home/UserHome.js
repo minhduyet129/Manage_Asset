@@ -35,8 +35,7 @@ const UserHome = () => {
             onCreateRequestForReturning={onCreateRequestForReturning}
           />
         </Modal> */}
-        <h2>Hello User</h2>
-        <UserHomeTable/>
+        <UserHomeTable />
       </div>
     </LayoutUser>
   );
