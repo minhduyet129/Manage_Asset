@@ -45,7 +45,7 @@ const EditUser = () => {
       .then((res) => {
         setUsers(res.data.data);
         setStartDate(setDateTime(res.data.data.doB));
-        console.log(setDateTime(res.data.data.doB))
+        console.log(setDateTime(res.data.data.doB));
         setJoinedDate(setDateTime(res.data.data.joinedDate));
         reset({
           id: res.data.data.id,
@@ -91,9 +91,9 @@ const EditUser = () => {
   const { errors } = formState;
 
   const setDateTime = (data) => {
-    let d = new Date(data.slice(0, 10))
-    let date = new Date(d.setHours(d.getHours() + 7))
-    
+    let d = new Date(data.slice(0, 10));
+    let date = new Date(d.setHours(d.getHours() + 7));
+
     return date;
   };
 
@@ -187,7 +187,7 @@ const EditUser = () => {
                   selected={joinedDate}
                   onChange={(d) => {
                     onChange(d);
-                    setJoinedDate(d)
+                    setJoinedDate(d);
                     console.log(d);
                   }}
                   filterDate={isWeekday}
@@ -236,7 +236,7 @@ const EditUser = () => {
           </div>
           {errors.type && <span>This field is required</span>}
           <div className='form__field'>
-            <input type='submit' className='btn' value='Submit' />
+            <input type='submit' className='btn' value='Save' />
             <Link to='/admin/users/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>

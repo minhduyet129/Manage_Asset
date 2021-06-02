@@ -19,6 +19,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminChangePassword from './admin/pages/change-password/AdminChangePassword';
 
 function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -69,6 +70,7 @@ function App() {
           component={RequestForReturning}
         />
         <Route path='/admin/reports' exact component={Report} />
+        <Route path='/admin/change-password' component={AdminChangePassword} />
       </Switch>
     </>
   ) : isUserLoggedIn ? (

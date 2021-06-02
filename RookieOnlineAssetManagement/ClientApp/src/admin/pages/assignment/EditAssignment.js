@@ -25,15 +25,19 @@ const customStyles = {
 };
 
 const schema = Yup.object().shape({
-  assignToId: Yup.string().required('User is required'),
-  assetId: Yup.string().required('Asset is required'),
+  assignToId: Yup.number()
+    .required('User is required')
+    .typeError('User is required'),
+  assetId: Yup.number()
+    .required('Asset is required')
+    .typeError('Asset is required'),
   assignedDate: Yup.date()
     .required('Assigned Date is required')
-    .typeError('Assigned Date is required')
+    .typeError('Assigned Date is required'),
 });
 
-const userInfoJSON = window.localStorage.getItem('userInfo')
-const userInfo = window.JSON.parse(userInfoJSON)
+const userInfoJSON = window.localStorage.getItem('userInfo');
+const userInfo = window.JSON.parse(userInfoJSON);
 
 function CreateAssignment() {
   const [userModal, setUserModal] = useState(false);
@@ -41,9 +45,9 @@ function CreateAssignment() {
   const [fullName, setFullName] = useState();
   const [assetName, setAssetName] = useState();
   const [submitData, setSubmitData] = useState({
-    assignToId: null,
-    assetId: null,
-    assignedDate: '',
+    assignToId: '',
+    assetId: '',
+    assignedDate: null,
     assignById: userInfo.userId,
   });
 
@@ -83,6 +87,7 @@ function CreateAssignment() {
       .catch((err) => {
         console.log(err);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const onSubmit = (data) => {
@@ -122,12 +127,12 @@ function CreateAssignment() {
     setSubmitData((prev) => {
       return {
         ...submitData,
-        assignToId: null,
+        assignToId: '',
       };
     });
     reset({
       ...submitData,
-      assignToId: null,
+      assignToId: '',
     });
   };
 
@@ -145,12 +150,12 @@ function CreateAssignment() {
     setSubmitData((prev) => {
       return {
         ...submitData,
-        assetId: null,
+        assetId: '',
       };
     });
     reset({
       ...submitData,
-      assetId: null,
+      assetId: '',
     });
   };
 
@@ -269,7 +274,7 @@ function CreateAssignment() {
           </div>
 
           <div className='form__field'>
-            <input type='submit' className='btn' value='Update' />
+            <input type='submit' className='btn' value='Save' />
             <Link to='/admin/assignments/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>

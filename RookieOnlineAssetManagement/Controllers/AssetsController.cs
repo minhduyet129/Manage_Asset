@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace RookieOnlineAssetManagement.Controllers
 {
-    [Authorize(Roles =RoleName.Admin)]
+    [Authorize(Roles = RoleName.Admin)]
     [ApiController]
     [Route("api/[Controller]")]
     public class AssetsController : ControllerBase
@@ -124,15 +124,70 @@ namespace RookieOnlineAssetManagement.Controllers
 
         }
         [HttpGet("{id}/Detail")]
-        public async Task<IActionResult> GetAssetDetail(int id)
+        public IActionResult GetAssetDetail(int id)
         {
-            var asset = await _context.Assets.Include(x => x.Assignments.Where(x => x.AssetId == id)).SingleOrDefaultAsync(x => x.Id == id);
-            if (asset == null)
-            {
-                return BadRequest();
-            }
+            var queryable =
+                            from b in _context.Assignments
+                            join c in _context.Users
+                            on b.AssignToId equals c.Id
+                            into f
+                            from c in f.DefaultIfEmpty()
+                            join d in _context.Users
+                            on b.AssignById equals d.Id
+                            into g
+                            from d in g.DefaultIfEmpty()
 
-            return Ok(asset);
+                            select new
+                            {
+                                AssetId=b.AssetId,
+                                AssignState=b.State,
+                                AssignDate=b.AssignedDate,
+                                AssignBy = d.UserName,
+                                AssignTo = c.UserName
+
+                            } into k
+                            join a in _context.Assets
+                             on k.AssetId equals a.Id into h
+                            from a in h.DefaultIfEmpty()
+                            where a.Id == id
+                            select new
+                            {
+                                
+                                AssetId=a.Id,
+                                a.AssetCode,
+                                a.AssetName,
+                                a.Category.Name,
+                                a.InstalledDate,
+                                a.Location,
+                                a.State,
+                                k.AssignDate,
+                                k.AssignTo,
+                                k.AssignBy,
+                                k.AssignState
+
+                            };
+
+            if (queryable.Count()>0)
+            {
+                return Ok(queryable);
+            };
+
+            var query = from a in _context.Assets
+                        where a.Id==id
+                        select new
+                        {
+                            AssetId = a.Id,
+                            a.AssetCode,
+                            a.AssetName,
+                            a.Category.Name,
+                            a.InstalledDate,
+                            a.Location,
+                            a.State
+                        };
+   
+            return Ok(query);
+
+                            
         }
         [HttpGet("GetAssetAvailable")]
         public async Task<IActionResult> GetAssetAvailable(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
