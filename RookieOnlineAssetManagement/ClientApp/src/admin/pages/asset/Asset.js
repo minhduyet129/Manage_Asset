@@ -1,6 +1,6 @@
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, Redirect, useHistory } from 'react-router-dom';
+import {useHistory } from 'react-router-dom';
 import { getApiAssets } from './assetsApi';
 import AssetsTable from './AssetsTable';
 import { toast } from 'react-toastify';

@@ -41,6 +41,7 @@ const CreateAsset = (props) => {
   const [modalIsOpen, setModelIsOpen] = useState(false);
   const [installedDate, setInstalledDate] = useState();
   const [categories, setCategories] = useState([]);
+  const [location, setLocation] = useState([]);
   const [changes, setChanges] = useState(false);
   const history = useHistory();
 
@@ -53,11 +54,23 @@ const CreateAsset = (props) => {
     register,
     handleSubmit,
     control,
-    // reset,
+     reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
+
+  useEffect(() => {
+    const items = JSON.parse(localStorage.getItem('userInfo'));
+    if (items) {
+      setLocation(items);
+      console.log(items)
+      reset({
+        location: items.location,
+      });
+    }
+  }, []);
+
 
   const onSubmit = async (data) => {
     await handleAsset(data);
@@ -150,7 +163,7 @@ const CreateAsset = (props) => {
             </div>
           </div>
            <p className='invalid-feedback'>{errors.categoryId?.message}</p> 
-
+           <input id='location' {...register('location')} className='input' hidden />
           <div className='form__field'>
             <label>Specification</label>
             <textarea

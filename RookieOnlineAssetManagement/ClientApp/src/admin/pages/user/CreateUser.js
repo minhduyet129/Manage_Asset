@@ -12,10 +12,11 @@ import { toast } from 'react-toastify';
 const schema = Yup.object().shape({
   firstName: Yup.string()
     .required('First Name is required')
-    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid Input'),
+    .matches(/^[aA-zZ\s 0-9 ]+$/, 'Invalid Input').max(8, 'Can only contain 8 charaters').trim(),
   lastName: Yup.string()
     .required('Last name is required')
-    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid Input'),
+    .matches(/^[aA-zZ\s 0-9 ]+$/, 'Invalid Input').max(8, 'Can only contain 8 charaters').trim(),
+
   doB: Yup.date()
     .required('Date of birth is required')
     .typeError('Date of birth is required')
@@ -36,7 +37,7 @@ const schema = Yup.object().shape({
 const CreateUser = () => {
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState();
-  const [reload, setReload] = useState(true);
+  const [location, setLocation] = useState([]);
   const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
@@ -60,9 +61,18 @@ const CreateUser = () => {
       });
   };
 
-  // useEffect(handlerUser, []);
+  useEffect(() => {
+    const items = JSON.parse(localStorage.getItem('userInfo'));
+    if (items) {
+      setLocation(items);
+      console.log(items)
+      reset({
+        location: items.location,
+      });
+    }
+  }, []);
 
-  const { register, handleSubmit, control, formState } = useForm({
+  const { register, handleSubmit, control, formState, reset } = useForm({
     resolver: yupResolver(schema),
   });
   const { errors } = formState;
@@ -98,6 +108,7 @@ const CreateUser = () => {
               className={`input ${errors.lastName ? 'is-invalid' : ''}`}
             />
           </div>
+            <input id='location' {...register('location')} className='input' hidden/>
           <p className='invalid-feedback'>{errors.lastName?.message}</p>
           <div className='form__field'>
             <label className='form__label' htmlFor='dob'>
@@ -192,14 +203,6 @@ const CreateUser = () => {
               </select>
             </div>
           </div>
-          <input
-            id='location'
-            hidden
-            className='form__input'
-            {...register('location')}
-          />
-          {errors.type && <span>This field is required</span>}
-
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />
             <Link to='/admin/users/'>
