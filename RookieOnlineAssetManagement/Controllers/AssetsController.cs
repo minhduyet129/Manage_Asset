@@ -160,6 +160,7 @@ namespace RookieOnlineAssetManagement.Controllers
                                 a.InstalledDate,
                                 a.Location,
                                 a.State,
+                                a.Specification,
                                 k.AssignDate,
                                 k.AssignTo,
                                 k.AssignBy,
