@@ -45,7 +45,6 @@ const User = () => {
         setUsers(res.data.data);
         setTotalPages(res.data.totalPages);
         setLoading(false);
-        console.log()
       })
       .catch((err) => console.log(err));
   };

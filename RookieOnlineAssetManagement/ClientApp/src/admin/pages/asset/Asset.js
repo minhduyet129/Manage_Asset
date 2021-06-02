@@ -12,17 +12,16 @@ import AssetDetailModal from './AssetDetailModal';
 import { modalCustomStyle } from '../ModalCustomStyles';
 import DeleteModal from './DeleteModal';
 
-
-
-
 function Asset() {
   const [assets, setAssets] = useState([]);
   const [asset, setAsset] = useState([]);
+  const [assetHistories, setAssetHistories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [changes, setChanges] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [authorities, setAuthorities] = useState(false);
+  const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const [filters, setFilters] = useState({
     PageNumber: 1,
@@ -34,7 +33,7 @@ function Asset() {
     asc: true,
   });
 
-  const usersRef = useRef(null);
+  const assetsRef = useRef(null);
   const assetIdRef = useRef(null);
   const typingTimoutRef = useRef(null);
   const history = useHistory();
@@ -45,7 +44,7 @@ function Asset() {
     getApiAssets
       .getAssets(paramString)
       .then((res) => {
-        usersRef.current = res.data.data;
+        assetsRef.current = res.data.data;
         setAssets(res.data.data);
         setTotalPages(res.data.totalPages);
         setLoading(false);
@@ -56,12 +55,9 @@ function Asset() {
 
   useEffect(getassets, [changes, filters]);
 
-
-  
-
   const getAssetId = async (rowIndex) => {
-    if (!usersRef.current) return;
-    const id = usersRef.current[rowIndex].id;
+    if (!assetsRef.current) return;
+    const id = assetsRef.current[rowIndex].id;
     if (id) {
       history.push(`/admin/assets/edit/${id}`);
     }
@@ -171,14 +167,24 @@ function Asset() {
     setDeleteModal(false);
   };
 
-  const handleShowAssetDetail = (value) => {
-    setAsset(value);
+  const handleShowAssetDetail = async (value) => {
+    setAsset(value)
+    await getApiAssets
+      .getAssetDetails(value.id)
+      .then((res) => {
+        setAssetHistories(res.data)
+        console.log(res.data)
+      })
+      .catch((err) => {
+        setError(err);
+        console.log(err);
+      });
     openModal();
   };
 
   const handleClickDeleteBtn = (rowIndex) => {
-    if (!usersRef.current) return;
-    const id = usersRef.current[rowIndex].id;
+    if (!assetsRef.current) return;
+    const id = assetsRef.current[rowIndex].id;
     if (id) {
       assetIdRef.current = id;
     }
@@ -201,7 +207,10 @@ function Asset() {
       .catch((err) => {
         setDeleteModal(false);
         if (err.response.status) {
-          toast.error(err.response.data + "If the asset is not able to be used anymore, please update its state in edit asset");
+          toast.error(
+            err.response.data +
+              'If the asset is not able to be used anymore, please update its state in edit asset'
+          );
         }
       });
   };
@@ -327,7 +336,7 @@ function Asset() {
         onRequestClose={closeModal}
         style={modalCustomStyle}
       >
-        <AssetDetailModal asset={asset} closeModal={closeModal} />
+        <AssetDetailModal asset={asset} assetHistories={assetHistories} closeModal={closeModal} />
       </Modal>
 
       <Modal isOpen={deleteModal} style={modalCustomStyle}>

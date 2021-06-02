@@ -62,7 +62,7 @@ const EditUser = () => {
       })
       .catch((err) => {
         setError(err);
-        console.log(err);
+        console.log(error);
       });
   };
 
@@ -70,7 +70,7 @@ const EditUser = () => {
     return useCreateUser
       .edit(users, id)
       .then((response) => {
-        if (response.status === 200) {
+        if (response.status) {
           toast.success('Update user sucessfully');
           history.push('/admin/users');
         }
