@@ -44,3 +44,42 @@
 .close-btn:hover {
     cursor: pointer;
 }
+
+.history-row {
+    flex-direction: column;
+    padding-bottom: 40px !important;
+}
+
+.history-title {
+    font-weight: 500 !important;
+    font-size: 20px !important;
+    color: var(--primary-color) !important;
+}
+
+.history-value {
+    width: 550px;
+    margin-top: 10px;
+}
+
+.history-value table {
+    width: 100%;
+}
+
+.history-value tbody {
+    position: relative;
+}
+
+.history-value table thead th {
+    text-align: left;
+    font-weight: 600;
+}
+
+.history-value table tbody tr {
+    height: 40px;
+}
+
+.table-no-history {
+    position: absolute;
+    right: 44%;
+    bottom: 13px;
+}

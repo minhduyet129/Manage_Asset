@@ -60,13 +60,13 @@ const EditAsset = (props) => {
       .updateAsset(assets, id)
       .then((response) => {
         if (response.status === 200) {
-          toast('Update asset sucessfully');
+          toast.success('Update asset sucessfully');
           history.push('/admin/assets');
         }
       })
       .catch((error) => {
         setError(error);
-        toast('Update asset failed');
+        toast.success('Update asset failed');
       });
   }
 
