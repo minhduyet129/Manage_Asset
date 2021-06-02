@@ -393,7 +393,7 @@ function Assignment() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters.sortBy]
+    [filters]
   );
 
   return (
