@@ -1,5 +1,5 @@
 .undo-icon svg {
-  font-size: 20px;
+  font-size: 1rem;
   margin-bottom: 3px;
 }
 
@@ -14,16 +14,17 @@
 
 .pagination li a {
   display: block;
-  padding: 9px 11px;
+  padding: 3px 5px;
   text-align: center;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: var(--normal-font-size);
+  font-weight: 400;
   color: var(--primary-color);
   border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .pagination li:hover {
   cursor: pointer;
+  transition: 0.3s;
 }
 
 .previous a:hover,
@@ -31,6 +32,7 @@
   cursor: pointer;
   color: #fff;
   background-color: var(--primary-color);
+  transition: 0.3s;
 }
 
 .pagination li.active a {
@@ -39,7 +41,7 @@
 }
 
 .previous {
-  width: 100px;
+  width: 90px;
 }
 
 .previous.disabled a {
@@ -53,11 +55,11 @@
 }
 
 .next {
-  width: 100px;
+  width: 90px;
 }
 
 .next.disabled a {
-  color: rgba(0, 0, 0, 0.15);
+  color: rgba(10, 10, 10, 0.15);
 }
 
 .next.disabled a:hover {
@@ -89,7 +91,7 @@
   position: absolute;
   top: -14px;
   right: -18px;
-  font-size: 24px;
+  font-size: 1.2rem;
   color: rgba(0, 0, 0, 0.6);
   padding: 10px 15px;
 }
@@ -117,7 +119,7 @@
 }
 
 .row-title {
-  font-weight: 500;
+  font-weight: 600;
   color: #777e88;
   font-size: 15px;
 }
@@ -271,7 +273,6 @@
 }
 
 .confirm-modal-body div {
-  font-weight: 600;
   font-size: 17px;
   color: #000;
   margin: 5px 0;

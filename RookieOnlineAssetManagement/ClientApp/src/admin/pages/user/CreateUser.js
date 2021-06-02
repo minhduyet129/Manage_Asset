@@ -55,9 +55,7 @@ const CreateUser = () => {
       .catch((error) => {
         if (error.response) {
           toast.error('Add user failed!');
-
         }
-        
       });
   };
 
@@ -70,7 +68,6 @@ const CreateUser = () => {
     await handlerUser(data);
     console.log(data);
   };
-
 
   return (
     <LayoutAdmin>
@@ -201,7 +198,7 @@ const CreateUser = () => {
           {errors.type && <span>This field is required</span>}
 
           <div className='form__field'>
-            <input type='submit' className='btn' value='Submit' />
+            <input type='submit' className='btn' value='Create' />
             <Link to='/admin/users/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>
