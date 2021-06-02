@@ -192,7 +192,10 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 queryable = queryable.Where(a => a.State == (AssignmentState)filterState);
             }
-
+            if (sortBy == null)
+            {
+                queryable = queryable.OrderByDescending(x => x.LastChangeAssignment);
+            }
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy)
@@ -272,7 +275,8 @@ namespace RookieOnlineAssetManagement.Controllers
                     AssetId = model.AssetId,
                     AssignedDate = model.AssignedDate,
                     Note = model.Note,
-                    State = AssignmentState.Waiting
+                    State = AssignmentState.Waiting,
+                    LastChangeAssignment=DateTime.Now
                 };
 
                 var result = await _dbContext.Assignments.AddAsync(assignment);
@@ -317,6 +321,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 assignment.AssetId = model.AssetId;
                 assignment.AssignedDate = model.AssignedDate;
                 assignment.Note = model.Note;
+                assignment.LastChangeAssignment = DateTime.Now;
                  _dbContext.Entry(assignment).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
 
@@ -359,6 +364,7 @@ namespace RookieOnlineAssetManagement.Controllers
                          where a.State != AssignmentState.Returned
                          where a.AssignToId == id
                          where a.AssignedDate <= DateTime.Now
+                         
                             select new
                          {
                              AssignmentId=a.Id,
@@ -366,9 +372,14 @@ namespace RookieOnlineAssetManagement.Controllers
                              AssetName=b.AssetName,
                              AssignedBy=c.UserName,
                              AssignedDate=a.AssignedDate,
-                             State = a.State
-
+                             State = a.State,
+                             LastChange=a.LastChangeAssignment
                             };
+
+            if(sortBy == null)
+            {
+                queryable = queryable.OrderByDescending(x => x.LastChange);
+            }
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy)

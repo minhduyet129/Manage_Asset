@@ -15,7 +15,7 @@ namespace RookieOnlineAssetManagement.Entities
 
         public int AssetId { get; set; }
         public virtual Asset Asset { get; set; }
-
+        public DateTime LastChangeAssignment { get; set; }
         public int AssignById { get; set; }
         public virtual ApplicationUser AssignBy { get; set; }
         

@@ -17,6 +17,7 @@ namespace RookieOnlineAssetManagement.Entities
         public string Location { get; set; }
 
         public int CategoryId { get; set; }
+        public DateTime LastChangeAsset { get; set; }
         public virtual Category Category { get; set; }
 
         public ICollection<Assignment> Assignments { get; set; }
