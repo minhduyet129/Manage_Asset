@@ -153,7 +153,6 @@ const CreateAsset = (props) => {
                 render={({ field }) => (
                   <Select
                     {...props}
-                    isSearchable
                     options={options}
                     onChange={(e) => field.onChange(e.value)}
                     value={options.find((c) => c.value === field.value)}
