@@ -1,7 +1,7 @@
 import { Switch, Route, useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Home from './admin/pages/Home/Home';
-import User from './admin/pages/user/User';
+import User from './user/pages/home/Home';
 import CreateUser from './admin/pages/user/CreateUser';
 import EditUser from './admin/pages/user/EditUser';
 import Asset from './admin/pages/asset/Asset';
@@ -14,7 +14,7 @@ import RequestForReturning from './admin/pages/request/RequestForReturning';
 import Report from './admin/pages/report/Report';
 import Login from './login/Login';
 import { ToastContainer } from 'react-toastify';
-import UserHome from './user/pages/home/UserHome';
+import UserHome from './user/pages/home/Home';
 import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';

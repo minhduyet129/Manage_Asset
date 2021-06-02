@@ -13,16 +13,6 @@ const AssignmentsTable = ({
   onDeclineAssignment = () => {},
   onClickReturnRequest = () => {},
 }) => {
-  const handleState = (value) => {
-    if (value === 0) return 'Waiting For Acceptance';
-    if (value === 1) return 'Accepted';
-    if (value === 2) return 'Declined';
-    if (value === 3) return 'Assigned';
-    if (value === 4) return 'Waiting For Returning';
-    if (value === 5) return 'Returned';
-    return null;
-  };
-
   const columns = useMemo(
     () => [
       {
@@ -90,7 +80,6 @@ const AssignmentsTable = ({
         },
       },
       {
-        id: 'state',
         Header: () => {
           return (
             <div className="table-header" onClick={() => onSortBy("state")}>
@@ -99,7 +88,7 @@ const AssignmentsTable = ({
             </div>
           );
         },
-        accessor: (d) => <div>{handleState(d.state)}</div>,
+        accessor: "state",
       },
       {
         Header: "Actions",
