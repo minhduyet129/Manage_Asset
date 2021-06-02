@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Spinner from '../../../../components/Spinner';
+import Spinner from '../Spinner';
 
 const ChangePassword = ({
   handleChangePassword,
-  isLoading,
   closeChangePasswordModal,
+  isLoading,
+  isError,
+  errorMessage,
 }) => {
   // Manage password input types (password <-> text)
   const [isOldPasswordShowed, setIsOldPasswordShowed] = useState(false);
@@ -37,7 +39,10 @@ const ChangePassword = ({
               className='input'
             ></input>
             <div style={{ margin: '0 10px' }}>
-              <i className='bx bx-show' onClick={showOldPassword}></i>
+              <i
+                className='bx bx-show cursor-pointer'
+                onClick={showOldPassword}
+              ></i>
             </div>
           </div>
           {errors.oldPassword && (
@@ -52,11 +57,18 @@ const ChangePassword = ({
               className='input'
             ></input>
             <div style={{ margin: '0 10px' }}>
-              <i className='bx bx-show' onClick={showNewPassword}></i>
+              <i
+                className='bx bx-show cursor-pointer'
+                onClick={showNewPassword}
+              ></i>
             </div>
           </div>
           {errors.newPassword && (
             <span className='form__validation'>This field is required</span>
+          )}
+
+          {errorMessage && (
+            <span className='form__validation'>{errorMessage}</span>
           )}
 
           <div style={{ paddingTop: '15px' }}>

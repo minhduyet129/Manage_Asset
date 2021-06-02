@@ -102,8 +102,8 @@
 
 .modal-header span {
   color: var(--primary-color);
-  font-weight: 500;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 22px;
 }
 
 .modal-body {
@@ -119,13 +119,14 @@
 }
 
 .row-title {
-  font-weight: 600;
+  font-weight: 500;
   color: #777e88;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .row-value {
-  font-size: 15px;
+  font-size: 18px !important;
+  font-weight: 500 !important;
 }
 
 #tr-hover:hover {
@@ -308,6 +309,10 @@
 .confirm-close-btn,
 .confirm-btn:hover {
   cursor: pointer;
+}
+
+.date-picker {
+  width: 100%;
 }
 
 /* .select-state .css-yk16xz-control {

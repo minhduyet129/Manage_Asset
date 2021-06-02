@@ -1,6 +1,6 @@
-import { useTable, usePagination } from "react-table";
-import React, { useMemo } from "react";
-import { format } from "date-fns";
+import { useTable, usePagination } from 'react-table';
+import React, { useMemo } from 'react';
+import { format } from 'date-fns';
 
 const AssignmentsTable = ({
   data = [],
@@ -13,138 +13,143 @@ const AssignmentsTable = ({
   onDeclineAssignment = () => {},
   onClickReturnRequest = () => {},
 }) => {
+  const handleState = (value) => {
+    if (value === 0) return 'Waiting For Acceptance';
+    if (value === 1) return 'Accepted';
+    if (value === 2) return 'Declined';
+    if (value === 3) return 'Assigned';
+    if (value === 4) return 'Waiting For Returning';
+    if (value === 5) return 'Returned';
+    return null;
+  };
+
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
-        accessor: "assignmentId",
+        Header: 'Id',
+        accessor: 'assignmentId',
       },
       {
         Header: () => {
           return (
-            <div
-              className="table-header"
-              onClick={() => onSortBy("assetCode")}
-            >
+            <div className='table-header' onClick={() => onSortBy('assetCode')}>
               <span>Asset Code</span>
-              {onSortIcon("assetCode")}
+              {onSortIcon('assetCode')}
             </div>
           );
         },
-        accessor: "assetCode",
+        accessor: 'assetCode',
       },
       {
         Header: () => {
           return (
-            <div
-              className="table-header"
-              onClick={() => onSortBy("assetName")}
-            >
+            <div className='table-header' onClick={() => onSortBy('assetName')}>
               <span>Asset Name</span>
-              {onSortIcon("assetName")}
+              {onSortIcon('assetName')}
             </div>
           );
         },
-        accessor: "assetName",
+        accessor: 'assetName',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => onSortBy("assignedBy")}
+              className='table-header'
+              onClick={() => onSortBy('assignedBy')}
             >
               <span>Assign by</span>
-              {onSortIcon("assignedBy")}
+              {onSortIcon('assignedBy')}
             </div>
           );
         },
-        accessor: "assignedBy",
+        accessor: 'assignedBy',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => onSortBy("assignedDate")}
+              className='table-header'
+              onClick={() => onSortBy('assignedDate')}
             >
               <span>Assigned Date</span>
-              {onSortIcon("assignedDate")}
+              {onSortIcon('assignedDate')}
             </div>
           );
         },
-        accessor: "assignedDate",
+        accessor: 'assignedDate',
         Cell: ({ value }) => {
           if (!value) return null;
-          return format(new Date(value), "dd/MM/yyyy");
+          return format(new Date(value), 'dd/MM/yyyy');
         },
       },
       {
+        id: 'state',
         Header: () => {
           return (
-            <div className="table-header" onClick={() => onSortBy("state")}>
+            <div className='table-header' onClick={() => onSortBy('state')}>
               <span>State</span>
-              {onSortIcon("state")}
+              {onSortIcon('state')}
             </div>
           );
         },
-        accessor: "state",
+        accessor: (d) => <div>{handleState(d.state)}</div>,
       },
       {
-        Header: "Actions",
-        accessor: "actions",
+        Header: 'Actions',
+        accessor: 'actions',
         Cell: ({ row }) => {
           const rowIdx = row;
 
           return (
-            <div id="actions" style={{ display: "flex" }}>
+            <div id='actions' style={{ display: 'flex' }}>
               {row.original.state === 0 ? (
                 <>
                   <span
-                    className="font"
+                    className='font'
                     onClick={() => onAcceptAssignment(rowIdx)}
                   >
-                    <i class="fas fa-check"></i>
+                    <i className='fas fa-check'></i>
                   </span>
                   &emsp;
                   <span
-                    className="font"
+                    className='font'
                     onClick={() => onDeclineAssignment(rowIdx)}
                   >
-                    <i className="fas fa-times "></i>
+                    <i className='fas fa-times '></i>
                   </span>
                 </>
               ) : (
                 <>
                   <span
-                    className="font"
-                    style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                    className='font'
+                    style={{ color: 'rgba(0, 0, 0, 0.2)' }}
                   >
-                    <i class="fas fa-check"></i>
+                    <i className='fas fa-check'></i>
                   </span>
                   &emsp;
                   <span
-                    className="font"
-                    style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                    className='font'
+                    style={{ color: 'rgba(0, 0, 0, 0.2)' }}
                   >
-                    <i className="fas fa-times "></i>
+                    <i className='fas fa-times '></i>
                   </span>
                 </>
               )}
               &emsp;
               {row.original.state === 1 ? (
                 <span
-                  className="font undo-icon"
+                  className='font undo-icon'
                   onClick={() => onClickReturnRequest(rowIdx)}
                 >
-                  <i className="fas fa-undo"></i>
+                  <i className='fas fa-undo'></i>
                 </span>
               ) : (
                 <span
-                  className="font undo-icon"
-                  style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                  className='font undo-icon'
+                  style={{ color: 'rgba(0, 0, 0, 0.2)' }}
                 >
-                  <i className="fas fa-undo"></i>
+                  <i className='fas fa-undo'></i>
                 </span>
               )}
             </div>
@@ -161,7 +166,7 @@ const AssignmentsTable = ({
 
   return (
     <div>
-      <div className="table__view">
+      <div className='table__view'>
         <h2>My Assignment</h2>
         <div>
           <table {...getTableProps()}>
@@ -170,15 +175,15 @@ const AssignmentsTable = ({
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map((column) => (
                     <th {...column.getHeaderProps()}>
-                      {column.render("Header")}
+                      {column.render('Header')}
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
             {loading ? (
-              <div className="spinner">
-                <i className="fas fa-spinner fa-spin"></i>
+              <div className='spinner'>
+                <i className='fas fa-spinner fa-spin'></i>
               </div>
             ) : (
               <tbody {...getTableBodyProps()}>
@@ -186,10 +191,10 @@ const AssignmentsTable = ({
                   prepareRow(row);
                   return (
                     <tr
-                      id="tr-hover"
+                      id='tr-hover'
                       {...row.getRowProps()}
                       onClick={(e) => {
-                        if (!e.target.closest("#actions")) {
+                        if (!e.target.closest('#actions')) {
                           onClickAssignment(row.original);
                         }
                       }}
@@ -197,7 +202,7 @@ const AssignmentsTable = ({
                       {row.cells.map((cell) => {
                         return (
                           <td id={cell.column.Header} {...cell.getCellProps()}>
-                            {cell.render("Cell")}
+                            {cell.render('Cell')}
                           </td>
                         );
                       })}
