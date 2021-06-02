@@ -36,7 +36,8 @@ namespace RookieOnlineAssetManagement.Controllers
                             join d in _context.Users
                             on c.RequestedByUserId equals d.Id
                             join f in _context.Users
-                            on c.AcceptedByUserId equals f.Id into g
+                            on c.AcceptedByUserId equals f.Id
+                            into g
                             from f in g.DefaultIfEmpty()
                             select new
                             {
@@ -46,7 +47,7 @@ namespace RookieOnlineAssetManagement.Controllers
                                 RequestBy=d.UserName,
                                 AssignedDate=b.AssignedDate,
                                 AcceptedBy = f.UserName,
-                                ReturnedDate =c.ReturnedDate,
+                                ReturnedDate = c.ReturnedDate,
                                 State=c.State
                                 
                             };
@@ -58,13 +59,16 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 queryable = queryable.Where(x => x.State == (ReturnRequestState)state);
             }
-            if(!string.IsNullOrEmpty(returnedDate))
+            if (!string.IsNullOrEmpty(returnedDate))
             {
                 DateTime date;
-                if(DateTime.TryParseExact(returnedDate,"dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
+                if (DateTime.TryParseExact(returnedDate, "dd/MM/yyyy",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out date))
                 {
-                    queryable = queryable.Where(a => a.ReturnedDate == date.Date);
+                    queryable = queryable.Where(a => a.ReturnedDate != null && a.ReturnedDate.Value.Date == date.Date);
                 }
+               
             }
 
             if (!string.IsNullOrEmpty(sortBy))
