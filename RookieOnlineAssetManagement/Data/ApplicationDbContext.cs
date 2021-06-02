@@ -51,10 +51,16 @@ namespace RookieOnlineAssetManagement.Data
             builder.Entity<ApplicationUser>(entity =>
             {
                 entity.Property(e => e.CountLogin).HasDefaultValue(0);
+                entity.Property(e => e.LastChangeUser).HasDefaultValue(DateTime.Now);
             });
-            
 
-                
+            builder.Entity<Asset>(entity => {
+                entity.Property(e => e.LastChangeAsset).HasDefaultValue(DateTime.Now);
+            });
+            builder.Entity<Assignment>(entity => {
+                entity.Property(e => e.LastChangeAssignment).HasDefaultValue(DateTime.Now);
+            });
+
             builder.Entity<ApplicationUserRole>(userRole =>
             {
                 userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
