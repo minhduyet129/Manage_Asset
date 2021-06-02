@@ -30,7 +30,6 @@ function AdminChangePassword() {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
     setIsLoading(true);
     setIsError(false);
 
@@ -39,12 +38,10 @@ function AdminChangePassword() {
       oldPassword: data.oldPassword,
       newPassword: data.newPassword,
     };
-    console.log(values);
 
     try {
       const response = await axios.put('/api/users/ChangePassword', values);
       setIsLoading(false);
-      console.log(response);
     } catch (error) {
       setIsLoading(false);
       setIsError(true);

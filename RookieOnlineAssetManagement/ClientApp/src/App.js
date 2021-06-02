@@ -1,7 +1,7 @@
 import { Switch, Route, useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Home from './admin/pages/Home/Home';
-import User from './user/pages/home/Home';
+import User from './admin/pages/user/User';
 import CreateUser from './admin/pages/user/CreateUser';
 import EditUser from './admin/pages/user/EditUser';
 import Asset from './admin/pages/asset/Asset';
