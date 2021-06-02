@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import ReactDatePicker from 'react-datepicker';
 import { useHistory } from 'react-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
@@ -26,16 +26,25 @@ const customStyles = {
 };
 
 const schema = Yup.object().shape({
-  assignToId: Yup.string().required('User is required'),
-  assetId: Yup.string().required('Asset is required'),
+  assignToId: Yup.number()
+    .required('User is required')
+    .typeError('User is required')
+    .nullable(true),
+  assetId: Yup.number()
+    .required('Asset is required')
+    .typeError('Asset is required')
+    .nullable(true),
   assignedDate: Yup.date()
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
-    .min(new Date(new Date().setHours(new Date().getHours() - 24)), 'Assigned Date must be current or future.'),
+    .min(
+      new Date(new Date().setHours(new Date().getHours() - 24)),
+      'Assigned Date must be current or future.'
+    ),
 });
 
-const userInfoJSON = window.localStorage.getItem('userInfo')
-const userInfo = window.JSON.parse(userInfoJSON)
+const userInfoJSON = window.localStorage.getItem('userInfo');
+const userInfo = window.JSON.parse(userInfoJSON);
 
 function CreateAssignment() {
   const [userModal, setUserModal] = useState(false);
@@ -165,7 +174,13 @@ function CreateAssignment() {
           <div className='form__field'>
             <label>User</label>
             <input className='input' {...register('assignToId')} hidden />
-            <input className='input' value={fullName} disabled required error={errors.assignToId}/>
+            <input
+              className='input'
+              value={fullName}
+              disabled
+              required
+              error={errors.assignToId}
+            />
             <div className='search-btn' onClick={openUserModal}>
               <i className='fas fa-search'></i>
             </div>
@@ -241,7 +256,7 @@ function CreateAssignment() {
           </div>
 
           <div className='form__field'>
-            <input type='submit' className='btn' value='Submit' />
+            <input type='submit' className='btn' value='Create' />
             <Link to='/admin/assignments/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>

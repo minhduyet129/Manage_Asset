@@ -10,7 +10,7 @@ import * as Yup from 'yup';
 import ModalForm from './ModalForm';
 import Select, { components } from 'react-select';
 
-import './Asset.css'
+import './Asset.css';
 
 const schema = Yup.object().shape({
   assetName: Yup.string()
@@ -19,7 +19,7 @@ const schema = Yup.object().shape({
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
-    categoryId: Yup.number().required('Select Category is required'),
+  categoryId: Yup.number().required('Select Category is required'),
   state: Yup.string().required('Select State is required'),
 });
 
@@ -28,10 +28,14 @@ const Control = ({ children, ...props }) => {
   const style = { cursor: 'pointer' };
 
   return (
-    <components.Control {...props} className="select-category">
+    <components.Control {...props} className='select-category'>
       {children}
-      <span onMouseDown={onCreateCategory} style={style} title="Create Category">
-      <i class="fas fa-plus-circle"></i>
+      <span
+        onMouseDown={onCreateCategory}
+        style={style}
+        title='Create Category'
+      >
+        <i class='fas fa-plus-circle'></i>
       </span>
     </components.Control>
   );
@@ -46,7 +50,7 @@ const CreateAsset = (props) => {
   const history = useHistory();
 
   const onClick = (e) => {
-    handleChange()
+    handleChange();
     e.preventDefault();
     e.stopPropagation();
   };
@@ -84,7 +88,7 @@ const CreateAsset = (props) => {
       .then((response) => {
         if (response.status) {
           toast('Add Asset sucessfully');
-           history.push('/admin/assets');
+          history.push('/admin/assets');
         }
       })
       .catch((error) => {
@@ -151,12 +155,12 @@ const CreateAsset = (props) => {
                     {...props}
                     isSearchable
                     options={options}
-                    onChange={ e => field.onChange( e.value )}
+                    onChange={(e) => field.onChange(e.value)}
                     value={options.find((c) => c.value === field.value)}
                     onCreateCategory={onClick}
                     components={{ Control }}
                     placeholder='Select or Create New Category'
-                     error={errors.categoryId}
+                    error={errors.categoryId}
                   />
                 )}
               />
@@ -221,7 +225,7 @@ const CreateAsset = (props) => {
           <p className='invalid-feedback'>{errors.state?.message}</p>
 
           <div className='form__field'>
-            <input type='submit' className='btn' value='Submit' />
+            <input type='submit' className='btn' value='Create' />
             <Link to='/admin/assets/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>

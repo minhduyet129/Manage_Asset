@@ -204,7 +204,7 @@ const CreateUser = () => {
             </div>
           </div>
           <div className='form__field'>
-            <input type='submit' className='btn' value='Submit' />
+            <input type='submit' className='btn' value='Create' />
             <Link to='/admin/users/'>
               <button className='btn__cancel'>Cancel</button>
             </Link>
