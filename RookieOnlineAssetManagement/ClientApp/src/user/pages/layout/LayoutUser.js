@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { SidebarData } from './SidebarDataUser';
-import { useForm } from 'react-hook-form';
+import ChangePassword from '../../../components/password-modals/ChangePassword';
+import ChangePasswordFirstLogin from '../../../components/password-modals/ChangePasswordFirstLogin';
+import ChangePasswordSuccess from '../../../components/password-modals/ChangePasswordSuccess';
 import Modal from 'react-modal';
 import axios from 'axios';
 import '../../../admin/pages/layout/Navbar.css';
@@ -18,71 +20,122 @@ const customStyles = {
 };
 
 function LayoutUser({ children }) {
-  const userLocalStorage = localStorage.getItem('userInfo');
-  const userInfoObject = JSON.parse(userLocalStorage);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isPasswordFirstTimeModalOpen, setIsPasswordFirstTimeModalOpen] =
-    useState(true);
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [sidebar, setSidebar] = useState(false);
   const [dropDown, setDropdown] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
 
   const showSidebar = () => setSidebar(!sidebar);
   const showDropdown = () => setDropdown(!dropDown);
   const autoHideDropdown = () =>
     setTimeout(() => {
-      setDropdown(!dropDown);
+      setDropdown(false);
     }, 4000);
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('isChangePasswordFirstTimeLoginSuccess');
     window.location.reload();
   };
 
-  const handleChangePasswordFirstTime = async (data) => {
-    // const response = await axios.post('/api/users/ChangePasswordFirstLogin', {
-    //   userId: userInfoObject.userId,
-    //   newPassword: data.paassword,
-    // });
-    // setIsPasswordFirstTimeModalOpen(false);
+  const userLocalStorage = localStorage.getItem('userInfo');
+  const userInfoObject = JSON.parse(userLocalStorage);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [
+    isPasswordChangeSuccessModalOpen,
+    setIsPasswordChangeSuccessModalOpen,
+  ] = useState(false);
 
-    // setIsLoading(true);
-    // setIsError(false);
+  const openChangePasswordModal = () => setIsPasswordModalOpen(true);
+  const closeChangePasswordModal = () => setIsPasswordModalOpen(false);
+  const closePasswordChangeSuccessModal = () =>
+    setIsPasswordChangeSuccessModalOpen(false);
 
-    // try {
-    //   const response = await axios.post('/api/users/ChangePasswordFirstLogin', {
-    //     userId: userInfoObject.userId,
-    //     newPassword: data.paassword,
-    //   });
-    //   const result = await response.data;
-    //   setIsLoading(false);
-    //   console.log(result);
-    // } catch (error) {
-    //   setIsLoading(false);
-    //   setIsError(true);
-    // }
-    console.log(data);
+  const handleChangePassword = async (data) => {
+    setIsLoading(true);
+    setIsError(false);
+
+    const values = {
+      userId: userInfoObject.userId,
+      oldPassword: data.oldPassword,
+      newPassword: data.newPassword,
+    };
+
+    try {
+      const response = await axios.put('/api/users/ChangPassword', null, {
+        params: values,
+      });
+      setIsLoading(false);
+      setIsPasswordModalOpen(false);
+      setIsPasswordChangeSuccessModalOpen(true);
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      setErrorMessage(error.response.data);
+    }
   };
 
-  // const handleCreateRequestForReturning = () => {
-  //   setIsPasswordFirstTimeModalOpen(false);
-  // };
+  // Start logic for changing password for users when they first login
+  const [isPasswordFirstTimeLoginModalOpen, setIsPasswordFirstTimeModalOpen] =
+    useState(false);
+  const [
+    isChangePasswordFirstTimeLoginSuccess,
+    setIsChangePasswordFirstTimeLoginSuccess,
+  ] = useState(
+    localStorage.getItem('isChangePasswordFirstTimeLoginSuccess') || false
+  );
+  const firstTimeLogin = 1;
 
-  // Open Change password for users when they first login
   useEffect(() => {
     if (userLocalStorage) {
-      if (userInfoObject.countLogin <= 1) {
+      if (
+        userInfoObject.countLogin === firstTimeLogin &&
+        isChangePasswordFirstTimeLoginSuccess === false
+      ) {
         setIsPasswordFirstTimeModalOpen(true);
+
+        setIsChangePasswordFirstTimeLoginSuccess(
+          isChangePasswordFirstTimeLoginSuccess
+        );
+
+        if (isPasswordChangeSuccessModalOpen === true) {
+          setIsPasswordFirstTimeModalOpen(false);
+          setIsChangePasswordFirstTimeLoginSuccess(true);
+        }
       }
     }
-  }, [userInfoObject, userLocalStorage]);
+  }, []);
+
+  const handleChangePasswordFirstTimeLogin = async (data) => {
+    setIsLoading(true);
+    setIsError(false);
+
+    const values = {
+      userId: userInfoObject.userId,
+      newPassword: data.newPassword,
+    };
+
+    try {
+      const response = await axios.put(
+        '/api/users/ChangPasswordFirstLogin',
+        null,
+        { params: values }
+      );
+      setIsLoading(false);
+      console.log(response);
+      setIsPasswordFirstTimeModalOpen(false);
+
+      localStorage.setItem('isChangePasswordFirstTimeLoginSuccess', true);
+
+      setIsPasswordChangeSuccessModalOpen(true);
+    } catch (error) {
+      setIsLoading(false);
+      setIsError(true);
+      setErrorMessage(error.response.data);
+    }
+  };
+  // End logic for changing password for users when they first login
 
   return (
     <div className='container'>
@@ -124,10 +177,7 @@ function LayoutUser({ children }) {
                 dropDown ? 'dropdown-content show' : 'dropdown-content'
               }
             >
-              <button
-                className='dropbtn'
-                // onClick={openChangePasswordModal}
-              >
+              <button className='dropbtn' onClick={openChangePasswordModal}>
                 <i className='bx bxs-lock-alt icon-dropdown'></i>
                 Change password
               </button>
@@ -143,73 +193,37 @@ function LayoutUser({ children }) {
         <div className='main__wrapper'>
           {children}
 
-          {/* Change password for first time logged in users */}
-          {/* <Modal isOpen={isPasswordFirstTimeModalOpen} style={customStyles}>
-            <div className='modal'>
-              <div className='modal-body'>
-                <div>Change password for first time login</div>
-                <p>
-                  This is the first time you login. You need to change your
-                  password to continue.
-                </p>
-                <form onSubmit={handleSubmit(handleChangePasswordFirstTime)}>
-                  <div className='form__field'>
-                    <label>New Password</label>
-                    <input
-                      {...register('password', { required: true })}
-                      className='input'
-                    ></input>
-                  </div>
-                </form>
-              </div>
-              <div className='modal-footer'>
-                <div
-                  className='btn save'
-                  onClick={handleChangePasswordFirstTime}
-                >
-                  Save
-                </div>
-                <div
-                  className='confirm-btn cancel'
-                  onClick={handleShowPassword}
-                >
-                  No
-                </div>
-              </div>
-            </div>
-          </Modal> */}
-
+          {/* --- Modals --- */}
           {/* Change password */}
           <Modal isOpen={isPasswordModalOpen} style={customStyles}>
-            <div className='modal'>
-              <div className='modal-body'>
-                <div>Change password for first time login</div>
-                <p>
-                  This is the first time you login. You need to change your
-                  password to continue.
-                </p>
-                <form>
-                  <div className='form__field'>
-                    <label>New Password</label>
-                    <input className='input'></input>
-                  </div>
-                </form>
-              </div>
-              <div className='modal-footer'>
-                <div
-                  className='btn save'
-                  onClick={handleChangePasswordFirstTime}
-                >
-                  Save
-                </div>
-                {/* <div
-                  className='confirm-btn cancel'
-                  onClick={handleShowPassword}
-                >
-                  No
-                </div> */}
-              </div>
-            </div>
+            <ChangePassword
+              handleChangePassword={handleChangePassword}
+              closeChangePasswordModal={closeChangePasswordModal}
+              isLoading={isLoading}
+              errorMessage={errorMessage}
+            />
+          </Modal>
+
+          {/* Change password for users when they login for the first time */}
+          <Modal
+            isOpen={isPasswordFirstTimeLoginModalOpen}
+            style={customStyles}
+          >
+            <ChangePasswordFirstLogin
+              handleChangePasswordFirstTimeLogin={
+                handleChangePasswordFirstTimeLogin
+              }
+              isLoading={isLoading}
+              isError={isError}
+              errorMessage={errorMessage}
+            />
+          </Modal>
+
+          {/* If changing password is success, pop up a message to user */}
+          <Modal isOpen={isPasswordChangeSuccessModalOpen} style={customStyles}>
+            <ChangePasswordSuccess
+              closePasswordChangeSuccessModal={closePasswordChangeSuccessModal}
+            />
           </Modal>
         </div>
       </main>

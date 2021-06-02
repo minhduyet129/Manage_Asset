@@ -14,7 +14,7 @@ const queryClient = new QueryClient();
 const userLocalStorage = localStorage.getItem('userInfo');
 const userInfoObject = JSON.parse(userLocalStorage);
 
-axios.defaults.baseURL = 'http://rookies-001-site1.itempurl.com/api/';
+axios.defaults.baseURL = 'http://rookies-001-site1.itempurl.com/';
 
 Modal.setAppElement('#root');
 

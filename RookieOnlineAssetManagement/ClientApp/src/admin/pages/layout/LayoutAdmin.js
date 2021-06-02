@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { SidebarData } from './SidebarDataAdmin';
-import ChangePassword from './password-modals/ChangePassword';
-import ChangePasswordFirstLogin from './password-modals/ChangePasswordFirstLogin';
-import ChangePasswordSuccess from './password-modals/ChangePasswordSuccess';
+import ChangePassword from '../../../components/password-modals/ChangePassword';
+import ChangePasswordFirstLogin from '../../../components/password-modals/ChangePasswordFirstLogin';
+import ChangePasswordSuccess from '../../../components/password-modals/ChangePasswordSuccess';
 import Modal from 'react-modal';
 import axios from 'axios';
 import './Navbar.css';
@@ -25,29 +25,28 @@ function LayoutAdmin({ children }) {
 
   const showSidebar = () => setSidebar(!sidebar);
   const showDropdown = () => setDropdown(!dropDown);
-  const autoHideDropdown = () =>
+  const autoHideDropdown = () => {
     setTimeout(() => {
-      setDropdown(!dropDown);
+      setDropdown(false);
     }, 4000);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('isChangePasswordFirstTimeLoginSuccess');
     window.location.reload();
   };
 
   const userLocalStorage = localStorage.getItem('userInfo');
   const userInfoObject = JSON.parse(userLocalStorage);
-
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState('');
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [
     isPasswordChangeSuccessModalOpen,
     setIsPasswordChangeSuccessModalOpen,
   ] = useState(false);
-  const [isPasswordFirstTimeLoginModalOpen, setIsPasswordFirstTimeModalOpen] =
-    useState(false);
 
   const openChangePasswordModal = () => setIsPasswordModalOpen(true);
   const closeChangePasswordModal = () => setIsPasswordModalOpen(false);
@@ -63,20 +62,51 @@ function LayoutAdmin({ children }) {
       oldPassword: data.oldPassword,
       newPassword: data.newPassword,
     };
-    console.log(values);
 
     try {
-      const response = await axios.post('/api/users/ChangePassword', values);
-      console.log(response);
+      const response = await axios.put('/api/users/ChangPassword', null, {
+        params: values,
+      });
       setIsLoading(false);
       setIsPasswordModalOpen(false);
       setIsPasswordChangeSuccessModalOpen(true);
     } catch (error) {
       setIsLoading(false);
       setIsError(true);
-      console.log(error);
+      setErrorMessage(error.response.data);
     }
   };
+
+  // Start logic for changing password for users when they first login
+  const [isPasswordFirstTimeLoginModalOpen, setIsPasswordFirstTimeModalOpen] =
+    useState(false);
+  const [
+    isChangePasswordFirstTimeLoginSuccess,
+    setIsChangePasswordFirstTimeLoginSuccess,
+  ] = useState(
+    localStorage.getItem('isChangePasswordFirstTimeLoginSuccess') || false
+  );
+  const firstTimeLogin = 1;
+
+  useEffect(() => {
+    if (userLocalStorage) {
+      if (
+        userInfoObject.countLogin === firstTimeLogin &&
+        isChangePasswordFirstTimeLoginSuccess === false
+      ) {
+        setIsPasswordFirstTimeModalOpen(true);
+
+        setIsChangePasswordFirstTimeLoginSuccess(
+          isChangePasswordFirstTimeLoginSuccess
+        );
+
+        if (isPasswordChangeSuccessModalOpen === true) {
+          setIsPasswordFirstTimeModalOpen(false);
+          setIsChangePasswordFirstTimeLoginSuccess(true);
+        }
+      }
+    }
+  }, []);
 
   const handleChangePasswordFirstTimeLogin = async (data) => {
     setIsLoading(true);
@@ -86,22 +116,26 @@ function LayoutAdmin({ children }) {
       userId: userInfoObject.userId,
       newPassword: data.newPassword,
     };
-    console.log(values);
 
     try {
-      const response = await axios.post(
-        '/api/users/ChangePasswordFirstLogin',
-        values
+      const response = await axios.put(
+        '/api/users/ChangPasswordFirstLogin',
+        null,
+        { params: values }
       );
       setIsLoading(false);
-      console.log(response);
+      setIsPasswordFirstTimeModalOpen(false);
+
+      localStorage.setItem('isChangePasswordFirstTimeLoginSuccess', true);
+
+      setIsPasswordChangeSuccessModalOpen(true);
     } catch (error) {
       setIsLoading(false);
       setIsError(true);
+      setErrorMessage(error.response.data);
     }
-
-    setIsPasswordFirstTimeModalOpen(false);
   };
+  // End logic for changing password for users when they first login
 
   return (
     <div className='container'>
@@ -169,6 +203,8 @@ function LayoutAdmin({ children }) {
               handleChangePassword={handleChangePassword}
               closeChangePasswordModal={closeChangePasswordModal}
               isLoading={isLoading}
+              isError={isError}
+              errorMessage={errorMessage}
             />
           </Modal>
 
@@ -182,6 +218,8 @@ function LayoutAdmin({ children }) {
                 handleChangePasswordFirstTimeLogin
               }
               isLoading={isLoading}
+              isError={isError}
+              errorMessage={errorMessage}
             />
           </Modal>
 
