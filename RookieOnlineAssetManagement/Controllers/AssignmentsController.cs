@@ -364,7 +364,7 @@ namespace RookieOnlineAssetManagement.Controllers
                              AssetName=b.AssetName,
                              AssignedBy=c.UserName,
                              AssignedDate=a.AssignedDate,
-                             State = GetAssignmentState(a.State)
+                             State = a.State
 
                             };
             if (!string.IsNullOrEmpty(sortBy))

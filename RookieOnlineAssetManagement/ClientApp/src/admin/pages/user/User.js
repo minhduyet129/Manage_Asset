@@ -23,7 +23,7 @@ const User = () => {
   const [filters, setFilters] = useState({
     PageNumber: 1,
     PageSize: 10,
-    filterRole: null,
+    filterUser: null,
     keyword: null,
     sortBy: null,
     asc: true,
@@ -45,6 +45,7 @@ const User = () => {
         setUsers(res.data.data);
         setTotalPages(res.data.totalPages);
         setLoading(false);
+        console.log(res.data.data)
       })
       .catch((err) => console.log(err));
   };
@@ -121,7 +122,7 @@ const User = () => {
     }
     setFilters({
       ...filters,
-      filterRole: event.value,
+      filterUser: event.value,
       PageNumber: 1,
     });
   };
