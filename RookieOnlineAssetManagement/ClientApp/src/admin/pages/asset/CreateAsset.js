@@ -78,11 +78,9 @@ const CreateAsset = (props) => {
 
   const onSubmit = async (data) => {
     await handleAsset(data);
-    console.log(data);
   };
 
   function handleAsset(assets) {
-    console.log(assets);
     return getApiAssets
       .createAsset(assets)
       .then((response) => {
@@ -102,7 +100,6 @@ const CreateAsset = (props) => {
       .then((res) => res.data)
       .then((data) => {
         setCategories(data);
-        console.log(data);
       })
       .catch((err) => err);
   };
@@ -189,7 +186,6 @@ const CreateAsset = (props) => {
                     let d = new Date(e.setHours(e.getHours() + 7));
                     onChange(d);
                     setInstalledDate(d);
-                    console.log(d);
                   }}
                   placeholderText='MM/DD/YY'
                   withPortal

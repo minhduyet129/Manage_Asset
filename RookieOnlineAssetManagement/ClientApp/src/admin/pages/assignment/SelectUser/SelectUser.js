@@ -86,7 +86,6 @@ function SelectUser({ onSelectUser, onSaveUserModal, onCancelUserModal }) {
           <>
             <Waypoint
               onEnter={() => {
-                console.log(filters.PageNumber)
                 if (
                   users.length - 1 === Number(d.row.id) &&
                   filters.PageNumber < totalPages

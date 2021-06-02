@@ -106,10 +106,9 @@ const AssignmentsTable = ({
         accessor: "actions",
         Cell: ({ row }) => {
           const rowIdx = row;
-
           return (
             <div id="actions" style={{ display: "flex" }}>
-              {row.original.state === "Waiting for acceptance" ? (
+              {row.original.state === 0 ? (
                 <>
                   <span
                     className="font"
@@ -143,7 +142,7 @@ const AssignmentsTable = ({
                 </>
               )}
               &emsp;
-              {row.original.state === "Accepted" ? (
+              {row.original.state === 1 ? (
                 <span
                   className="font undo-icon"
                   onClick={() => onClickReturnRequest(rowIdx)}
