@@ -8,6 +8,10 @@ function getAsset(id) {
   return axios.get(`api/Assets/${id}`);
 }
 
+function getAssetDetails(id) {
+  return axios.get(`api/Assets/${id}/Detail`);
+}
+
 // CREATE
 function createAsset(assets) {
   return axios.post('api/Assets', assets);
@@ -39,6 +43,7 @@ function deleteAsset(id) {
 export const getApiAssets = {
   getAssets,
   getAsset,
+  getAssetDetails,
   createAsset,
   getCategories,
   createCategories,

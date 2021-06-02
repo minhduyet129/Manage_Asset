@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
 import { useCreateUser } from './UserHooks';
@@ -36,6 +36,7 @@ const schema = Yup.object().shape({
 const CreateUser = () => {
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState();
+  const [reload, setReload] = useState(true);
   const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
@@ -55,11 +56,11 @@ const CreateUser = () => {
       .catch((error) => {
         if (error.response) {
           toast.error('Add user failed!');
-
         }
-        
       });
   };
+
+  // useEffect(handlerUser, []);
 
   const { register, handleSubmit, control, formState } = useForm({
     resolver: yupResolver(schema),
@@ -70,7 +71,6 @@ const CreateUser = () => {
     await handlerUser(data);
     console.log(data);
   };
-
 
   return (
     <LayoutAdmin>
