@@ -51,18 +51,20 @@
 }
 
 .history-title {
-    font-weight: 500 !important;
-    font-size: 20px !important;
+    font-weight: 600 !important;
+    font-size: 22px !important;
     color: var(--primary-color) !important;
+    padding: 10px 0 15px 0;
 }
 
 .history-value {
-    width: 550px;
+    width: 580px;
     margin-top: 10px;
 }
 
 .history-value table {
     width: 100%;
+    font-size: 18px !important;
 }
 
 .history-value tbody {
@@ -71,11 +73,15 @@
 
 .history-value table thead th {
     text-align: left;
-    font-weight: 600;
+    font-weight: 500 !important;
+    color: #777e88 !important;
+    padding: 0 15px 0 0;
 }
 
 .history-value table tbody tr {
     height: 40px;
+    font-weight: 400 !important;
+    
 }
 
 .table-no-history {
