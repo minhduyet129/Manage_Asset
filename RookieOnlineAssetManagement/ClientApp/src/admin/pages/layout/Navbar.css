@@ -189,7 +189,7 @@
   color: #696969;
 }
 
-.modal-body div {
+.modal-body .form__field {
   font-weight: 700;
   font-size: 17px;
   color: #000;

@@ -175,6 +175,7 @@ const CreateAsset = (props) => {
 
           <div className='form__field'>
             <label>Installed Date</label>
+            <div className='date-picker'>
             <Controller
               control={control}
               name='installedDate'
@@ -201,6 +202,7 @@ const CreateAsset = (props) => {
                 />
               )}
             />
+            </div>
           </div>
           <p className='invalid-feedback'>{errors.installedDate?.message}</p>
 
