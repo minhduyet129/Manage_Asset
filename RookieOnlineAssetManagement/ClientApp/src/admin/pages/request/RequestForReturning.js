@@ -432,7 +432,7 @@ function Assignment() {
           onRequestClose={closeModal}
           style={modalCustomStyle}
         >
-          <RequestDetailModal closeModal={closeModal} assignment={request} />
+          <RequestDetailModal closeModal={closeModal} request={request} />
         </Modal>
       )}
       <Modal isOpen={confirmCompleteModal} style={modalCustomStyle}>
