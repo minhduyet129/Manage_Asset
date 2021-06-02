@@ -194,7 +194,7 @@ namespace RookieOnlineAssetManagement.Controllers
         }
         [Authorize(Roles = RoleName.Admin)]
         [HttpGet]
-        public async Task<IActionResult> GetListUser(string location, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
+        public async Task<IActionResult> GetListUser(string location,string filterUser, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
             var queryable = !string.IsNullOrEmpty(location)
                 ? _userManager.Users.Where(u => u.Location == location)
@@ -205,6 +205,10 @@ namespace RookieOnlineAssetManagement.Controllers
             if (!string.IsNullOrEmpty(keyword))
             {
                 queryable = queryable.Where(u => u.FirstName.Contains(keyword) || u.LastName.Contains(keyword) || u.StaffCode.Contains(keyword));
+            }
+            if(!string.IsNullOrEmpty(filterUser))
+            {
+                queryable = queryable.Where(x => x.UserRoles.FirstOrDefault().Role.Name == filterUser);
             }
 
             if (!string.IsNullOrEmpty(sortBy))
@@ -223,8 +227,10 @@ namespace RookieOnlineAssetManagement.Controllers
                     case "joinedDate":
                         queryable = asc ? queryable.OrderBy(u => u.JoinedDate) : queryable.OrderByDescending(u => u.JoinedDate);
                         break;
-                    case "type":
-                        queryable = asc ? queryable.OrderBy(user => user.UserRoles.Select(r => r.Role.Name).First()) : queryable.OrderByDescending(user => user.UserRoles.Select(r => r.Role.Name).First());
+                    case "roles":
+                        queryable = asc
+                             ? queryable.OrderBy(user => user.UserRoles.FirstOrDefault().Role.Name)
+                             : queryable.OrderByDescending(user => user.UserRoles.FirstOrDefault().Role.Name);
                         break;
                     default:
                         queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
