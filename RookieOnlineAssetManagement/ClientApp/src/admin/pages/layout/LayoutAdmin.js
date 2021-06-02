@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SidebarData } from './SidebarDataAdmin';
 import ChangePassword from './password-modals/ChangePassword';
@@ -22,6 +22,7 @@ const customStyles = {
 function LayoutAdmin({ children }) {
   const [sidebar, setSidebar] = useState(false);
   const [dropDown, setDropdown] = useState(false);
+  const [userId, setUserId] = useState([]);
 
   const showSidebar = () => setSidebar(!sidebar);
   const showDropdown = () => setDropdown(!dropDown);
@@ -35,8 +36,13 @@ function LayoutAdmin({ children }) {
     window.location.reload();
   };
 
-  const userLocalStorage = localStorage.getItem('userInfo');
-  const userInfoObject = JSON.parse(userLocalStorage);
+  useEffect(() => {
+    const items = JSON.parse(localStorage.getItem('userInfo'));
+    if (items) {
+      setUserId(items);
+      console.log(items);
+    }
+  }, []);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -58,14 +64,17 @@ function LayoutAdmin({ children }) {
     setIsLoading(true);
     setIsError(false);
 
-    const values = {
-      userId: userInfoObject.userId,
-      oldPassword: data.oldPassword,
-      newPassword: data.newPassword,
-    };
+
 
     try {
-      const response = await axios.post('/api/users/ChangePassword', values);
+      const response = await axios.put('/api/users/ChangPassword', null, {
+        params: {
+          userId: userId.userId,
+          oldPassword: data.oldPassword,
+          newPassword: data.newPassword,
+        },
+      });
+      console.log(response);
       setIsLoading(false);
       setIsPasswordModalOpen(false);
       setIsPasswordChangeSuccessModalOpen(true);
@@ -81,7 +90,7 @@ function LayoutAdmin({ children }) {
     setIsError(false);
 
     const values = {
-      userId: userInfoObject.userId,
+      userId: userId.userId,
       newPassword: data.newPassword,
     };
     console.log(values);
@@ -130,7 +139,7 @@ function LayoutAdmin({ children }) {
           </div>
 
           <div className='dropdown'>
-            <span className='dropdown-username'>{userInfoObject.userName}</span>
+            <span className='dropdown-username'>{userId.userName}</span>
             <span style={{ paddingRight: '10px' }}>
               <i
                 className='bx bxs-chevron-down'

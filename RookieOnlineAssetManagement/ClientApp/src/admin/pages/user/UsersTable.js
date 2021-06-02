@@ -5,10 +5,9 @@ import Select from "react-select";
 import { customStyles } from "../CustomSelectStyle"
 
 const options = [
-  { value: 0, label: "Admin" },
-  { value: 1, label: "User" },
+  { value: "Admin", label: "Admin" },
+  { value: "User", label: "User" },
 ];
-
 const UsersTable = ({
   columns,
   data,
