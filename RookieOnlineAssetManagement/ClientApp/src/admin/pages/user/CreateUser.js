@@ -16,7 +16,6 @@ const schema = Yup.object().shape({
   lastName: Yup.string()
     .required('Last name is required')
     .matches(/^[aA-zZ\s 0-9 ]+$/, 'Invalid Input').max(8, 'Can only contain 8 charaters').trim(),
-
   doB: Yup.date()
     .required('Date of birth is required')
     .typeError('Date of birth is required')
@@ -41,7 +40,7 @@ const CreateUser = () => {
   const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
-    return day !== 0 && day !== 6;
+    return day !== 1 && day !== 6;
   };
   const handlerUser = (users) => {
     users.gender = users.gender === 0 ? 0 : 1;
