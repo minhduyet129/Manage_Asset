@@ -121,11 +121,11 @@
 .row-title {
   font-weight: 500;
   color: #777e88;
-  font-size: 18px;
+  font-size: var(--normal-font-size);
 }
 
 .row-value {
-  font-size: 18px !important;
+  font-size: var(--normal-font-size) !important;
   font-weight: 500 !important;
 }
 
