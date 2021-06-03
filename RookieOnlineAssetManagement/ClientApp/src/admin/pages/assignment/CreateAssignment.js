@@ -39,6 +39,8 @@ const schema = Yup.object().shape({
     .required('Assigned Date is required')
     .typeError('Assigned Date is required')
     .min(format(new Date(), 'MM/dd/yyyy'), 'Only present and future day are allowed'),
+    note: Yup.string()
+    .max(255, "Note has a maximum limit of 255 characters")
 });
 
 const userInfoJSON = window.localStorage.getItem('userInfo');
@@ -239,7 +241,7 @@ function CreateAssignment() {
           <div className='form__field'>
             <label>Note</label>
             <textarea
-              className='input'
+              className={`input ${errors.firstName ? "is-invalid" : ""}`}
               {...register('note')}
               onChange={(e) =>
                 setSubmitData((prev) => {
@@ -251,6 +253,7 @@ function CreateAssignment() {
               }
             />
           </div>
+          <p className="invalid-feedback">{errors.note?.message}</p>
 
           <div className='form__field'>
             <input type='submit' className='btn' value='Create' />
