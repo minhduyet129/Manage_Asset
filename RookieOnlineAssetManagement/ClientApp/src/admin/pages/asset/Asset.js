@@ -340,7 +340,7 @@ function Asset() {
         <DeleteModal
           closeDeleteModal={closeDeleteModal}
           onDeleteAsset={handleDeleteAsset}
-          title='Do you want to disable this asset?'
+          title='Do you want to delete this asset?'
         />
       </Modal>
     </>
