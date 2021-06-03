@@ -13,7 +13,7 @@ const schema = Yup.object().shape({
     .required("Asset Name is required")
     .matches(/^[aA-zZ\s 0-9]+$/, "Invalid keyword")
     .min(2, "This has to be at least 2 charaters")
-    .max(10,"Asset Name has a maximum limit of 10 characters"),
+    .max(30,"Asset Name has a maximum limit of 30 characters"),
   installedDate: Yup.date()
     .required("Installed Date is required")
     .typeError("Installed Date is required"),
