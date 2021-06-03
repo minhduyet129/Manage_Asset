@@ -131,7 +131,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
             return response;
         }
-        [Authorize(Roles =RoleName.Admin)]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAssignmentById(int id)
         {
