@@ -12,13 +12,22 @@ import { toast } from "react-toastify";
 const schema = Yup.object().shape({
   firstName: Yup.string()
     .required("First Name is required")
-    .matches(/^[aA-zZ\s 0-9 ]+$/, "Invalid Input")
-    .max(8, "Can only contain 8 charaters")
-    .trim(),
+    .matches(/^[aA-zZ\s]+$/, "Invalid Input")
+    .min(2, "This has to be at least 2 charaters")
+    .max(10,"Last Name has a maximum limit of 10 characters")
+    .test("firstName", "No space between input", function (firstName){
+      if (firstName?.includes(' ')) {
+        return false
+      }
+      return true
+    }),
+
+
   lastName: Yup.string()
     .required("Last name is required")
-    .matches(/^[aA-zZ\s 0-9 ]+$/, "Invalid Input")
-    .max(8, "Can only contain 8 charaters")
+    .matches(/^[aA-zZ\s]+$/, "Invalid Input")
+    .min(2, "This has to be at least 2 charaters")
+    .max(30,"Last Name has a maximum limit of 30 characters")
     .trim(),
   doB: Yup.date()
     .required("Date of birth is required")
@@ -33,18 +42,19 @@ const schema = Yup.object().shape({
     .typeError("Joined Date is required")
     .min(
       Yup.ref("doB"),
-      ({ min }) => `Joined Date Must be later than Date of birth`
+       `Joined Date Must be later than Date of birth`
     ),
 });
+
+
 
 const CreateUser = () => {
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState();
-  const [location, setLocation] = useState([]);
   const history = useHistory();
   const isWeekday = (date) => {
     const day = date.getDay();
-    return day !== 1 && day !== 6;
+    return day !== 0 && day !== 6;
   };
   const handlerUser = (users) => {
     users.gender = users.gender === 0 ? 0 : 1;
@@ -66,12 +76,11 @@ const CreateUser = () => {
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem("userInfo"));
     if (items) {
-      setLocation(items);
-      console.log(items);
       reset({
         location: items.location,
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { register, handleSubmit, control, formState, reset } = useForm({
@@ -80,13 +89,12 @@ const CreateUser = () => {
   const { errors } = formState;
 
   const onSubmit = async (data) => {
-    await handlerUser(data);
+     await handlerUser(data);
   };
-
   return (
     <LayoutAdmin>
       <div className="table__view">
-        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+        <form className="form" onSubmit={ handleSubmit(onSubmit)}>
           <h2 className="form__title">Create User</h2>
           <div className="form__field">
             <label className="form__label" htmlFor="firstname">
@@ -131,6 +139,7 @@ const CreateUser = () => {
                     selected={startDate}
                     format="YYYY-MM-D HH:m:s"
                     onChange={(e) => {
+                      e = new Date(e.setHours(0));
                       let d = new Date(e.setHours(e.getHours() + 7));
                       onChange(d);
                       setStartDate(d);
@@ -166,6 +175,7 @@ const CreateUser = () => {
                   selected={joinedDate}
                   format="YYYY-MM-D HH:m:s"
                   onChange={(e) => {
+                    e = new Date(e.setHours(0));
                     let d = new Date(e.setHours(e.getHours() + 7));
                     onChange(d);
                     setJoinedDate(d);

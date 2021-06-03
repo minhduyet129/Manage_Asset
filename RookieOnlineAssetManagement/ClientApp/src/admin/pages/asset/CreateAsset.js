@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useForm, Controller } from 'react-hook-form';
-import { Link, useHistory } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import ReactDatePicker from 'react-datepicker';
 import { getApiAssets } from './assetsApi';
 import { toast } from 'react-toastify';
@@ -15,7 +15,9 @@ import './Asset.css';
 const schema = Yup.object().shape({
   assetName: Yup.string()
     .required('Asset Name is required')
-    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid keyword'),
+    .matches(/^[aA-zZ\s 0-9]+$/, 'Invalid keyword')
+    .min(2, "This has to be at least 2 charaters")
+    .max(30,"Asset Name has a maximum limit of 30 characters"),
   installedDate: Yup.date()
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
@@ -45,7 +47,6 @@ const CreateAsset = (props) => {
   const [modalIsOpen, setModelIsOpen] = useState(false);
   const [installedDate, setInstalledDate] = useState();
   const [categories, setCategories] = useState([]);
-  const [location, setLocation] = useState([]);
   const [changes, setChanges] = useState(false);
   const history = useHistory();
 
@@ -67,12 +68,11 @@ const CreateAsset = (props) => {
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem('userInfo'));
     if (items) {
-      setLocation(items);
-      console.log(items)
       reset({
         location: items.location,
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -85,12 +85,12 @@ const CreateAsset = (props) => {
       .createAsset(assets)
       .then((response) => {
         if (response.status) {
-          toast('Add Asset sucessfully');
+          toast.success('Add Asset sucessfully');
           history.push('/admin/assets');
         }
       })
       .catch((error) => {
-        toast('Add asset failed!');
+        toast.error('Add asset failed!');
       });
   }
 
@@ -184,6 +184,7 @@ const CreateAsset = (props) => {
                   id='installedDate'
                   selected={installedDate}
                   onChange={(e) => {
+                    e = new Date(e.setHours(0));
                     let d = new Date(e.setHours(e.getHours() + 7));
                     onChange(d);
                     setInstalledDate(d);
@@ -223,9 +224,9 @@ const CreateAsset = (props) => {
 
           <div className='form__field'>
             <input type='submit' className='btn' value='Create' />
-            <Link to='/admin/assets/'>
+            <NavLink to='/admin/assets/'>
               <button className='btn__cancel'>Cancel</button>
-            </Link>
+            </NavLink>
           </div>
         </form>
         <ModalForm

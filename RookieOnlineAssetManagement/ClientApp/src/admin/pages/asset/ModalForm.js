@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';

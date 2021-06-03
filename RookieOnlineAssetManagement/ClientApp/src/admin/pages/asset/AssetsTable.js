@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Select from 'react-select';
 import { useTable } from 'react-table';
 
@@ -85,11 +85,11 @@ function AssetsTable({
             />
             <i className='bx bx-search' />
           </form>
-          <Link to='/admin/assets/create'>
+          <NavLink to='/admin/assets/create'>
             <button href='assets' className='btn'>
               Create New Asset
             </button>
-          </Link>
+          </NavLink>
         </div>
         <div>
           {loading ? (

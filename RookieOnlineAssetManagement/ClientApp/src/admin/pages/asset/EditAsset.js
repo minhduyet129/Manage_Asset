@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import LayoutAdmin from "../layout/LayoutAdmin";
 import { useForm, Controller } from "react-hook-form";
-import { Link, useHistory, useParams } from "react-router-dom";
+import { NavLink, useHistory, useParams } from "react-router-dom";
 import ReactDatePicker from "react-datepicker";
 import { getApiAssets } from "./assetsApi";
 import { toast } from "react-toastify";
@@ -11,7 +11,9 @@ import * as Yup from "yup";
 const schema = Yup.object().shape({
   assetName: Yup.string()
     .required("Asset Name is required")
-    .matches(/^[aA-zZ\s 0-9]+$/, "Invalid keyword"),
+    .matches(/^[aA-zZ\s 0-9]+$/, "Invalid keyword")
+    .min(2, "This has to be at least 2 charaters")
+    .max(30,"Asset Name has a maximum limit of 30 characters"),
   installedDate: Yup.date()
     .required("Installed Date is required")
     .typeError("Installed Date is required"),
@@ -20,7 +22,7 @@ const schema = Yup.object().shape({
 
 const EditAsset = (props) => {
   const [installedDate, setInstalledDate] = useState(null);
-  const [assets, setAssets] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   const history = useHistory();
   const { id } = useParams();
@@ -29,7 +31,6 @@ const EditAsset = (props) => {
     await getApiAssets
       .getAsset(id)
       .then((res) => {
-        setAssets(res.data);
         setInstalledDate(setDateTime(res.data[0].installedDate));
         reset({
           id: res.data[0].id,
@@ -49,6 +50,7 @@ const EditAsset = (props) => {
 
   const setDateTime = (data) => {
     let d = new Date(data.slice(0, 10));
+    d = new Date(d.setHours(0));
     let date = new Date(d.setHours(d.getHours() + 7));
 
     return date;
@@ -65,12 +67,13 @@ const EditAsset = (props) => {
       })
       .catch((error) => {
         setError(error);
-        toast.success("Update asset failed");
+        toast.error("Update asset failed");
       });
   }
 
   useEffect(() => {
     loadAssets();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { register, handleSubmit, control, reset, formState } = useForm({
@@ -81,8 +84,6 @@ const EditAsset = (props) => {
 
   const onSubmit = (data) => {
     updateAssets(data);
-    // alert('Edit successfully!');
-    // history.push('/admin/assets');
   };
 
   return (
@@ -125,6 +126,7 @@ const EditAsset = (props) => {
                     id="doB"
                     selected={installedDate}
                     onChange={(e) => {
+
                       onChange(e);
                       setInstalledDate(e);
                     }}
@@ -153,9 +155,7 @@ const EditAsset = (props) => {
                 className={`input ${errors.categoryId ? "is-invalid" : ""}`}
               >
                 <option value={0}>Available</option>
-                <option value={1}>Waiting For Approval</option>
                 <option value={2}>Not Available</option>
-                <option value={3}>Assigned</option>
                 <option value={4}>Waiting For Recycling</option>
                 <option value={5}>Recycled</option>
               </select>
@@ -165,9 +165,9 @@ const EditAsset = (props) => {
 
           <div className="form__field">
             <input type="submit" className="btn" value="Save" />
-            <Link to="/admin/assets/">
+            <NavLink to="/admin/assets/">
               <button className="btn__cancel">Cancel</button>
-            </Link>
+            </NavLink>
           </div>
         </form>
       </div>

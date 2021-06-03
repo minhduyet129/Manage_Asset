@@ -12,6 +12,9 @@ import AssetDetailModal from './AssetDetailModal';
 import { modalCustomStyle } from '../ModalCustomStyles';
 import DeleteModal from './DeleteModal';
 
+const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfo = window.JSON.parse(userInfoJSON);
+
 function Asset() {
   const [assets, setAssets] = useState([]);
   const [asset, setAsset] = useState([]);
@@ -20,7 +23,7 @@ function Asset() {
   const [changes, setChanges] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [authorities, setAuthorities] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const [filters, setFilters] = useState({
@@ -31,6 +34,7 @@ function Asset() {
     keyword: null,
     sortBy: null,
     asc: true,
+    location: userInfo.location,
   });
 
   const assetsRef = useRef(null);
@@ -275,7 +279,7 @@ function Asset() {
           const rowIdx = row.id;
           return (
             <div id='actions' style={{ display: 'flex' }}>
-              {row.original.state === 3 ? (
+              {(row.original.state === 3 || row.original.state === 1) ? (
                 <span className='font' style={{ color: 'rgba(0, 0, 0, 0.2)' }}>
                   <i className='bx bx-edit'></i>
                 </span>
@@ -340,7 +344,7 @@ function Asset() {
         <DeleteModal
           closeDeleteModal={closeDeleteModal}
           onDeleteAsset={handleDeleteAsset}
-          title='Do you want to disable this asset?'
+          title='Do you want to delete this asset?'
         />
       </Modal>
     </>

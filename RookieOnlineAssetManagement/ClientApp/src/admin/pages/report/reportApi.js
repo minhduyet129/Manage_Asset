@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-function getReports() {
-  return axios.get('api/Reports');
+function getReports(paramString) {
+  return axios.get(`api/Reports?${paramString}`);
 }
 
 export const getApiReport = {

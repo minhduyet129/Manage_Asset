@@ -1,5 +1,5 @@
 import { useTable } from "react-table";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Select from "react-select";
 
 import { customStyles } from "../CustomSelectStyle"
@@ -46,9 +46,9 @@ const UsersTable = ({
             />
             <i className="bx bx-search" />
           </form>
-          <Link to="/admin/users/create">
+          <NavLink to="/admin/users/create">
             <button className="btn">Create New User</button>
-          </Link>
+          </NavLink>
         </div>
         <div>
           <table {...getTableProps()}>
