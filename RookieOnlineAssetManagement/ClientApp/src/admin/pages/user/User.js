@@ -12,6 +12,9 @@ import UserDetailModal from "./UserDetailModal";
 import { modalCustomStyle } from "../ModalCustomStyles";
 import DeleteModal from "./DeleteModal";
 
+const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfo = window.JSON.parse(userInfoJSON);
+
 const User = () => {
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
@@ -27,6 +30,7 @@ const User = () => {
     keyword: null,
     sortBy: null,
     asc: true,
+    location: userInfo.location,
   });
 
   const usersRef = useRef(null);

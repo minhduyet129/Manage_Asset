@@ -98,6 +98,10 @@ namespace RookieOnlineAssetManagement.Controllers
                         queryable = asc ? queryable.OrderBy(u => u.ReturnedDate) : queryable.OrderByDescending(u => u.ReturnedDate);
 
                         break;
+                    case "state":
+                        queryable = asc ? queryable.OrderBy(u => u.State) : queryable.OrderByDescending(u => u.State);
+
+                        break;
                     default:
                         queryable = asc ? queryable.OrderBy(u => u.ReturnId) : queryable.OrderByDescending(u => u.ReturnId);
 

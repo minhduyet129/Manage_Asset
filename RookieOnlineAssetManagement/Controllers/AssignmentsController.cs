@@ -95,7 +95,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 error.Add(new { assetId = "The asset is not available" });
             }
 
-            if (model.AssignedDate < DateTime.Today)
+            if (model.AssignedDate.Date < DateTime.Today)
             {
                 error.Add(new { assignedDate = "The assigned date is only current or future date" });
             }
@@ -251,7 +251,8 @@ namespace RookieOnlineAssetManagement.Controllers
                 State = GetAssignmentState(assignment.State),
                 AssetId = assignment.AssetId,
                 AssignById = assignment.AssignById,
-                AssignToId = assignment.AssignToId
+                AssignToId = assignment.AssignToId,
+                Note=assignment.Note
             }).ToList();
 
 
@@ -363,7 +364,7 @@ namespace RookieOnlineAssetManagement.Controllers
                          from c in f.DefaultIfEmpty()
                          where a.State != AssignmentState.Returned
                          where a.AssignToId == id
-                         where a.AssignedDate <= DateTime.Now
+                         where a.AssignedDate.Date <= DateTime.Today
                          
                             select new
                          {

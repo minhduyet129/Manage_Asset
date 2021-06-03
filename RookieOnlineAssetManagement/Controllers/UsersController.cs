@@ -46,20 +46,35 @@ namespace RookieOnlineAssetManagement.Controllers
         {
             string userName = firstName;
             var parts = lastName.Split(" ").ToList();
-
+            var afterName = "";
             foreach (var part in parts)
             {
-                userName += part.Substring(0, 1).ToLower();
+                afterName = part.Substring(0, 1).ToLower();
             }
 
-            var count = _dbContext.Users.Count(u => u.UserName.StartsWith(userName));
-
-            if (count > 0)
+            userName += afterName;
+            var listUserName = new List<string>();
+            var query = _dbContext.Users.Where(x=>x.UserName.StartsWith(userName)).Select(y => y.UserName);
+            listUserName.AddRange(query);
+            for (int i = 0; i < 1000000; i++)
             {
-                userName += count.ToString();
-            }
+                userName = firstName;
+                userName += afterName;
+                if (i > 0)
+                {
+                    userName = userName + i.ToString();
 
+                }
+                var result = listUserName.Find(x => x == userName);
+                if (result == null)
+                {
+                    return userName;
+                }
+
+            }
+            userName = "";
             return userName;
+
         }
 
         private string AutoGenerateStaffCode(int id)
@@ -208,7 +223,7 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             if(!string.IsNullOrEmpty(filterUser))
             {
-                queryable = queryable.Where(x => x.UserRoles.FirstOrDefault()!=null&& x.UserRoles.FirstOrDefault().Role.Name == filterUser);
+                queryable = queryable.Where(x => x.UserRoles.FirstOrDefault().Role.Name == filterUser);
             }
             if (sortBy == null)
             {
@@ -286,6 +301,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 if (userValidation.Errors.Count > 0) return BadRequest(userValidation);
 
                 var userName = AutoGenerateUserName(model.FirstName, model.LastName);
+                if (userName == null) return BadRequest("Error create UserName .Please try again!");
                 var password = AutoGeneratePassword(userName, model.DoB);
 
                 var user = new ApplicationUser
