@@ -210,7 +210,11 @@ namespace RookieOnlineAssetManagement.Controllers
             {
                 queryable = queryable.Where(x => x.UserRoles.FirstOrDefault()!=null&& x.UserRoles.FirstOrDefault().Role.Name == filterUser);
             }
-
+            if (sortBy == null)
+            {
+                queryable = queryable.OrderByDescending(x => x.LastChangeUser);
+            }
+           
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy)
@@ -295,6 +299,7 @@ namespace RookieOnlineAssetManagement.Controllers
                     UserName = userName,
                     Password = password,
                     State = UserState.Enable,
+                    LastChangeUser=DateTime.Now
                 };
 
                 var result = await _userManager.CreateAsync(user, password);
@@ -359,6 +364,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 user.DoB = model.DoB;
                 user.JoinedDate = model.JoinedDate;
                 user.Gender = model.Gender;
+                user.LastChangeUser = DateTime.Now;
                 await _dbContext.SaveChangesAsync();
 
                 return Ok(new UserResponseModel

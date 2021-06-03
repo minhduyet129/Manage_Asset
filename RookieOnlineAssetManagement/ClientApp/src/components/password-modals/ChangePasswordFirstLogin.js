@@ -1,8 +1,13 @@
 import { useState } from 'react';
-import Spinner from '../../../../components/Spinner';
+import Spinner from '../Spinner';
 import { useForm } from 'react-hook-form';
 
-const ChangePassword = ({ handleChangePasswordFirstTimeLogin, isLoading }) => {
+const ChangePassword = ({
+  handleChangePasswordFirstTimeLogin,
+  isLoading,
+  isError,
+  errorMessage,
+}) => {
   const [isNewPasswordShowed, setNewPasswordShowed] = useState(false);
   const showNewPassword = () => setNewPasswordShowed(!isNewPasswordShowed);
 
@@ -34,6 +39,10 @@ const ChangePassword = ({ handleChangePasswordFirstTimeLogin, isLoading }) => {
           </div>
           {errors.newPassword && (
             <span className='form__validation'>This field is required</span>
+          )}
+
+          {errorMessage && (
+            <span className='form__validation'>{errorMessage}</span>
           )}
 
           <div style={{ paddingTop: '25px' }}>

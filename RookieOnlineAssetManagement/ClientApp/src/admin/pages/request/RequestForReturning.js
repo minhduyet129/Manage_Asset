@@ -1,20 +1,20 @@
-import axios from "axios";
-import Modal from "react-modal";
-import { format } from "date-fns";
-import { toast } from "react-toastify";
-import ReactPaginate from "react-paginate";
-import { useEffect, useRef, useState, useMemo } from "react";
-import queryString from "query-string";
+import axios from 'axios';
+import Modal from 'react-modal';
+import { format } from 'date-fns';
+import { toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import queryString from 'query-string';
 
-import RequestTable from "./RequestTable";
-import LayoutAdmin from "../layout/LayoutAdmin";
-import ConfirmModal from "./ConfirmModal";
-import RequestDetailModal from "./RequestDetailModal";
-import { modalCustomStyle } from "../ModalCustomStyles";
+import RequestTable from './RequestTable';
+import LayoutAdmin from '../layout/LayoutAdmin';
+import ConfirmModal from './ConfirmModal';
+import RequestDetailModal from './RequestDetailModal';
+import { modalCustomStyle } from '../ModalCustomStyles';
 
-Modal.setAppElement("#root");
+Modal.setAppElement('#root');
 
-const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfoJSON = window.localStorage.getItem('userInfo');
 const userInfo = window.JSON.parse(userInfoJSON);
 
 function Assignment() {
@@ -99,11 +99,11 @@ function Assignment() {
   const handleSortIcon = (sortBy) => {
     if (filters.sortBy === sortBy) {
       if (filters.asc) {
-        return <i className="fas fa-caret-down"></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i className="fas fa-caret-up"></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i className="fas fa-caret-down"></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSortBy = (sortBy) => {
@@ -159,7 +159,7 @@ function Assignment() {
         returnedDate: null,
       });
     } else {
-      const date = format(new Date(value), "dd/MM/yyyy");
+      const date = format(new Date(value), 'dd/MM/yyyy');
       setReturnedDate(value);
       setFilters({
         ...filters,
@@ -177,7 +177,6 @@ function Assignment() {
     setIsOpen(false);
   };
 
-
   const handleOnClickAssignment = (value) => {
     setRequest(value);
     openModal();
@@ -189,7 +188,7 @@ function Assignment() {
     });
     if (!event) {
       event = {
-        target: "",
+        target: '',
         value: null,
       };
     }
@@ -202,189 +201,193 @@ function Assignment() {
 
   const handleCompleteRequest = () => {
     axios
-      .put(`/api/Returns/${requestIdRef.current}/Completed?acceptedByUserId=${userInfo.userId}`)
+      .put(
+        `/api/Returns/${requestIdRef.current}/Completed?acceptedByUserId=${userInfo.userId}`
+      )
       .then((res) => {
         callAssignmentsAPI();
-        setConfirmCompleteModal(false)
-        toast.success("Completed Request for Returning Successfully");
+        setConfirmCompleteModal(false);
+        toast.success('Completed Request for Returning Successfully');
       })
       .catch((err) => {
-        setConfirmCompleteModal(false)
-        toast("Completed Request for Returning Failed");
+        setConfirmCompleteModal(false);
+        toast('Completed Request for Returning Failed');
         console.log(err);
       });
   };
 
   const handleCancelRequest = () => {
     axios
-      .put(`/api/Returns/${requestIdRef.current}/Declined?acceptedByUserId=${userInfo.userId}`)
+      .put(
+        `/api/Returns/${requestIdRef.current}/Declined?acceptedByUserId=${userInfo.userId}`
+      )
       .then((res) => {
         callAssignmentsAPI();
         setConfirmCancelModal(false);
-        toast.success("Cancel Request for Returning Successfully");
+        toast.success('Cancel Request for Returning Successfully');
       })
       .catch((err) => {
         setConfirmCancelModal(false);
-        toast("Cancel Request for Returning Failed");
+        toast('Cancel Request for Returning Failed');
         console.log(err);
       });
   };
 
   const handleState = (value) => {
-    if (value === 0) return "WaitingForReturning";
-    if (value === 1) return "Completed";
-    if (value === 2) return "Declined";
+    if (value === 0) return 'WaitingForReturning';
+    if (value === 1) return 'Completed';
+    if (value === 2) return 'Declined';
     return null;
   };
 
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
-        accessor: "returnId",
+        Header: 'Id',
+        accessor: 'returnId',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetCode")}
+              className='table-header'
+              onClick={() => handleSortBy('assetCode')}
             >
               <span>Asset Code</span>
-              {handleSortIcon("assetCode")}
+              {handleSortIcon('assetCode')}
             </div>
           );
         },
-        accessor: "assetCode",
+        accessor: 'assetCode',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assetName")}
+              className='table-header'
+              onClick={() => handleSortBy('assetName')}
             >
               <span>Asset Name</span>
-              {handleSortIcon("assetName")}
+              {handleSortIcon('assetName')}
             </div>
           );
         },
-        accessor: "assetName",
+        accessor: 'assetName',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("requestedBy")}
+              className='table-header'
+              onClick={() => handleSortBy('requestedBy')}
             >
               <span>Requested By</span>
-              {handleSortIcon("requestedBy")}
+              {handleSortIcon('requestedBy')}
             </div>
           );
         },
-        accessor: "requestBy",
+        accessor: 'requestBy',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("assignedDate")}
+              className='table-header'
+              onClick={() => handleSortBy('assignedDate')}
             >
               <span>Assigned Date</span>
-              {handleSortIcon("assignedDate")}
+              {handleSortIcon('assignedDate')}
             </div>
           );
         },
-        accessor: "assignedDate",
+        accessor: 'assignedDate',
         Cell: ({ value }) => {
           if (!value) return null;
-          return format(new Date(value), "dd/MM/yyyy");
+          return format(new Date(value), 'dd/MM/yyyy');
         },
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("acceptedBy")}
+              className='table-header'
+              onClick={() => handleSortBy('acceptedBy')}
             >
               <span>Accepted by</span>
-              {handleSortIcon("acceptedBy")}
+              {handleSortIcon('acceptedBy')}
             </div>
           );
         },
-        accessor: "acceptedBy",
+        accessor: 'acceptedBy',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("returnedDate")}
+              className='table-header'
+              onClick={() => handleSortBy('returnedDate')}
             >
               <span>Returned Date</span>
-              {handleSortIcon("returnedDate")}
+              {handleSortIcon('returnedDate')}
             </div>
           );
         },
-        accessor: "returnedDate",
+        accessor: 'returnedDate',
         Cell: ({ value }) => {
           if (!value) return null;
-          return format(new Date(value), "dd/MM/yyyy");
+          return format(new Date(value), 'dd/MM/yyyy');
         },
       },
       {
-        id: "state",
+        id: 'state',
         Header: () => {
           return (
-            <div className="table-header" onClick={() => handleSortBy("state")}>
+            <div className='table-header' onClick={() => handleSortBy('state')}>
               <span>State</span>
-              {handleSortIcon("state")}
+              {handleSortIcon('state')}
             </div>
           );
         },
         accessor: (d) => <div>{handleState(d.state)}</div>,
       },
       {
-        Header: "Actions",
-        accessor: "actions",
+        Header: 'Actions',
+        accessor: 'actions',
         Cell: ({ row }) => {
           const rowIdx = row.id;
 
           return (
-            <div id="actions" style={{ display: "flex" }}>
+            <div id='actions' style={{ display: 'flex' }}>
               {row.original.state === 0 ? (
                 <>
                   <span
-                    className="font"
+                    className='font'
                     onClick={() => handleClickTickBtn(rowIdx)}
                   >
-                    <i class="fas fa-check"></i>
+                    <i className='fas fa-check'></i>
                   </span>
                   &emsp;
                   <span
-                    className="font"
+                    className='font'
                     onClick={() => handleClickCancelBtn(rowIdx)}
                   >
-                    <i className="fas fa-times "></i>
+                    <i className='fas fa-times '></i>
                   </span>
                 </>
               ) : (
                 <>
                   <span
-                    className="font"
-                    style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                    className='font'
+                    style={{ color: 'rgba(0, 0, 0, 0.2)' }}
                   >
-                    <i class="fas fa-check"></i>
+                    <i className='fas fa-check'></i>
                   </span>
                   &emsp;
                   <span
-                    className="font"
-                    style={{ color: "rgba(0, 0, 0, 0.2)" }}
+                    className='font'
+                    style={{ color: 'rgba(0, 0, 0, 0.2)' }}
                   >
-                    <i className="fas fa-times "></i>
+                    <i className='fas fa-times '></i>
                   </span>
                 </>
               )}
@@ -409,19 +412,19 @@ function Assignment() {
         onFilterReturnedDate={handleFilterReturnedDate}
         onSelectStateOption={handleSelectState}
       />
-      <div className="paging-box">
+      <div className='paging-box'>
         {pagination.totalPages > 0 && (
           <ReactPaginate
-            previousLabel={"Previous"}
-            nextLabel={"Next"}
-            breakLabel={"..."}
-            breakClassName={"break-me"}
+            previousLabel={'Previous'}
+            nextLabel={'Next'}
+            breakLabel={'...'}
+            breakClassName={'break-me'}
             pageCount={pagination.totalPages}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
+            containerClassName={'pagination'}
+            activeClassName={'active'}
           />
         )}
       </div>
@@ -446,7 +449,7 @@ function Assignment() {
         <ConfirmModal
           closeDeleteModal={() => setConfirmCancelModal(false)}
           onRequest={handleCancelRequest}
-          title="Do you want to cancel this returning request"
+          title='Do you want to cancel this returning request'
         />
       </Modal>
     </LayoutAdmin>

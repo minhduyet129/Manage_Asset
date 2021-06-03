@@ -12,7 +12,6 @@ const options = [
   { value: 1, label: "Accepted" },
   { value: 2, label: "Declined" },
   { value: 3, label: "Waiting For Returning" },
-  { value: 4, label: "Returned" },
 ];
 
 const AssignmentsTable = ({

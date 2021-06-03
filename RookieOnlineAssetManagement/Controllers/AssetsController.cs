@@ -27,32 +27,35 @@ namespace RookieOnlineAssetManagement.Controllers
 
         [HttpGet]
 
-        public async Task<IActionResult> GetAllCategory(string location, int? state, string categoryName, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
+        public async Task<IActionResult> GetAllAsset(string location, int? state, string categoryName, [FromQuery] PaginationFilter filter, string keyword, string sortBy, bool asc = true)
         {
             
             var queryLocation = from a in _context.Assets
                                 join b in _context.Categories
                                 on a.CategoryId equals b.Id
                                 where a.Location == location
+                                
                                 select new
                                 {
                                     Id = a.Id,
                                     AssetCode = a.AssetCode,
                                     AssetName = a.AssetName,
                                     CategoryName = b.Name,
-                                    State = a.State
+                                    State = a.State,
+                                    LastChange = a.LastChangeAsset
                                 };
             var queryNotLocation = from a in _context.Assets
                                    join b in _context.Categories
                                    on a.CategoryId equals b.Id
-
+                                   
                                    select new
                                    {
                                        Id = a.Id,
                                        AssetCode = a.AssetCode,
                                        AssetName = a.AssetName,
                                        CategoryName = b.Name,
-                                       State = a.State
+                                       State = a.State,
+                                       LastChange=a.LastChangeAsset
                                    };
             var query = !string.IsNullOrEmpty(location) ? queryLocation : queryNotLocation;
             if (!string.IsNullOrEmpty(keyword))
@@ -66,6 +69,10 @@ namespace RookieOnlineAssetManagement.Controllers
             if (state!=null &&!string.IsNullOrEmpty(state.ToString()))
             {
                 query = query.Where(z => z.State == (AssetState)state);
+            }
+            if (sortBy == null)
+            {
+                query = query.OrderByDescending(x => x.LastChange);
             }
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -160,6 +167,7 @@ namespace RookieOnlineAssetManagement.Controllers
                                 a.InstalledDate,
                                 a.Location,
                                 a.State,
+                                a.Specification,
                                 k.AssignDate,
                                 k.AssignTo,
                                 k.AssignBy,
@@ -262,7 +270,8 @@ namespace RookieOnlineAssetManagement.Controllers
                 State = asset.State,
                 Location = asset.Location,
                 InstalledDate = asset.InstalledDate,
-                CategoryId = asset.CategoryId
+                CategoryId = asset.CategoryId,
+                LastChangeAsset=DateTime.Now
 
             };
             _context.Assets.Add(newasset);
@@ -292,6 +301,7 @@ namespace RookieOnlineAssetManagement.Controllers
             assetupdate.Specification = asset.Specification;
             assetupdate.InstalledDate = asset.InstalledDate;
             assetupdate.State = asset.State;
+            assetupdate.LastChangeAsset=DateTime.Now;
             await _context.SaveChangesAsync();
             return Ok(assetupdate);
 
