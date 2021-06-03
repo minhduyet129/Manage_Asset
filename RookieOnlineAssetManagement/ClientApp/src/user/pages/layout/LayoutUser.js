@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { SidebarData } from './SidebarDataUser';
 import ChangePassword from '../../../components/password-modals/ChangePassword';
 import ChangePasswordFirstLogin from '../../../components/password-modals/ChangePasswordFirstLogin';
@@ -63,6 +63,7 @@ function LayoutUser({ children }) {
     };
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.put('/api/users/ChangPassword', null, {
         params: values,
       });
@@ -105,6 +106,7 @@ function LayoutUser({ children }) {
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChangePasswordFirstTimeLogin = async (data) => {
@@ -117,13 +119,13 @@ function LayoutUser({ children }) {
     };
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.put(
         '/api/users/ChangPasswordFirstLogin',
         null,
         { params: values }
       );
       setIsLoading(false);
-      console.log(response);
       setIsPasswordFirstTimeModalOpen(false);
 
       localStorage.setItem('isChangePasswordFirstTimeLoginSuccess', true);
@@ -181,10 +183,10 @@ function LayoutUser({ children }) {
                 <i className='bx bxs-lock-alt icon-dropdown'></i>
                 Change password
               </button>
-              <Link to='/login' className='dropbtn' onClick={handleLogout}>
+              <NavLink to='/login' className='dropbtn' onClick={handleLogout}>
                 <i className='bx bx-log-out-circle icon-dropdown'></i>
                 Logout
-              </Link>
+              </NavLink>
             </div>
           </div>
         </div>

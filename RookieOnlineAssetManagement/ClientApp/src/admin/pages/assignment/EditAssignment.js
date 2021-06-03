@@ -4,7 +4,7 @@ import ReactDatePicker from "react-datepicker";
 import { useHistory, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Modal from "react-modal";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -277,9 +277,9 @@ function CreateAssignment() {
 
           <div className="form__field">
             <input type="submit" className="btn" value="Save" />
-            <Link to="/admin/assignments/">
+            <NavLink to="/admin/assignments/">
               <button className="btn__cancel">Cancel</button>
-            </Link>
+            </NavLink>
           </div>
         </form>
       </div>

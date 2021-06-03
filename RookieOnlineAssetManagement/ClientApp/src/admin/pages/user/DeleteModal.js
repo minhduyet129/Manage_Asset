@@ -12,7 +12,7 @@ function DeleteModal({ closeDeleteModal, onDisableUser, title }) {
           Cancel
         </div>
         <div className='confirm-btn delete' onClick={onDisableUser}>
-          Delete
+          Disable
         </div>
       </div>
     </div>

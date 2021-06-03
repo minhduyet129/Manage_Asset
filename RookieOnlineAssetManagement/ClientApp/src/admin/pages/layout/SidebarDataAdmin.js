@@ -1,10 +1,5 @@
 export const SidebarData = [
   {
-    title: 'Asset Management',
-    path: '/admin',
-    icon: 'bx bxs-dashboard',
-  },
-  {
     title: 'Home',
     path: '/admin',
     icon: 'bx bxs-home',

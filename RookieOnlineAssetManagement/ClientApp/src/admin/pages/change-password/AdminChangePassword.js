@@ -2,7 +2,7 @@ import LayoutAdmin from '../layout/LayoutAdmin';
 import Spinner from '../../../components/Spinner';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import axios from 'axios';
 import '../TableView.css';
 
@@ -86,9 +86,9 @@ function AdminChangePassword() {
 
           <div className='form__field'>
             <input type='submit' className='btn' value='Submit' />
-            <Link to='/admin'>
+            <NavLink to='/admin'>
               <button className='btn__cancel'>Cancel</button>
-            </Link>
+            </NavLink>
           </div>
 
           {isLoading && (

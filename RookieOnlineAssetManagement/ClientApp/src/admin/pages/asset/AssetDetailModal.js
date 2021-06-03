@@ -15,9 +15,8 @@ function AssetDetailModal({ closeModal, asset, assetHistories }) {
     if (value === 0) return 'Waiting For Approval';
     if (value === 1) return 'Accepted';
     if (value === 2) return 'Declined';
-    if (value === 3) return 'Assigned';
-    if (value === 4) return 'Waiting For Returning';
-    if (value === 5) return 'Returned';
+    if (value === 3) return 'Waiting For Returning';
+    if (value === 4) return 'Returned';
     return null;
   };
   return (
@@ -42,6 +41,10 @@ function AssetDetailModal({ closeModal, asset, assetHistories }) {
             <div className='body-row'>
               <div className='row-title'>Category Name</div>
               <div className='row-value'>{asset.categoryName}</div>
+            </div>
+            <div className='body-row'>
+              <div className='row-title'>Specification</div>
+              <div className='row-value'>{asset.specification}</div>
             </div>
             <div className='body-row'>
               <div className='row-title'>Asset State</div>
@@ -85,26 +88,6 @@ function AssetDetailModal({ closeModal, asset, assetHistories }) {
                 </table>
               </div>
             </div>
-            {/* <div className='body-row'>
-            <div className='row-title'>Assign Date</div>
-            <div className='row-value'>{asset.assignDate} </div>
-          </div>
-          <div className='body-row'>
-            <div className='row-title'>Assign To</div>
-            <div className='row-value'>{asset.assignTo}</div>
-          </div>
-          <div className='body-row'>
-            <div className='row-title'>Assign By</div>
-            <div className='row-value'>{asset.assignBy}</div>
-          </div>
-          <div className='body-row'>
-            <div className='row-title'>Assign State</div>
-            <div className='row-value'>{asset.assignState}</div>
-          </div> */}
-            {/* <div className='body-row'>
-            <div className='row-title'>Location</div>
-            <div className='row-value'>{user.location}</div>
-          </div> */}
           </div>
         </div>
       )}

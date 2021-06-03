@@ -20,7 +20,7 @@ function Asset() {
   const [changes, setChanges] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [authorities, setAuthorities] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const [filters, setFilters] = useState({

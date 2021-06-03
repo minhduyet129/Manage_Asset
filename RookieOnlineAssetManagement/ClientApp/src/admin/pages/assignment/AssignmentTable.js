@@ -1,6 +1,6 @@
 import { useTable, usePagination } from "react-table";
 import ReactDatePicker from "react-datepicker";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Select from "react-select";
 import React from "react";
 
@@ -75,9 +75,9 @@ const AssignmentsTable = ({
             />
             <i className="bx bx-search" />
           </div>
-          <Link to="/admin/assignments/create">
+          <NavLink to="/admin/assignments/create">
             <button className="btn">Create New Assignment</button>
-          </Link>
+          </NavLink>
         </div>
         <div>
           <table {...getTableProps()}>
