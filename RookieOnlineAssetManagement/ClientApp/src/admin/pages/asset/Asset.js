@@ -275,7 +275,7 @@ function Asset() {
           const rowIdx = row.id;
           return (
             <div id='actions' style={{ display: 'flex' }}>
-              {row.original.state === 3 ? (
+              {(row.original.state === 3 || row.original.state === 1) ? (
                 <span className='font' style={{ color: 'rgba(0, 0, 0, 0.2)' }}>
                   <i className='bx bx-edit'></i>
                 </span>
