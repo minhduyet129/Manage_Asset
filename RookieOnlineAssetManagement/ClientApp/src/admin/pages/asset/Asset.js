@@ -12,6 +12,9 @@ import AssetDetailModal from './AssetDetailModal';
 import { modalCustomStyle } from '../ModalCustomStyles';
 import DeleteModal from './DeleteModal';
 
+const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfo = window.JSON.parse(userInfoJSON);
+
 function Asset() {
   const [assets, setAssets] = useState([]);
   const [asset, setAsset] = useState([]);
@@ -31,6 +34,7 @@ function Asset() {
     keyword: null,
     sortBy: null,
     asc: true,
+    location: userInfo.location,
   });
 
   const assetsRef = useRef(null);
