@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { useEffect, useRef, useState } from "react";
 import queryString from "query-string";
-
 import AssignmentTable from "./AssignmentTable";
 import LayoutUser from "../layout/LayoutUser";
 import ConfirmModal from "./ConfirmModal";
@@ -49,6 +48,7 @@ function Assignment() {
           pageNumber: res.data.pageNumber,
         });
         setLoading(false);
+        console.log(res.data.data)
       })
       .catch((err) => {
         console.log(err);
@@ -232,7 +232,7 @@ function Assignment() {
         >
           <AssignmentDetailModal
             closeModal={closeModal}
-            assignment={assignment}
+            assignments={assignment}
           />
         </Modal>
       )}

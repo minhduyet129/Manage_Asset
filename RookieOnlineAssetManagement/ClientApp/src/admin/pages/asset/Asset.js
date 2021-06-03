@@ -173,7 +173,7 @@ function Asset() {
   const handleShowAssetDetail = async (value) => {
     setAsset(value)
     await getApiAssets
-      .getAssetDetails(value.id)
+      .getAssetDetails(value.assignmentId)
       .then((res) => {
         setAssetHistories(res.data)
       })
