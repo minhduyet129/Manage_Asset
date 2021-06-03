@@ -42,6 +42,7 @@ namespace RookieOnlineAssetManagement.Controllers
                                     AssetName = a.AssetName,
                                     CategoryName = b.Name,
                                     State = a.State,
+                                    a.Specification,
                                     LastChange = a.LastChangeAsset
                                 };
             var queryNotLocation = from a in _context.Assets
@@ -55,6 +56,7 @@ namespace RookieOnlineAssetManagement.Controllers
                                        AssetName = a.AssetName,
                                        CategoryName = b.Name,
                                        State = a.State,
+                                       a.Specification,
                                        LastChange=a.LastChangeAsset
                                    };
             var query = !string.IsNullOrEmpty(location) ? queryLocation : queryNotLocation;
@@ -334,19 +336,17 @@ namespace RookieOnlineAssetManagement.Controllers
             for(int i = 1; i < 1000000; i++)
             {
                 assetcode = cate.CategoryCode + i.ToString("d6");
-
-                if (!listAssetCode.Contains(assetcode))
+                var result = listAssetCode.Find(x =>x == assetcode);
+                if (result==null)
                 {
                     return assetcode;
                 }
             }
-            
+            assetcode = "";
 
 
             return assetcode;
         }
-        
-
 
     }
 }
