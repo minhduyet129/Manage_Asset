@@ -95,7 +95,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 error.Add(new { assetId = "The asset is not available" });
             }
 
-            if (model.AssignedDate < DateTime.Today)
+            if (model.AssignedDate.Date < DateTime.Today)
             {
                 error.Add(new { assignedDate = "The assigned date is only current or future date" });
             }
