@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { SidebarData } from './SidebarDataAdmin';
 import ChangePassword from '../../../components/password-modals/ChangePassword';
 import ChangePasswordFirstLogin from '../../../components/password-modals/ChangePasswordFirstLogin';
@@ -64,6 +64,7 @@ function LayoutAdmin({ children }) {
     };
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.put('/api/users/ChangPassword', null, {
         params: values,
       });
@@ -106,6 +107,7 @@ function LayoutAdmin({ children }) {
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChangePasswordFirstTimeLogin = async (data) => {
@@ -118,6 +120,7 @@ function LayoutAdmin({ children }) {
     };
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.put(
         '/api/users/ChangPasswordFirstLogin',
         null,
@@ -143,15 +146,31 @@ function LayoutAdmin({ children }) {
       <nav className={sidebar ? 'nav active' : 'nav'}>
         {/* Render each item of the side bar */}
         <ul>
+          <li key={'abc123'}>
+            <Link className='link' exact to='/admin'>
+              <span className='icon'>
+                <i className='bx bxs-dashboard'></i>
+              </span>
+              <span className='title'>Asset Management</span>
+            </Link>
+          </li>
           {SidebarData.map((item, index) => {
             return (
               <li key={index}>
-                <Link className='link' to={item.path}>
+                <NavLink
+                  className='link'
+                  exact
+                  to={item.path}
+                  activeStyle={{
+                    color: 'white',
+                    backgroundColor: 'var(--secondary-color)',
+                  }}
+                >
                   <span className='icon'>
                     <i className={item.icon}></i>
                   </span>
                   <span className='title'>{item.title}</span>
-                </Link>
+                </NavLink>
               </li>
             );
           })}
@@ -184,10 +203,10 @@ function LayoutAdmin({ children }) {
                 <i className='bx bxs-lock-alt icon-dropdown'></i>
                 Change password
               </button>
-              <Link to='/login' className='dropbtn' onClick={handleLogout}>
+              <NavLink to='/login' className='dropbtn' onClick={handleLogout}>
                 <i className='bx bx-log-out-circle icon-dropdown'></i>
                 Logout
-              </Link>
+              </NavLink>
             </div>
           </div>
         </div>

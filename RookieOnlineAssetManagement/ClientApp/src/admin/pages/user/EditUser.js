@@ -4,7 +4,7 @@ import LayoutAdmin from "../layout/LayoutAdmin";
 import { useForm, Controller } from "react-hook-form";
 import { useCreateUser } from "./UserHooks";
 import ReactDatePicker from "react-datepicker";
-import { Link, useHistory } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
@@ -30,6 +30,7 @@ const schema = Yup.object().shape({
 const EditUser = () => {
   const [startDate, setStartDate] = useState();
   const [joinedDate, setJoinedDate] = useState();
+  // eslint-disable-next-line no-unused-vars
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const { id } = useParams();
@@ -82,6 +83,7 @@ const EditUser = () => {
 
   useEffect(() => {
     loadUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { register, handleSubmit, control, formState, reset } = useForm({
@@ -91,6 +93,7 @@ const EditUser = () => {
 
   const setDateTime = (data) => {
     let d = new Date(data.slice(0, 10));
+    d = new Date(d.setHours(0));
     let date = new Date(d.setHours(d.getHours() + 7));
 
     return date;
@@ -238,9 +241,9 @@ const EditUser = () => {
           {errors.type && <span>This field is required</span>}
           <div className="form__field">
             <input type="submit" className="btn" value="Save" />
-            <Link to="/admin/users/">
+            <NavLink to="/admin/users/">
               <button className="btn__cancel">Cancel</button>
-            </Link>
+            </NavLink>
           </div>
         </form>
       </div>

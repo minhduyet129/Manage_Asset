@@ -32,6 +32,10 @@ function AssignmentDetailModal({ closeModal, assignment }) {
           <div className='row-title'>State</div>
           <div className='row-value'>{assignment.state}</div>
         </div>
+        <div className='body-row'>
+          <div className='row-title'>Note</div>
+          <div className='row-value'>{assignment.note}</div>
+        </div>
       </div>
     </div>
   );
