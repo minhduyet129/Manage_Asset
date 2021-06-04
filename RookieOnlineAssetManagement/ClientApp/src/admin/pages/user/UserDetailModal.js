@@ -32,10 +32,10 @@ function UserDetailModal({ closeModal, user }) {
           <div className='row-title'>Type</div>
           <div className='row-value'>{user.roles[0]}</div>
         </div>
-        {/* <div className='body-row'>
+        <div className='body-row'>
           <div className='row-title'>Location</div>
           <div className='row-value'>{user.location}</div>
-        </div> */}
+        </div>
       </div>
     </div>
   );

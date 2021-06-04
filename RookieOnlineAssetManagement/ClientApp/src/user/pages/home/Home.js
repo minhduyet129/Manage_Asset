@@ -232,7 +232,7 @@ function Assignment() {
         >
           <AssignmentDetailModal
             closeModal={closeModal}
-            assignments={assignment}
+            assignment={assignment}
           />
         </Modal>
       )}
