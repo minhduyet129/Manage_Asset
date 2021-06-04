@@ -248,10 +248,6 @@ function Assignment() {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
-        accessor: "id",
-      },
-      {
         Header: () => {
           return (
             <div

@@ -81,8 +81,10 @@
 }
 
 .modal-wrapper {
-  min-width: 350px;
+  min-width: 400px;
   min-height: 200px;
+  max-height: 650px;
+  max-width: 600px;
   position: relative;
   padding: 0px 10px;
 }
@@ -127,6 +129,15 @@
 .row-value {
   font-size: var(--normal-font-size) !important;
   font-weight: 500 !important;
+  max-width: 250px;
+  overflow-wrap: anywhere;
+}
+
+.row-value-note {
+  max-height: 130px;
+  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 #tr-hover:hover {
@@ -183,6 +194,7 @@
   height: 350px;
   overflow: scroll;
   overflow-x: hidden;
+  overflow-wrap: anywhere;
 }
 
 .table-wrapper {
@@ -193,6 +205,7 @@
   margin-top: 0px;
   display: block;
 }
+
 
 .table__view table tr th:nth-child(3) {
   width: 170px;
@@ -209,6 +222,14 @@
 .table__view table tr th:nth-child(2) {
   width: 160px;
 }
+
+.table__view table tr td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px !important;
+}
+
 
 .table__view table tbody td:hover {
   cursor: pointer;
@@ -263,6 +284,7 @@
   width: 360px;
   height: 150px;
   padding-top: 25px;
+  max-width: 600px;
 }
 
 .confirm-close-btn {

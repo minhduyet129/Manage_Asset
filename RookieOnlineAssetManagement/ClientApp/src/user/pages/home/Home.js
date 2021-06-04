@@ -1,20 +1,19 @@
-import axios from "axios";
-import Modal from "react-modal";
-import { toast } from "react-toastify";
-import ReactPaginate from "react-paginate";
-import { useEffect, useRef, useState } from "react";
-import queryString from "query-string";
-
-import AssignmentTable from "./AssignmentTable";
-import LayoutUser from "../layout/LayoutUser";
-import ConfirmModal from "./ConfirmModal";
-import AssignmentDetailModal from "./AssignmentDetailModal";
-import { modalCustomStyle } from "../../../admin/pages/ModalCustomStyles";
+import axios from 'axios';
+import Modal from 'react-modal';
+import { toast } from 'react-toastify';
+import ReactPaginate from 'react-paginate';
+import { useEffect, useRef, useState } from 'react';
+import queryString from 'query-string';
+import AssignmentTable from './AssignmentTable';
+import LayoutUser from '../layout/LayoutUser';
+import ConfirmModal from './ConfirmModal';
+import AssignmentDetailModal from './AssignmentDetailModal';
+import { modalCustomStyle } from '../../../admin/pages/ModalCustomStyles';
 // import "../Assignment./Assignment.css";
 
-Modal.setAppElement("#root");
+Modal.setAppElement('#root');
 
-const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfoJSON = window.localStorage.getItem('userInfo');
 const userInfo = window.JSON.parse(userInfoJSON);
 
 function Assignment() {
@@ -49,6 +48,7 @@ function Assignment() {
           pageNumber: res.data.pageNumber,
         });
         setLoading(false);
+        console.log(res.data.data);
       })
       .catch((err) => {
         console.log(err);
@@ -67,29 +67,29 @@ function Assignment() {
       .then((res) => {
         callAssignmentsAPI();
         setConfirmAcceptModal(false);
-        toast.success("Accept Successfully");
+        toast.success('Accept Successfully');
       })
       .catch((err) => {
         setConfirmAcceptModal(false);
-          toast.error("Accept Failed, please contact to admin");
+        toast.error('Accept Failed, please contact to admin');
       });
   };
 
   const handleCreateReturnRequest = () => {
     axios
-      .post("api/Returns", {
+      .post('api/Returns', {
         requestedByUserId: userInfo.userId,
         assignmentId: assignmentIdRef.current,
       })
       .then((res) => {
         callAssignmentsAPI();
         setConfirmReturnModal(false);
-        toast.success("Create Request for Returning Successfully");
+        toast.success('Create Request for Returning Successfully');
       })
       .catch((err) => {
         setConfirmReturnModal(false);
         if (err.response.status === 400) {
-          toast.error("Create Fail");
+          toast.error('Create Fail');
         }
       });
   };
@@ -129,11 +129,11 @@ function Assignment() {
   const handleSortIcon = (sortBy) => {
     if (filters.sortBy === sortBy) {
       if (filters.asc) {
-        return <i className="fas fa-caret-down"></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i className="fas fa-caret-up"></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i className="fas fa-caret-down"></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSortBy = (sortBy) => {
@@ -184,15 +184,13 @@ function Assignment() {
       .then((res) => {
         callAssignmentsAPI();
         setConfirmDeclineModal(false);
-        toast.success("Decline Successfully");
+        toast.success('Decline Successfully');
       })
       .catch((err) => {
         setConfirmDeclineModal(false);
-          toast.error("Decline Failed, please contact to admin");
+        toast.error('Decline Failed, please contact to admin');
       });
   };
-
-  
 
   return (
     <LayoutUser>
@@ -208,19 +206,19 @@ function Assignment() {
         onDeclineAssignment={handleClickDeclineBtn}
         onClickReturnRequest={handleClickReturnRequest}
       />
-      <div className="paging-box">
+      <div className='paging-box'>
         {pagination.totalPages > 0 && (
           <ReactPaginate
-            previousLabel={"Previous"}
-            nextLabel={"Next"}
-            breakLabel={"..."}
-            breakClassName={"break-me"}
+            previousLabel={'Previous'}
+            nextLabel={'Next'}
+            breakLabel={'...'}
+            breakClassName={'break-me'}
             pageCount={pagination.totalPages}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
+            containerClassName={'pagination'}
+            activeClassName={'active'}
           />
         )}
       </div>
@@ -240,9 +238,9 @@ function Assignment() {
         <ConfirmModal
           closeModal={() => setConfirmDeclineModal(false)}
           handleFunction={handleDeclineAssignment}
-          title="Are you sure decline this assignment?"
-          acceptBtn="Yes"
-          cancelBtn="No"
+          title='Are you sure decline this assignment?'
+          acceptBtn='Yes'
+          cancelBtn='No'
         />
       </Modal>
 
@@ -250,9 +248,9 @@ function Assignment() {
         <ConfirmModal
           closeModal={() => setConfirmAcceptModal(false)}
           handleFunction={handleAcceptAssignment}
-          title="Do you want to accept this assignment?"
-          acceptBtn="Yes"
-          cancelBtn="No"
+          title='Do you want to accept this assignment?'
+          acceptBtn='Yes'
+          cancelBtn='No'
         />
       </Modal>
 
@@ -260,9 +258,9 @@ function Assignment() {
         <ConfirmModal
           closeModal={() => setConfirmReturnModal(false)}
           handleFunction={handleCreateReturnRequest}
-          title="Do you want to create a returning request for this asset?"
-          acceptBtn="Yes"
-          cancelBtn="No"
+          title='Do you want to create a returning request for this asset?'
+          acceptBtn='Yes'
+          cancelBtn='No'
         />
       </Modal>
     </LayoutUser>
