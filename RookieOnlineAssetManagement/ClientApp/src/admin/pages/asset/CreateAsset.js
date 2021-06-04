@@ -23,7 +23,7 @@ const schema = Yup.object().shape({
     .typeError('Installed Date is required'),
   categoryId: Yup.number().required('Select Category is required'),
   specification: Yup.string()
-    .max(255,"Asset Name has a maximum limit of 255 characters"),
+    .max(255,"Specification has a maximum limit of 255 characters"),
   state: Yup.string().required('Select State is required'),
 });
 

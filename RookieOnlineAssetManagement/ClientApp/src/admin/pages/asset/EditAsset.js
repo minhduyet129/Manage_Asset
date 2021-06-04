@@ -19,7 +19,7 @@ const schema = Yup.object().shape({
     .typeError("Installed Date is required"),
   state: Yup.string().required("Select State is required"),
   specification: Yup.string()
-    .max(255,"Note has a maximum limit of 255 characters"),
+    .max(255,"Specification has a maximum limit of 255 characters"),
 });
 
 const EditAsset = (props) => {
