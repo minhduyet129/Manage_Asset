@@ -205,7 +205,7 @@ namespace RookieOnlineAssetManagement.Controllers
                         break;
 
                     case "assetCode":
-                        queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
+                        queryable = asc ? queryable.OrderBy(u => u.Asset.AssetCode) : queryable.OrderByDescending(u => u.Asset.AssetCode);
                         break;
 
                     case "assetName":
@@ -315,9 +315,15 @@ namespace RookieOnlineAssetManagement.Controllers
 
                 if (assignment == null) return NotFound("Not found assignment");
                 if (assignment.State != AssignmentState.Waiting) return BadRequest("Assignment must have state Waiting for acceptance ");
+
                 var assetOld = await _dbContext.Assets.SingleOrDefaultAsync(x => x.Id == assignment.AssetId);
                 if (assetOld == null) return NotFound("Not found old asset of assignment ");
                 assetOld.State = AssetState.Available;
+
+                var assetNew = await _dbContext.Assets.SingleOrDefaultAsync(x => x.Id == model.AssetId);
+                if(assetNew==null) return NotFound("Not found new asset of assignment ");
+
+                assetNew.State = AssetState.WaitingForApproval;
 
                 assignment.AssignToId = model.AssignToId;
                 assignment.AssignById = model.AssignById;
@@ -325,6 +331,7 @@ namespace RookieOnlineAssetManagement.Controllers
                 assignment.AssignedDate = model.AssignedDate;
                 assignment.Note = model.Note;
                 assignment.LastChangeAssignment = DateTime.Now;
+
                  _dbContext.Entry(assignment).State = EntityState.Modified;
                 await _dbContext.SaveChangesAsync();
 
