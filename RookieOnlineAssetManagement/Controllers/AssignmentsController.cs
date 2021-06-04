@@ -366,7 +366,7 @@ namespace RookieOnlineAssetManagement.Controllers
                          from c in f.DefaultIfEmpty()
                          where a.State != AssignmentState.Returned
                          where a.AssignToId == id
-                         where a.AssignedDate.Date <= DateTime.Today.AddDays(1)
+                         where a.AssignedDate.Date <= DateTime.UtcNow.Date
                          
                             select new
                          {
