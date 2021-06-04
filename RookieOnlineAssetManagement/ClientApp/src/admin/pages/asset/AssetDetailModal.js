@@ -67,7 +67,7 @@ function AssetDetailModal({ closeModal, asset, assetHistories }) {
                     {assetHistories.map((item, index) => (
                       <>
                         {item.assignBy ? (
-                          <tr>
+                          <tr key={index}>
                             <td width="10%">{index + 1}</td>
                             <td width="20%">{item.assignBy}</td>
                             <td width="20%">{item.assignTo}</td>
