@@ -275,7 +275,7 @@ function CreateAssignment() {
             />
           </div>
           <div className="invalid-feedback">
-            <p>{errors.assetId?.message}</p>
+            <p>{errors.note?.message}</p>
           </div>
 
           <div className="form__field">
