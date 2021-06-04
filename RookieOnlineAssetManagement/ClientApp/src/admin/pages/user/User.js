@@ -172,7 +172,7 @@ const User = () => {
       .catch((error) => {
         setDeleteModal(false);
         if (error.response.status === 400) {
-          toast.error(error.response.data);
+          toast.error('Cannot Disable User');
         }
       });
   };
