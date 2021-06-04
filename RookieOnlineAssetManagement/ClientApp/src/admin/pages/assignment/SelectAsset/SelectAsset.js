@@ -136,7 +136,7 @@ function SelectAsset({ onSelectAsset, onSaveAssetModal, onCancelAssetModal }) {
               className='table-header'
               onClick={() => handleSortBy('assetName')}
             >
-              <span>Asset Name</span>
+              <span>Category</span>
               {handleSortIcon('assetName')}
             </div>
           );

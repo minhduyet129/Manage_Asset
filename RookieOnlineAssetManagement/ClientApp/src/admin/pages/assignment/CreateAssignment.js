@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import { NavLink } from "react-router-dom";
 import Modal from "react-modal";
 import * as Yup from "yup";
-import { format } from "date-fns";
 
 import SelectUser from "./SelectUser/SelectUser";
 import SelectAsset from "./SelectAsset/SelectAsset";
@@ -35,13 +34,13 @@ const schema = Yup.object().shape({
     .required("Asset is required")
     .typeError("Asset is required")
     .nullable(true),
-  assignedDate: Yup.date()
-    .required("Assigned Date is required")
-    .typeError("Assigned Date is required")
-    .min(
-      format(new Date(), "MM/dd/yyyy"),
-      "Only present and future day are allowed"
-    ),
+  // assignedDate: Yup.date()
+  //   .required("Assigned Date is required")
+  //   .typeError("Assigned Date is required")
+  //   .min(
+  //     format(new Date(), "MM/dd/yyyy"),
+  //     "Only present and future day are allowed"
+  //   ),
   note: Yup.string().max(255, "Note has a maximum limit of 255 characters"),
 });
 
