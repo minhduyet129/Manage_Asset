@@ -243,8 +243,10 @@ function Assignment() {
   const columns = useMemo(
     () => [
       {
-        Header: 'Id',
-        accessor: 'returnId',
+        Header: 'No.',
+        Cell: ({ row }) => {
+          return <div>{row.index + 1 + (pagination.pageNumber - 1) * 10}</div>;
+        },
       },
       {
         Header: () => {
@@ -397,7 +399,7 @@ function Assignment() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters]
+    [filters, pagination]
   );
 
   return (

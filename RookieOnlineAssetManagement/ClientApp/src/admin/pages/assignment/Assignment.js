@@ -248,6 +248,23 @@ function Assignment() {
   const columns = useMemo(
     () => [
       {
+        id: 'No',
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("lastChange")}
+            >
+              <span>No.</span>
+              {handleSortIcon("lastChange")}
+            </div>
+          );
+        },
+        Cell: ({ row }) => {
+          return <div>{row.index + 1 + (pagination.pageNumber - 1) * 10}</div>;
+        },
+      },
+      {
         Header: () => {
           return (
             <div
@@ -388,7 +405,7 @@ function Assignment() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters]
+    [filters, pagination]
   );
 
   return (
