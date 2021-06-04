@@ -210,7 +210,7 @@ function Asset() {
         setDeleteModal(false);
         if (err.response.status) {
           toast.error(
-            err.response.data + '' +
+            err.response.data + '. ' +
               'If the asset is not able to be used anymore, please update its state in edit asset'
           );
         }
