@@ -18,6 +18,8 @@ const schema = Yup.object().shape({
     .required("Installed Date is required")
     .typeError("Installed Date is required"),
   state: Yup.string().required("Select State is required"),
+  specification: Yup.string()
+    .max(255,"Specification has a maximum limit of 255 characters"),
 });
 
 const EditAsset = (props) => {
@@ -113,6 +115,7 @@ const EditAsset = (props) => {
               {...register("specification")}
             />
           </div>
+          <p className="invalid-feedback">{errors.specification?.message}</p>
 
           <div className="form__field">
             <label>Installed Date</label>

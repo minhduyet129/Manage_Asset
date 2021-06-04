@@ -30,6 +30,8 @@ function Assignment() {
   const [pagination, setPaginaion] = useState({
     totalPages: 0,
     pageNumber: 1,
+    totalRecords: 0,
+    pageSize: 0
   });
   const [filters, setFilters] = useState({
     PageNumber: 1,
@@ -37,7 +39,7 @@ function Assignment() {
     filterState: null,
     PageSize: 10,
     keyword: null,
-    sortBy: null,
+    sortBy: 'lastChange',
     asc: true,
   });
 
@@ -57,6 +59,8 @@ function Assignment() {
         setPaginaion({
           totalPages: res.data.totalPages,
           pageNumber: res.data.pageNumber,
+          pageSize: res.data.pageSize,
+          totalRecords: res.data.totalRecords
         });
         setLoading(false);
       })
@@ -248,8 +252,24 @@ function Assignment() {
   const columns = useMemo(
     () => [
       {
-        Header: "Id",
-        accessor: "id",
+        id: 'No',
+        Header: () => {
+          return (
+            <div
+              className="table-header"
+              onClick={() => handleSortBy("lastChange")}
+            >
+              <span>No.</span>
+              {handleSortIcon("lastChange")}
+            </div>
+          );
+        },
+        Cell: ({ row }) => {
+          if (filters.asc) {
+            return <div>{pagination.totalRecords - row.index - ((pagination.pageNumber - 1) * pagination.pageSize)}</div>;
+          }
+          return <div>{row.index + 1 + (pagination.pageNumber - 1) * pagination.pageSize}</div>;
+        },
       },
       {
         Header: () => {
@@ -392,7 +412,7 @@ function Assignment() {
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters]
+    [filters, pagination]
   );
 
   return (

@@ -22,6 +22,8 @@ const schema = Yup.object().shape({
     .required('Installed Date is required')
     .typeError('Installed Date is required'),
   categoryId: Yup.number().required('Select Category is required'),
+  specification: Yup.string()
+    .max(255,"Specification has a maximum limit of 255 characters"),
   state: Yup.string().required('Select State is required'),
 });
 
@@ -172,6 +174,7 @@ const CreateAsset = (props) => {
               className='input'
             />
           </div>
+          <p className='invalid-feedback'>{errors.specification?.message}</p>
 
           <div className='form__field'>
             <label>Installed Date</label>

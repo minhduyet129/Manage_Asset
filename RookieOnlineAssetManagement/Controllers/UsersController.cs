@@ -408,6 +408,11 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpPut("disable/{id}")]
         public async Task<IActionResult> DisableUser(int id)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId == id.ToString())
+            {
+                return BadRequest("You can't disable yourself");
+            }
             var user = await _dbContext.Users.Include(u => u.AssignmentsTo).SingleOrDefaultAsync(u => u.Id == id);
             var errors = new List<object>();
 
@@ -447,7 +452,8 @@ namespace RookieOnlineAssetManagement.Controllers
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name,user.UserName)
+                    new Claim(ClaimTypes.Name,user.UserName),
+                    new Claim(ClaimTypes.NameIdentifier,user.Id.ToString())
                 };
                 foreach (var userRole in userRoles)
                 {

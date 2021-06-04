@@ -131,7 +131,7 @@ namespace RookieOnlineAssetManagement.Controllers
 
             return response;
         }
-        [Authorize(Roles =RoleName.Admin)]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAssignmentById(int id)
         {
@@ -227,7 +227,9 @@ namespace RookieOnlineAssetManagement.Controllers
                     case "state":
                         queryable = asc ? queryable.OrderBy(u => u.State) : queryable.OrderByDescending(u => u.State);
                         break;
-
+                    case "lastChange":
+                        queryable= asc ? queryable.OrderBy(u => u.LastChangeAssignment) : queryable.OrderByDescending(u => u.LastChangeAssignment);
+                        break;
                     default:
                         queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
                         break;
@@ -364,7 +366,7 @@ namespace RookieOnlineAssetManagement.Controllers
                          from c in f.DefaultIfEmpty()
                          where a.State != AssignmentState.Returned
                          where a.AssignToId == id
-                         where a.AssignedDate.Date <= DateTime.Today
+                         where a.AssignedDate.Date <= DateTime.UtcNow.Date
                          
                             select new
                          {
