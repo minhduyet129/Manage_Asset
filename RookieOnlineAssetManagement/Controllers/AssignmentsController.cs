@@ -227,7 +227,9 @@ namespace RookieOnlineAssetManagement.Controllers
                     case "state":
                         queryable = asc ? queryable.OrderBy(u => u.State) : queryable.OrderByDescending(u => u.State);
                         break;
-
+                    case "lastChange":
+                        queryable= asc ? queryable.OrderBy(u => u.LastChangeAssignment) : queryable.OrderByDescending(u => u.LastChangeAssignment);
+                        break;
                     default:
                         queryable = asc ? queryable.OrderBy(u => u.Id) : queryable.OrderByDescending(u => u.Id);
                         break;
