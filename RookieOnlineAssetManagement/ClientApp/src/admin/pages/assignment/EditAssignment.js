@@ -34,6 +34,7 @@ const schema = Yup.object().shape({
   assignedDate: Yup.date()
     .required("Assigned Date is required")
     .typeError("Assigned Date is required"),
+  note: Yup.string().max(255, "Note has a maximum limit of 255 characters"),
 });
 
 const userInfoJSON = window.localStorage.getItem("userInfo");
@@ -273,6 +274,9 @@ function CreateAssignment() {
                 })
               }
             />
+          </div>
+          <div className="invalid-feedback">
+            <p>{errors.assetId?.message}</p>
           </div>
 
           <div className="form__field">
