@@ -238,7 +238,6 @@ function CreateAssignment() {
                     selected={submitData.assignedDate}
                     onChange={(e) => handleSetAssignedDate(e, onChange)}
                     placeholderText="MM/DD/YY"
-                    isClearable
                     withPortal
                     showYearDropdown
                     showMonthDropdown

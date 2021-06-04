@@ -12,7 +12,7 @@ function DeleteModal({ closeDeleteModal, onDeleteAsset = () => {}, title }) {
           Cancel
         </div>
         <div className='confirm-btn delete' onClick={onDeleteAsset}>
-          Disable
+          Delete
         </div>
       </div>
     </div>

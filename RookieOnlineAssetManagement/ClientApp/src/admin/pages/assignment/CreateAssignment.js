@@ -243,8 +243,8 @@ function CreateAssignment() {
           <div className="form__field">
             <label>Note</label>
             <textarea
-              className="input"
-              {...register("note")}
+              className={`input ${errors.firstName ? "is-invalid" : ""}`}
+              {...register('note')}
               onChange={(e) =>
                 setSubmitData((prev) => {
                   return {

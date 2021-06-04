@@ -49,30 +49,32 @@ namespace RookieOnlineAssetManagement.Controllers
             var afterName = "";
             foreach (var part in parts)
             {
-                afterName= part.Substring(0, 1).ToLower();
+                afterName = part.Substring(0, 1).ToLower();
             }
-            
+
+            userName += afterName;
             var listUserName = new List<string>();
-            var query = _dbContext.Users.Select(x => x.UserName);
+            var query = _dbContext.Users.Where(x=>x.UserName.StartsWith(userName)).Select(y => y.UserName);
             listUserName.AddRange(query);
-            for(int i = 0; i < 1000000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 userName = firstName;
                 userName += afterName;
                 if (i > 0)
                 {
                     userName = userName + i.ToString();
-                    
+
                 }
                 var result = listUserName.Find(x => x == userName);
                 if (result == null)
                 {
                     return userName;
                 }
-                
+
             }
             userName = "";
             return userName;
+
         }
 
         private string AutoGenerateStaffCode(int id)
@@ -221,7 +223,7 @@ namespace RookieOnlineAssetManagement.Controllers
             }
             if(!string.IsNullOrEmpty(filterUser))
             {
-                queryable = queryable.Where(x => x.UserRoles.FirstOrDefault()!=null&& x.UserRoles.FirstOrDefault().Role.Name == filterUser);
+                queryable = queryable.Where(x => x.UserRoles.FirstOrDefault().Role.Name == filterUser);
             }
             if (sortBy == null)
             {
@@ -406,6 +408,11 @@ namespace RookieOnlineAssetManagement.Controllers
         [HttpPut("disable/{id}")]
         public async Task<IActionResult> DisableUser(int id)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId == id.ToString())
+            {
+                return BadRequest("You can't disable yourself");
+            }
             var user = await _dbContext.Users.Include(u => u.AssignmentsTo).SingleOrDefaultAsync(u => u.Id == id);
             var errors = new List<object>();
 
@@ -445,7 +452,8 @@ namespace RookieOnlineAssetManagement.Controllers
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name,user.UserName)
+                    new Claim(ClaimTypes.Name,user.UserName),
+                    new Claim(ClaimTypes.NameIdentifier,user.Id.ToString())
                 };
                 foreach (var userRole in userRoles)
                 {
