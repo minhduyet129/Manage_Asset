@@ -1,6 +1,6 @@
 import LayoutAdmin from '../layout/LayoutAdmin';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import {useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { getApiAssets } from './assetsApi';
 import AssetsTable from './AssetsTable';
 import { toast } from 'react-toastify';
@@ -12,7 +12,7 @@ import AssetDetailModal from './AssetDetailModal';
 import { modalCustomStyle } from '../ModalCustomStyles';
 import DeleteModal from './DeleteModal';
 
-const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfoJSON = window.localStorage.getItem('userInfo');
 const userInfo = window.JSON.parse(userInfoJSON);
 
 function Asset() {
@@ -172,11 +172,11 @@ function Asset() {
 
   const handleShowAssetDetail = async (value) => {
     console.log(value);
-    setAsset(value)
+    setAsset(value);
     await getApiAssets
       .getAssetDetails(value.id)
       .then((res) => {
-        setAssetHistories(res.data)
+        setAssetHistories(res.data);
       })
       .catch((err) => {
         setError(err);
@@ -211,6 +211,7 @@ function Asset() {
         if (err.response.status) {
           toast.error(
             err.response.data +
+              '. ' +
               'If the asset is not able to be used anymore, please update its state in edit asset'
           );
         }
@@ -280,7 +281,7 @@ function Asset() {
           const rowIdx = row.id;
           return (
             <div id='actions' style={{ display: 'flex' }}>
-              {(row.original.state === 3 || row.original.state === 1) ? (
+              {row.original.state === 3 || row.original.state === 1 ? (
                 <span className='font' style={{ color: 'rgba(0, 0, 0, 0.2)' }}>
                   <i className='bx bx-edit'></i>
                 </span>
@@ -290,12 +291,18 @@ function Asset() {
                 </span>
               )}
               &emsp;
-              <span
-                className='font'
-                onClick={() => handleClickDeleteBtn(rowIdx)}
-              >
-                <i className='fas fa-times'></i>
-              </span>
+              {row.original.state === 3 ? (
+                <span className='font' style={{ color: 'rgba(0, 0, 0, 0.2)' }}>
+                  <i className='fas fa-times'></i>
+                </span>
+              ) : (
+                <span
+                  className='font'
+                  onClick={() => handleClickDeleteBtn(rowIdx)}
+                >
+                  <i className='fas fa-times'></i>
+                </span>
+              )}
             </div>
           );
         },
@@ -338,7 +345,11 @@ function Asset() {
         onRequestClose={closeModal}
         style={modalCustomStyle}
       >
-        <AssetDetailModal asset={asset} assetHistories={assetHistories} closeModal={closeModal} />
+        <AssetDetailModal
+          asset={asset}
+          assetHistories={assetHistories}
+          closeModal={closeModal}
+        />
       </Modal>
 
       <Modal isOpen={deleteModal} style={modalCustomStyle}>
