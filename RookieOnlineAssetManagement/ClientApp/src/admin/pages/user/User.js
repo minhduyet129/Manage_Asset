@@ -1,18 +1,18 @@
-import { useEffect, useState, useRef, useMemo } from "react";
-import LayoutAdmin from "../layout/LayoutAdmin";
-import UsersTable from "./UsersTable";
-import { useHistory } from "react-router-dom";
-import { format } from "date-fns";
-import { useCreateUser } from "./UserHooks";
-import { toast } from "react-toastify";
-import Modal from "react-modal";
-import queryString from "query-string";
-import ReactPaginate from "react-paginate";
-import UserDetailModal from "./UserDetailModal";
-import { modalCustomStyle } from "../ModalCustomStyles";
-import DeleteModal from "./DeleteModal";
+import { useEffect, useState, useRef, useMemo } from 'react';
+import LayoutAdmin from '../layout/LayoutAdmin';
+import UsersTable from './UsersTable';
+import { useHistory } from 'react-router-dom';
+import { format } from 'date-fns';
+import { useCreateUser } from './UserHooks';
+import { toast } from 'react-toastify';
+import Modal from 'react-modal';
+import queryString from 'query-string';
+import ReactPaginate from 'react-paginate';
+import UserDetailModal from './UserDetailModal';
+import { modalCustomStyle } from '../ModalCustomStyles';
+import DeleteModal from './DeleteModal';
 
-const userInfoJSON = window.localStorage.getItem("userInfo");
+const userInfoJSON = window.localStorage.getItem('userInfo');
 const userInfo = window.JSON.parse(userInfoJSON);
 
 const User = () => {
@@ -93,11 +93,11 @@ const User = () => {
   const handleSortIcon = (sortBy) => {
     if (filters.sortBy === sortBy) {
       if (filters.asc) {
-        return <i className="fas fa-caret-down"></i>;
+        return <i className='fas fa-caret-down'></i>;
       }
-      return <i className="fas fa-caret-up"></i>;
+      return <i className='fas fa-caret-up'></i>;
     }
-    return <i className="fas fa-caret-down"></i>;
+    return <i className='fas fa-caret-down'></i>;
   };
 
   const handleSearchChange = (value) => {
@@ -119,7 +119,7 @@ const User = () => {
     setTotalPages(0);
     if (!event) {
       event = {
-        target: "",
+        target: '',
         value: null,
       };
     }
@@ -166,13 +166,13 @@ const User = () => {
         });
         setDeleteModal(false);
         if (res.status === 200) {
-          toast.success("Disable user successfully");
+          toast.success('Disable user successfully');
         }
       })
       .catch((error) => {
         setDeleteModal(false);
         if (error.response.status === 400) {
-          toast.error(error.response.data.errors[0].message);
+          toast.error(error.response.data);
         }
       });
   };
@@ -183,90 +183,90 @@ const User = () => {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("staffCode")}
+              className='table-header'
+              onClick={() => handleSortBy('staffCode')}
             >
               <span>Staff Code</span>
-              {handleSortIcon("staffCode")}
+              {handleSortIcon('staffCode')}
             </div>
           );
         },
-        accessor: "staffCode",
+        accessor: 'staffCode',
       },
       {
-        id: "firstName",
+        id: 'firstName',
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("firstName")}
+              className='table-header'
+              onClick={() => handleSortBy('firstName')}
             >
               <span>Full Name</span>
-              {handleSortIcon("firstName")}
+              {handleSortIcon('firstName')}
             </div>
           );
         },
-        accessor: (d) => <div>{d.firstName + " " + d.lastName}</div>,
+        accessor: (d) => <div>{d.firstName + ' ' + d.lastName}</div>,
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("userName")}
+              className='table-header'
+              onClick={() => handleSortBy('userName')}
             >
               <span>Username</span>
-              {handleSortIcon("userName")}
+              {handleSortIcon('userName')}
             </div>
           );
         },
-        accessor: "userName",
+        accessor: 'userName',
       },
       {
         Header: () => {
           return (
             <div
-              className="table-header"
-              onClick={() => handleSortBy("joinedDate")}
+              className='table-header'
+              onClick={() => handleSortBy('joinedDate')}
             >
               <span>Joined Date</span>
-              {handleSortIcon("joinedDate")}
+              {handleSortIcon('joinedDate')}
             </div>
           );
         },
-        accessor: "joinedDate",
+        accessor: 'joinedDate',
         Cell: ({ value }) => {
-          return format(new Date(value), "dd/MM/yyyy");
+          return format(new Date(value), 'dd/MM/yyyy');
         },
       },
       {
         Header: () => {
           return (
-            <div className="table-header" onClick={() => handleSortBy("roles")}>
+            <div className='table-header' onClick={() => handleSortBy('roles')}>
               <span>Type</span>
-              {handleSortIcon("roles")}
+              {handleSortIcon('roles')}
             </div>
           );
         },
-        accessor: "roles",
+        accessor: 'roles',
       },
       {
-        Header: "Actions",
-        accessor: "actions",
+        Header: 'Actions',
+        accessor: 'actions',
         Cell: (props) => {
           const rowIdx = props.row.id;
 
           return (
-            <div id="actions" style={{ display: "flex" }}>
-              <span className="font" onClick={() => getUserId(rowIdx)}>
-                <i className="bx bx-edit"></i>
+            <div id='actions' style={{ display: 'flex' }}>
+              <span className='font' onClick={() => getUserId(rowIdx)}>
+                <i className='bx bx-edit'></i>
               </span>
               &emsp;
               <span
-                className="font"
+                className='font'
                 onClick={() => handleClickDisableUserBtn(rowIdx)}
               >
-                <i className="fas fa-times"></i>
+                <i className='fas fa-times'></i>
               </span>
             </div>
           );
@@ -288,19 +288,19 @@ const User = () => {
           onSelectType={handleSelectType}
           onShowUserDetail={handleShowUserDetail}
         />
-        <div className="paging-box">
+        <div className='paging-box'>
           {totalPages > 0 && (
             <ReactPaginate
-              previousLabel={"Previous"}
-              nextLabel={"Next"}
-              breakLabel={"..."}
-              breakClassName={"break-me"}
+              previousLabel={'Previous'}
+              nextLabel={'Next'}
+              breakLabel={'...'}
+              breakClassName={'break-me'}
               pageCount={totalPages || 1}
               marginPagesDisplayed={2}
               pageRangeDisplayed={5}
               onPageChange={handlePageClick}
-              containerClassName={"pagination"}
-              activeClassName={"active"}
+              containerClassName={'pagination'}
+              activeClassName={'active'}
             />
           )}
         </div>
@@ -318,7 +318,7 @@ const User = () => {
         <DeleteModal
           closeDeleteModal={closeDeleteModal}
           onDisableUser={handleDisableUser}
-          title="Do you want to disable this user?"
+          title='Do you want to disable this user?'
         />
       </Modal>
     </>
