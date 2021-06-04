@@ -9,9 +9,11 @@ import * as Yup from 'yup';
 const schema = Yup.object().shape({
   categoryCode: Yup.string()
     .required('Category Code is required')
+    .max(5, "Category Code has a maximum limit of 5 characters")
     .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
   name: Yup.string()
     .required('Category Name is required')
+    .max(30, "Category Name has a maximum limit of 30 characters")
     .matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
 });
 const ModalForm = ({ modalIsOpen, setModelIsOpen, setChanges }) => {
