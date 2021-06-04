@@ -34,7 +34,7 @@ function AssignmentDetailModal({ closeModal, assignment }) {
         </div>
         <div className='body-row'>
           <div className='row-title'>Note</div>
-          <div className='row-value'>{assignment.note}</div>
+          <div className='row-value row-value-note'>{assignment.note}</div>
         </div>
       </div>
     </div>
