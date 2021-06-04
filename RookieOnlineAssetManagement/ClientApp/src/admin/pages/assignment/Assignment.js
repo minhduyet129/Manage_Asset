@@ -40,7 +40,7 @@ function Assignment() {
     PageSize: 10,
     keyword: null,
     sortBy: 'lastChange',
-    asc: true,
+    asc: false,
   });
 
   const history = useHistory();
@@ -266,9 +266,9 @@ function Assignment() {
         },
         Cell: ({ row }) => {
           if (filters.asc) {
-            return <div>{pagination.totalRecords - row.index - ((pagination.pageNumber - 1) * pagination.pageSize)}</div>;
+            return <div>{row.index + 1 + (pagination.pageNumber - 1) * pagination.pageSize}</div>;
           }
-          return <div>{row.index + 1 + (pagination.pageNumber - 1) * pagination.pageSize}</div>;
+          return <div>{pagination.totalRecords - row.index - ((pagination.pageNumber - 1) * pagination.pageSize)}</div>;
         },
       },
       {
